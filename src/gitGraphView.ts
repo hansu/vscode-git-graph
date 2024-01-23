@@ -691,6 +691,7 @@ export class GitGraphView extends Disposable {
 				onRepoLoad: config.onRepoLoad,
 				referenceLabels: config.referenceLabels,
 				repoDropdownOrder: config.repoDropdownOrder,
+				selectMultipleAuthors: config.selectMultipleAuthors,
 				selectMultipleBranches: config.selectMultipleBranches,
 				showRemoteBranches: config.showRemoteBranches,
 				showStashes: config.showStashes,
@@ -719,12 +720,13 @@ export class GitGraphView extends Disposable {
 		} else if (numRepos > 0) {
 			const stickyClassAttr = initialState.config.stickyHeader ? ' class="sticky"' : '';
 			const branchDropdownLabel = initialState.config.selectMultipleBranches ? 'Branches' : 'Branch';
+			const authorDropdownLabel = initialState.config.selectMultipleAuthors ? 'Authors' : 'Author';
 			body = `<body>
 			<div id="view" tabindex="-1">
 				<div id="controls"${stickyClassAttr}>
 					<span id="repoControl"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
 					<span id="branchControl"><span class="unselectable">${branchDropdownLabel}: </span><div id="branchDropdown" class="dropdown"></div></span>
-					<span id="authorControl"><span class="unselectable">Authors: </span><div id="authorDropdown" class="dropdown"></div></span>
+					<span id="authorControl"><span class="unselectable">${authorDropdownLabel}: </span><div id="authorDropdown" class="dropdown"></div></span>
 
 					<label id="showRemoteBranchesControl"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Show Remote Branches</label>
 					<div id="currentBtn" title="Current"></div>

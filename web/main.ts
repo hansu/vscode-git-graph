@@ -93,7 +93,7 @@ class GitGraphView {
 			this.clearCommits();
 			this.requestLoadRepoInfoAndCommits(true, true);
 		});
-		this.authorDropdown = new Dropdown('authorDropdown', false, true, 'Authors', (values) => {
+		this.authorDropdown = new Dropdown('authorDropdown', false, this.config.selectMultipleAuthors, 'Authors', (values) => {
 			this.currentAuthors = values;
 			this.maxCommits = this.config.initialLoadCommits;
 			this.saveState();
