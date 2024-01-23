@@ -86,7 +86,7 @@ class GitGraphView {
 			this.loadRepo(values[0]);
 		});
 
-		this.branchDropdown = new Dropdown('branchDropdown', false, true, 'Branches', (values) => {
+		this.branchDropdown = new Dropdown('branchDropdown', false, this.config.selectMultipleBranches, 'Branches', (values) => {
 			this.currentBranches = values;
 			this.maxCommits = this.config.initialLoadCommits;
 			this.saveState();
