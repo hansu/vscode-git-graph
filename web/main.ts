@@ -86,14 +86,14 @@ class GitGraphView {
 			this.loadRepo(values[0]);
 		});
 
-		this.branchDropdown = new Dropdown('branchDropdown', false, true, 'Branches', (values) => {
+		this.branchDropdown = new Dropdown('branchDropdown', false, this.config.selectMultipleBranches, 'Branches', (values) => {
 			this.currentBranches = values;
 			this.maxCommits = this.config.initialLoadCommits;
 			this.saveState();
 			this.clearCommits();
 			this.requestLoadRepoInfoAndCommits(true, true);
 		});
-		this.authorDropdown = new Dropdown('authorDropdown', false, true, 'Authors', (values) => {
+		this.authorDropdown = new Dropdown('authorDropdown', false, this.config.selectMultipleAuthors, 'Authors', (values) => {
 			this.currentAuthors = values;
 			this.maxCommits = this.config.initialLoadCommits;
 			this.saveState();

@@ -261,6 +261,8 @@ export interface GitGraphViewConfig {
 	readonly onRepoLoad: OnRepoLoadConfig;
 	readonly referenceLabels: ReferenceLabelsConfig;
 	readonly repoDropdownOrder: RepoDropdownOrder;
+	readonly selectMultipleAuthors: boolean;
+	readonly selectMultipleBranches: boolean;
 	readonly showRemoteBranches: boolean;
 	readonly showStashes: boolean;
 	readonly showTags: boolean;
