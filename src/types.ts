@@ -218,6 +218,7 @@ export interface GitRepoState {
 	pullRequestConfig: PullRequestConfig | null;
 	showRemoteBranches: boolean;
 	showRemoteBranchesV2: BooleanOverride;
+	simplifyByDecoration: BooleanOverride;
 	showStashes: BooleanOverride;
 	showTags: BooleanOverride;
 	workspaceFolderIndex: number | null;
@@ -262,6 +263,7 @@ export interface GitGraphViewConfig {
 	readonly referenceLabels: ReferenceLabelsConfig;
 	readonly repoDropdownOrder: RepoDropdownOrder;
 	readonly showRemoteBranches: boolean;
+	readonly simplifyByDecoration: boolean;
 	readonly showStashes: boolean;
 	readonly showTags: boolean;
 	readonly stickyHeader: boolean;
@@ -911,6 +913,7 @@ export interface RequestLoadCommits extends RepoRequest {
 	readonly maxCommits: number;
 	readonly showTags: boolean;
 	readonly showRemoteBranches: boolean;
+	readonly simplifyByDecoration: boolean;
 	readonly includeCommitsMentionedByReflogs: boolean;
 	readonly onlyFollowFirstParent: boolean;
 	readonly commitOrdering: CommitOrdering;
@@ -942,6 +945,7 @@ export interface RequestLoadRepoInfo extends RepoRequest {
 	readonly command: 'loadRepoInfo';
 	readonly refreshId: number;
 	readonly showRemoteBranches: boolean;
+	readonly simplifyByDecoration: boolean;
 	readonly showStashes: boolean;
 	readonly hideRemotes: ReadonlyArray<string>;
 }

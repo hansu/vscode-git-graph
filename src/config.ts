@@ -465,6 +465,13 @@ class Config {
 	}
 
 	/**
+	 * Get the value of the `git-graph.repository.simplifyByDecoration` Extension Setting.
+	 */
+	get simplifyByDecoration() {
+		return !!this.config.get('repository.simplifyByDecoration', false);
+	}
+
+	/**
 	 * Get the value of the `git-graph.repository.showRemoteHeads` Extension Setting.
 	 */
 	get showRemoteHeads() {

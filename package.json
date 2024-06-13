@@ -1077,6 +1077,11 @@
 					"default": true,
 					"description": "Show Remote Branches in Git Graph by default. This can be overridden per repository from the Git Graph View's Control Bar."
 				},
+				"git-graph.repository.simplifyByDecoration": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show branch topology by omitting commits that are not referenced by tags. This can be overridden per repository from the Git Graph View's Control Bar."
+				},
 				"git-graph.repository.showRemoteHeads": {
 					"type": "boolean",
 					"default": true,

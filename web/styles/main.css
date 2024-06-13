@@ -805,7 +805,7 @@ body.tagLabelsRightAligned .gitRef.tag{
 	z-index:12;
 }
 
-#repoControl, #branchControl, #showRemoteBranchesControl{
+#repoControl, #branchControl, #showRemoteBranchesControl, #simplifyByDecorationControl{
 	display:inline-block;
 	white-space:nowrap;
 	margin:0 10px;
@@ -813,7 +813,7 @@ body.tagLabelsRightAligned .gitRef.tag{
 #repoDropdown, #branchDropdown #authorDropdown{
 	margin-left:3px;
 }
-#showRemoteBranchesControl > .customCheckbox{
+#showRemoteBranchesControl > .customCheckbox, #simplifyByDecorationControl > .customCheckbox{
 	margin-right:6px;
 }
 

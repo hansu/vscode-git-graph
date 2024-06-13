@@ -55,6 +55,7 @@ class GitGraphView {
 	private tableColHeadersElem: HTMLElement | null;
 	private readonly footerElem: HTMLElement;
 	private readonly showRemoteBranchesElem: HTMLInputElement;
+	private readonly simplifyByDecorationElem: HTMLInputElement;
 	private readonly refreshBtnElem: HTMLElement;
 
 	constructor(viewElem: HTMLElement, prevState: WebViewState | null) {
@@ -105,6 +106,11 @@ class GitGraphView {
 			this.saveRepoStateValue(this.currentRepo, 'showRemoteBranchesV2', this.showRemoteBranchesElem.checked ? GG.BooleanOverride.Enabled : GG.BooleanOverride.Disabled);
 			this.refresh(true);
 		});
+		this.simplifyByDecorationElem = <HTMLInputElement>document.getElementById('simplifyByDecorationCheckbox')!;
+		this.simplifyByDecorationElem.addEventListener('change', () => {
+			this.saveRepoStateValue(this.currentRepo, 'simplifyByDecoration', this.simplifyByDecorationElem.checked ? GG.BooleanOverride.Enabled : GG.BooleanOverride.Disabled);
+			this.refresh(true);
+		});
 
 		this.refreshBtnElem = document.getElementById('refreshBtn')!;
 		this.refreshBtnElem.addEventListener('click', () => {
@@ -140,6 +146,7 @@ class GitGraphView {
 			this.findWidget.restoreState(prevState.findWidget);
 			this.settingsWidget.restoreState(prevState.settingsWidget);
 			this.showRemoteBranchesElem.checked = getShowRemoteBranches(this.gitRepos[prevState.currentRepo].showRemoteBranchesV2);
+			this.simplifyByDecorationElem.checked = getSimplifyByDecoration(this.gitRepos[prevState.currentRepo].simplifyByDecoration);
 		}
 
 		let loadViewTo = initialState.loadViewTo;
@@ -224,6 +231,7 @@ class GitGraphView {
 		this.currentRepo = repo;
 		this.currentRepoLoading = true;
 		this.showRemoteBranchesElem.checked = getShowRemoteBranches(this.gitRepos[this.currentRepo].showRemoteBranchesV2);
+		this.simplifyByDecorationElem.checked = getSimplifyByDecoration(this.gitRepos[this.currentRepo].simplifyByDecoration);
 		this.maxCommits = this.config.initialLoadCommits;
 		this.gitConfig = null;
 		this.gitRemotes = [];
@@ -634,6 +642,7 @@ class GitGraphView {
 			repo: this.currentRepo,
 			refreshId: ++this.currentRepoRefreshState.loadRepoInfoRefreshId,
 			showRemoteBranches: getShowRemoteBranches(repoState.showRemoteBranchesV2),
+			simplifyByDecoration: getSimplifyByDecoration(repoState.simplifyByDecoration),
 			showStashes: getShowStashes(repoState.showStashes),
 			hideRemotes: repoState.hideRemotes
 		});
@@ -650,6 +659,7 @@ class GitGraphView {
 			maxCommits: this.maxCommits,
 			showTags: getShowTags(repoState.showTags),
 			showRemoteBranches: getShowRemoteBranches(repoState.showRemoteBranchesV2),
+			simplifyByDecoration: getSimplifyByDecoration(repoState.simplifyByDecoration),
 			includeCommitsMentionedByReflogs: getIncludeCommitsMentionedByReflogs(repoState.includeCommitsMentionedByReflogs),
 			onlyFollowFirstParent: getOnlyFollowFirstParent(repoState.onlyFollowFirstParent),
 			commitOrdering: getCommitOrdering(repoState.commitOrdering),
@@ -3864,6 +3874,12 @@ function getCommitOrdering(repoValue: GG.RepoCommitOrdering): GG.CommitOrdering 
 function getShowRemoteBranches(repoValue: GG.BooleanOverride) {
 	return repoValue === GG.BooleanOverride.Default
 		? initialState.config.showRemoteBranches
+		: repoValue === GG.BooleanOverride.Enabled;
+}
+
+function getSimplifyByDecoration(repoValue: GG.BooleanOverride) {
+	return repoValue === GG.BooleanOverride.Default
+		? initialState.config.simplifyByDecoration
 		: repoValue === GG.BooleanOverride.Enabled;
 }
 
