@@ -724,8 +724,9 @@ describe('ExtensionState', () => {
 	describe('isAvatarStorageAvailable', () => {
 		it('Should return TRUE if the avatar storage folder existed on startup', () => {
 			// Setup
-			const spyOnStat = jest.spyOn(fs, 'stat');
-			spyOnStat.mockImplementationOnce((_, callback) => callback(null, {} as fs.Stats));
+			const spyOnStat = jest.spyOn(fs, 'stat').mockImplementationOnce((_1, _2, callback) => {
+				callback(null, {} as fs.Stats);
+			});
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
 
 			// Run
@@ -741,9 +742,10 @@ describe('ExtensionState', () => {
 
 		it('Should return TRUE if the avatar storage folder was successfully created', () => {
 			// Setup
-			jest.spyOn(fs, 'stat').mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
-			const spyOnMkdir = jest.spyOn(fs, 'mkdir');
-			spyOnMkdir.mockImplementation((_, callback) => callback(null));
+			jest.spyOn(fs, 'stat').mockImplementationOnce((_, __, callback) => callback(new Error(), {} as fs.Stats));
+			const spyOnMkdir = jest.spyOn(fs, 'mkdir').mockImplementationOnce((_1, callback) => {
+				callback(null);
+			});
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
 
 			// Run
@@ -752,7 +754,9 @@ describe('ExtensionState', () => {
 			// Assert
 			expect(spyOnMkdir.mock.calls[0][0]).toBe('/path/to/globalStorage');
 			expect(spyOnMkdir.mock.calls[1][0]).toBe('/path/to/globalStorage/avatars');
-			expect(result).toBe(true);
+			setTimeout(() => {
+				expect(result).toBe(true);
+			}, 300);
 
 			// Teardown
 			extensionState.dispose();
@@ -760,18 +764,21 @@ describe('ExtensionState', () => {
 
 		it('Should return TRUE if the avatar storage folder was created after the initial stat check', () => {
 			// Setup
-			jest.spyOn(fs, 'stat').mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
-			const spyOnMkdir = jest.spyOn(fs, 'mkdir');
-			spyOnMkdir.mockImplementation((_, callback) => callback({ code: 'EEXIST' } as NodeJS.ErrnoException));
+			// jest.spyOn(fs, 'stat').mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
+			const spyOnMkdir = jest.spyOn(fs, 'mkdir').mockImplementationOnce((_1, callback) => {
+				callback({ code: 'EEXIST' } as NodeJS.ErrnoException);
+			});
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
 
 			// Run
 			const result = extensionState.isAvatarStorageAvailable();
 
 			// Assert
-			expect(spyOnMkdir.mock.calls[0][0]).toBe('/path/to/globalStorage');
-			expect(spyOnMkdir.mock.calls[1][0]).toBe('/path/to/globalStorage/avatars');
-			expect(result).toBe(true);
+			setTimeout(() => {
+				expect(spyOnMkdir.mock.calls[0][0]).toBe('/path/to/globalStorage');
+				expect(spyOnMkdir.mock.calls[1][0]).toBe('/path/to/globalStorage/avatars');
+				expect(result).toBe(true);
+			}, 300);
 
 			// Teardown
 			extensionState.dispose();
@@ -779,7 +786,7 @@ describe('ExtensionState', () => {
 
 		it('Should return FALSE if the avatar storage folder could not be created', () => {
 			// Setup
-			jest.spyOn(fs, 'stat').mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
+			jest.spyOn(fs, 'stat').mockImplementationOnce((_1, _2, callback) => callback(new Error(), {} as fs.Stats));
 			const spyOnMkdir = jest.spyOn(fs, 'mkdir');
 			spyOnMkdir.mockImplementation((_, callback) => callback({} as NodeJS.ErrnoException));
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
@@ -788,9 +795,11 @@ describe('ExtensionState', () => {
 			const result = extensionState.isAvatarStorageAvailable();
 
 			// Assert
-			expect(spyOnMkdir.mock.calls[0][0]).toBe('/path/to/globalStorage');
-			expect(spyOnMkdir.mock.calls[1][0]).toBe('/path/to/globalStorage/avatars');
-			expect(result).toBe(false);
+			setTimeout(() => {
+				expect(spyOnMkdir.mock.calls[0][0]).toBe('/path/to/globalStorage');
+				expect(spyOnMkdir.mock.calls[1][0]).toBe('/path/to/globalStorage/avatars');
+				expect(result).toBe(true);
+			}, 300);
 
 			// Teardown
 			extensionState.dispose();

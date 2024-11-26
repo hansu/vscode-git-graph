@@ -78,7 +78,7 @@ export class ExtensionState extends Disposable {
 		this.workspaceState = context.workspaceState;
 
 		this.globalStoragePath = getPathFromStr(context.globalStoragePath);
-		fs.stat(this.globalStoragePath + AVATAR_STORAGE_FOLDER, (err) => {
+		fs.stat(this.globalStoragePath + AVATAR_STORAGE_FOLDER, undefined, (err) => {
 			if (!err) {
 				this.avatarStorageAvailable = true;
 			} else {

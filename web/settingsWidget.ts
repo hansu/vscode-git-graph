@@ -602,7 +602,7 @@ class SettingsWidget {
 				} else if (new RegExp(issueRegex, 'gu')) {
 					regExpParseError = null;
 				}
-			} catch (e) {
+			} catch (e: any) {
 				regExpParseError = e.message;
 			}
 			if (regExpParseError !== null) {

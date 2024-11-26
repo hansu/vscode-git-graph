@@ -114,7 +114,7 @@ export function saveLifeCycleStateInDirectory(directory: string, state: LifeCycl
 					if (err) {
 						reject();
 					} else {
-						resolve();
+						resolve(1);
 					}
 				});
 			} else {

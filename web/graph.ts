@@ -358,7 +358,7 @@ class Graph {
 
 	private tooltipId: number = -1;
 	private tooltipElem: HTMLElement | null = null;
-	private tooltipTimeout: NodeJS.Timer | null = null;
+	private tooltipTimeout: NodeJS.Timeout | null = null;
 	private tooltipVertex: HTMLElement | null = null;
 
 	constructor(id: string, viewElem: HTMLElement, config: GG.GraphConfig, muteConfig: GG.MuteCommitsConfig) {

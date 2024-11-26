@@ -21,7 +21,7 @@ export class AvatarManager extends Disposable {
 	private avatars: AvatarCache;
 	private queue: AvatarRequestQueue;
 	private remoteSourceCache: { [repo: string]: RemoteSource } = {};
-	private interval: NodeJS.Timer | null = null;
+	private interval: NodeJS.Timeout | null = null;
 
 	private githubTimeout: number = 0;
 	private gitLabTimeout: number = 0;
@@ -243,7 +243,7 @@ export class AvatarManager extends Disposable {
 				if (res.statusCode === 200) { // Success
 					let commit: any = JSON.parse(respBody);
 					if (commit.author && commit.author.avatar_url) { // Avatar url found
-						let img = await this.downloadAvatarImage(avatarRequest.email, commit.author.avatar_url + '&size=162');
+						let img = await this.downloadAvatarImage(avatarRequest.email, commit.author.avatar_url + '/&size=162');
 						if (img !== null) {
 							this.saveAvatar(avatarRequest.email, img, false);
 						} else {

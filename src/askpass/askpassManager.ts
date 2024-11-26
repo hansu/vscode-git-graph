@@ -35,7 +35,7 @@ export class AskpassManager extends Disposable {
 	constructor() {
 		super();
 		this.ipcHandlePath = getIPCHandlePath(getNonce());
-		this.server = http.createServer((req, res) => this.onRequest(req, res));
+		this.server = http.createServer(this.onRequest.bind(this));
 		try {
 			this.server.listen(this.ipcHandlePath);
 			this.server.on('error', () => { });

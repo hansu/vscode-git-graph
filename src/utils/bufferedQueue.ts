@@ -5,7 +5,7 @@ import { Disposable, toDisposable } from './disposable';
  */
 export class BufferedQueue<T> extends Disposable {
 	private readonly queue: T[] = [];
-	private timeout: NodeJS.Timer | null = null;
+	private timeout: NodeJS.Timeout | null = null;
 	private processing: boolean = false;
 
 	private readonly bufferDuration: number;

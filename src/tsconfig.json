@@ -1,24 +1,23 @@
 {
-	"compilerOptions": {
-		"declaration": true,
-		"lib": [
-			"es6"
-		],
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"outDir": "../out",
-		"noFallthroughCasesInSwitch": true,
-		"noImplicitAny": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"removeComments": true,
-		"sourceMap": true,
-		"strict": true,
-		"target": "es6",
-		"types": [
-			"node",
-			"vscode",
-			"./utils/@types/node"
-		]
-	}
+  "compilerOptions": {
+    "declaration": true,
+    "lib": ["es6"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "../out",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "target": "es6",
+    "types": ["node", "vscode"],
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/@types/*"]
+    }
+  }
 }
