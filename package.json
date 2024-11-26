@@ -27,7 +27,7 @@
 		"url": "https://github.com/hansu/vscode-git-graph/issues"
 	},
 	"qna": "https://github.com/hansu/vscode-git-graph/wiki/Support-Resources",
-	"license": "SEE LICENSE IN 'LICENSE'",
+	"license": "SEE LICENSE IN LICENSE",
 	"icon": "resources/icon.png",
 	"engines": {
 		"vscode": "^1.38.0"
