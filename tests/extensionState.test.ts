@@ -786,7 +786,7 @@ describe('ExtensionState', () => {
 
 		it('Should return FALSE if the avatar storage folder could not be created', () => {
 			// Setup
-			// jest.spyOn(fs, 'stat').mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
+			jest.spyOn(fs, 'stat').mockImplementationOnce((_1, _2, callback) => callback(new Error(), {} as fs.Stats));
 			const spyOnMkdir = jest.spyOn(fs, 'mkdir');
 			spyOnMkdir.mockImplementation((_, callback) => callback({} as NodeJS.ErrnoException));
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
