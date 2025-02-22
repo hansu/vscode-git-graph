@@ -1,5 +1,8 @@
 # Git Graph extension for Visual Studio Code
+
 test
+
+test 2
 
 Fork of mhutchie's Git Graph with further improvements.  
 Main improvements:
