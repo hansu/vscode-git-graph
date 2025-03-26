@@ -1090,6 +1090,16 @@
 					"default": false,
 					"markdownDescription": "Only follow the first parent of commits when discovering the commits to load in the Git Graph View. See [--first-parent](https://git-scm.com/docs/git-log#Documentation/git-log.txt---first-parent) to find out more about this setting. This can be overridden per repository in the Git Graph View's Repository Settings Widget."
 				},
+				"git-graph.repository.selectMultipleAuthors": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enables the selection of multiple authors from the Authors dropdown."
+				},
+				"git-graph.repository.selectMultipleBranches": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enables the selection of multiple branches from the Branches dropdown."
+				},
 				"git-graph.repository.showCommitsOnlyReferencedByTags": {
 					"type": "boolean",
 					"default": true,
