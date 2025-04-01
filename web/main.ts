@@ -2709,7 +2709,7 @@ class GitGraphView {
 				}
 			}, () => this.saveState());
 
-			observeElemScroll('cdvFiles', expandedCommit.scrollTop.fileView, (scrollTop) => {
+			observeElemScroll('cdvFilesView', expandedCommit.scrollTop.fileView, (scrollTop) => {
 				if (this.expandedCommit === null) return;
 				this.expandedCommit.scrollTop.fileView = scrollTop;
 				if (this.expandedCommit.contextMenuOpen.fileView > -1) {
@@ -2908,7 +2908,7 @@ class GitGraphView {
 	 * @param fileWasViewed Was the file viewed - if so, set it to be the last viewed file.
 	 */
 	private cdvUpdateFileState(file: GG.GitFileChange, fileElem: HTMLElement, isReviewed: boolean | null, fileWasViewed: boolean) {
-		const expandedCommit = this.expandedCommit, filesElem = document.getElementById('cdvFiles'), filePath = file.newFilePath;
+		const expandedCommit = this.expandedCommit, filesElem = document.getElementById('cdvFilesView'), filePath = file.newFilePath;
 		if (expandedCommit === null || expandedCommit.fileTree === null || filesElem === null) return;
 
 		if (fileWasViewed) {
@@ -2979,7 +2979,7 @@ class GitGraphView {
 	}
 
 	private changeFileViewType(type: GG.FileViewType) {
-		const expandedCommit = this.expandedCommit, filesElem = document.getElementById('cdvFiles');
+		const expandedCommit = this.expandedCommit, filesElem = document.getElementById('cdvFilesView');
 		if (expandedCommit === null || expandedCommit.fileTree === null || expandedCommit.fileChanges === null || filesElem === null) return;
 		GitGraphView.closeCdvContextMenuIfOpen(expandedCommit);
 		this.setFileViewType(type);
@@ -3301,7 +3301,7 @@ class GitGraphView {
 	}
 
 	private saveAndRenderCodeReview(codeReview: GG.CodeReview | null) {
-		let filesElem = document.getElementById('cdvFiles');
+		let filesElem = document.getElementById('cdvFilesView');
 		if (this.expandedCommit === null || this.expandedCommit.fileTree === null || filesElem === null) return;
 
 		this.expandedCommit.codeReview = codeReview;
