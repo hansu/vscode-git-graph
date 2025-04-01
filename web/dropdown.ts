@@ -10,6 +10,7 @@ interface DropdownOption {
 class Dropdown {
 	private readonly showInfo: boolean;
 	private readonly multipleAllowed: boolean;
+	private readonly selectMultipleWithStrg: boolean;
 	private readonly changeCallback: (values: string[]) => void;
 
 	private options: ReadonlyArray<DropdownOption> = [];
@@ -34,10 +35,12 @@ class Dropdown {
 	 * @param dropdownType The type of content the dropdown is being used for.
 	 * @param changeCallback A callback to be invoked when the selected item(s) of the dropdown changes.
 	 * @returns The Dropdown instance.
+	 * @param selectMultipleWithStrg Select multiple items using strg
 	 */
-	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void) {
+	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void, selectMultipleWithStrg: boolean = true) {
 		this.showInfo = showInfo;
 		this.multipleAllowed = multipleAllowed;
+		this.selectMultipleWithStrg = selectMultipleWithStrg;
 		this.changeCallback = changeCallback;
 		this.elem = document.getElementById(id)!;
 
@@ -80,7 +83,7 @@ class Dropdown {
 				} else {
 					const option = <HTMLElement | null>(<HTMLElement>e.target).closest('.dropdownOption');
 					if (option !== null && option.parentNode === this.optionsElem && typeof option.dataset.id !== 'undefined') {
-						this.onOptionClick(parseInt(option.dataset.id!));
+						this.onOptionClick(parseInt(option.dataset.id!), e);
 					}
 				}
 			}
@@ -280,7 +283,7 @@ class Dropdown {
 	 * Select a dropdown option.
 	 * @param option The index of the option to select.
 	 */
-	private onOptionClick(option: number) {
+	private onOptionClick(option: number, event?: MouseEvent) {
 		// Note: Show All is always the first option (0 index) when multiple selected items are allowed
 		let change = false;
 		let doubleClick = this.doubleClickTimeout !== null && this.lastClicked === option;
@@ -296,7 +299,7 @@ class Dropdown {
 			}
 		} else {
 			// Single Click
-			if (this.multipleAllowed) {
+			if (this.multipleAllowed || (this.selectMultipleWithStrg && event && (event.ctrlKey || event.metaKey))) {
 				// Multiple dropdown options can be selected
 				if (option === 0) {
 					// Show All was selected
