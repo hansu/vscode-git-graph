@@ -146,18 +146,24 @@ class Dropdown {
 	 */
 	public selectOption(value: string) {
 		const optionIndex = this.options.findIndex((option) => value === option.value);
-		if (this.multipleAllowed && optionIndex > -1 && !this.optionsSelected[0] && !this.optionsSelected[optionIndex]) {
+		if (optionIndex < 0 && (this.optionsSelected[0] || this.optionsSelected[optionIndex])) return;
+		if (this.multipleAllowed) {
 			// Select the option with the specified value
 			this.optionsSelected[optionIndex] = true;
-
-			// A change has occurred, re-render the dropdown options
-			const menuScroll = this.menuElem.scrollTop;
-			this.render();
-			if (this.dropdownVisible) {
-				this.menuElem.scroll(0, menuScroll);
+		} else {
+			for (let i = 1; i < this.optionsSelected.length; i++) {
+				this.optionsSelected[i] = false;
 			}
-			this.changeCallback(this.getSelectedOptions(false));
+			this.optionsSelected[optionIndex] = true;
 		}
+		// A change has occurred, re-render the dropdown options
+		const menuScroll = this.menuElem.scrollTop;
+		this.render();
+		if (this.dropdownVisible) {
+			this.menuElem.scroll(0, menuScroll);
+		}
+		this.changeCallback(this.getSelectedOptions(false));
+
 	}
 
 	/**
