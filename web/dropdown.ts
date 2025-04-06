@@ -172,7 +172,8 @@ class Dropdown {
 	 */
 	public unselectOption(value: string) {
 		const optionIndex = this.options.findIndex((option) => value === option.value);
-		if (this.multipleAllowed && optionIndex > -1 && (this.optionsSelected[0] || this.optionsSelected[optionIndex])) {
+		if (optionIndex < 0 && (this.optionsSelected[0] || this.optionsSelected[optionIndex])) return;
+		if (this.multipleAllowed || this.selectMultipleWithStrg) {
 			if (this.optionsSelected[0]) {
 				// Show All is currently selected, so unselect it, and select all branch options
 				this.optionsSelected[0] = false;
