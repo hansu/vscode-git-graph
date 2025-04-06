@@ -37,7 +37,7 @@ class Dropdown {
 	 * @returns The Dropdown instance.
 	 * @param selectMultipleWithStrg Select multiple items using strg
 	 */
-	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void, selectMultipleWithStrg: boolean = true) {
+	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void, selectMultipleWithStrg: boolean = false) {
 		this.showInfo = showInfo;
 		this.multipleAllowed = multipleAllowed;
 		this.selectMultipleWithStrg = selectMultipleWithStrg;
@@ -64,7 +64,7 @@ class Dropdown {
 		this.currentValueElem = this.elem.appendChild(document.createElement('div'));
 		this.currentValueElem.className = 'dropdownCurrentValue';
 
-		alterClass(this.elem, 'multi', (multipleAllowed || selectMultipleWithStrg));
+		alterClass(this.elem, 'multi', (multipleAllowed));
 		this.elem.appendChild(this.menuElem);
 
 		document.addEventListener('click', (e) => {
@@ -127,7 +127,7 @@ class Dropdown {
 	 */
 	public isSelected(value: string) {
 		if (this.options.length > 0) {
-			if ((this.multipleAllowed || this.selectMultipleWithStrg) && this.optionsSelected[0]) {
+			if ((this.multipleAllowed) && this.optionsSelected[0]) {
 				// Multiple options can be selected, and "Show All" is selected.
 				return true;
 			}
@@ -147,7 +147,7 @@ class Dropdown {
 	public selectOption(value: string) {
 		const optionIndex = this.options.findIndex((option) => value === option.value);
 		if (optionIndex < 0 && (this.optionsSelected[0] || this.optionsSelected[optionIndex])) return;
-		if (this.multipleAllowed) {
+		if (this.multipleAllowed && !this.selectMultipleWithStrg) {
 			// Select the option with the specified value
 			this.optionsSelected[optionIndex] = true;
 		} else {
@@ -173,7 +173,7 @@ class Dropdown {
 	public unselectOption(value: string) {
 		const optionIndex = this.options.findIndex((option) => value === option.value);
 		if (optionIndex < 0 && (this.optionsSelected[0] || this.optionsSelected[optionIndex])) return;
-		if (this.multipleAllowed || this.selectMultipleWithStrg) {
+		if (this.multipleAllowed) {
 			if (this.optionsSelected[0]) {
 				// Show All is currently selected, so unselect it, and select all branch options
 				this.optionsSelected[0] = false;
@@ -237,7 +237,7 @@ class Dropdown {
 		for (let i = 0; i < this.options.length; i++) {
 			const escapedName = escapeHtml(this.options[i].name);
 			html += '<div class="dropdownOption' + (this.optionsSelected[i] ? ' ' + CLASS_SELECTED : '') + '" data-id="' + i + '" title="' + escapedName + '">' +
-				((this.multipleAllowed || this.selectMultipleWithStrg) && this.optionsSelected[i] ? '<div class="dropdownOptionMultiSelected">' + SVG_ICONS.check + '</div>' : '') +
+				(this.multipleAllowed && this.optionsSelected[i] ? '<div class="dropdownOptionMultiSelected">' + SVG_ICONS.check + '</div>' : '') +
 				escapedName + (typeof this.options[i].hint === 'string' && this.options[i].hint !== '' ? '<span class="dropdownOptionHint">' + escapeHtml(this.options[i].hint!) + '</span>' : '') +
 				(this.showInfo ? '<div class="dropdownOptionInfo" title="' + escapeHtml(this.options[i].value) + '">' + SVG_ICONS.info + '</div>' : '') +
 				'</div>';
@@ -276,7 +276,7 @@ class Dropdown {
 	 */
 	private getSelectedOptions(names: boolean) {
 		let selected = [];
-		if ((this.multipleAllowed || this.selectMultipleWithStrg) && this.optionsSelected[0]) {
+		if (this.multipleAllowed && this.optionsSelected[0]) {
 			// Note: Show All is always the first option (0 index) when multiple selected items are allowed
 			return [names ? this.options[0].name : this.options[0].value];
 		}
@@ -295,10 +295,11 @@ class Dropdown {
 		let change = false;
 		let doubleClick = this.doubleClickTimeout !== null && this.lastClicked === option;
 		if (this.doubleClickTimeout !== null) this.clearDoubleClickTimeout();
-
+		// eslint-disable-next-line no-console
+		console.log('test');
 		if (doubleClick) {
 			// Double click
-			if ((this.multipleAllowed || this.selectMultipleWithStrg) && option === 0) {
+			if ((this.multipleAllowed) && option === 0) {
 				for (let i = 1; i < this.optionsSelected.length; i++) {
 					this.optionsSelected[i] = !this.optionsSelected[i];
 				}
@@ -306,7 +307,7 @@ class Dropdown {
 			}
 		} else {
 			// Single Click
-			if (this.multipleAllowed || (this.selectMultipleWithStrg && event && (event.ctrlKey || event.metaKey))) {
+			if (this.multipleAllowed && (!this.selectMultipleWithStrg || (event && (event.ctrlKey || event.metaKey)))) {
 				// Multiple dropdown options can be selected
 				if (option === 0) {
 					// Show All was selected
