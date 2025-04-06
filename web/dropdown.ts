@@ -127,7 +127,7 @@ class Dropdown {
 	 */
 	public isSelected(value: string) {
 		if (this.options.length > 0) {
-			if (this.multipleAllowed && this.optionsSelected[0]) {
+			if ((this.multipleAllowed || this.selectMultipleWithStrg) && this.optionsSelected[0]) {
 				// Multiple options can be selected, and "Show All" is selected.
 				return true;
 			}
