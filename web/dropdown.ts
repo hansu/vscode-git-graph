@@ -276,7 +276,7 @@ class Dropdown {
 	 */
 	private getSelectedOptions(names: boolean) {
 		let selected = [];
-		if (this.multipleAllowed && this.optionsSelected[0]) {
+		if ((this.multipleAllowed || this.selectMultipleWithStrg) && this.optionsSelected[0]) {
 			// Note: Show All is always the first option (0 index) when multiple selected items are allowed
 			return [names ? this.options[0].name : this.options[0].value];
 		}
@@ -298,7 +298,7 @@ class Dropdown {
 
 		if (doubleClick) {
 			// Double click
-			if (this.multipleAllowed && option === 0) {
+			if ((this.multipleAllowed || this.selectMultipleWithStrg) && option === 0) {
 				for (let i = 1; i < this.optionsSelected.length; i++) {
 					this.optionsSelected[i] = !this.optionsSelected[i];
 				}
@@ -334,15 +334,27 @@ class Dropdown {
 			} else {
 				// Only a single dropdown option can be selected
 				this.close();
-				if (this.lastSelected !== option) {
+				if (option === 0) {
+					// Show All was selected
+					if (!this.optionsSelected[0]) {
+						this.optionsSelected[0] = true;
+						for (let i = 1; i < this.optionsSelected.length; i++) {
+							this.optionsSelected[i] = false;
+						}
+						change = true;
+					}
+				} else if (this.lastSelected !== option) {
+					for (let i = 0; i < this.optionsSelected.length; i++) {
+						this.optionsSelected[i] = false;
+					}
 					this.optionsSelected[this.lastSelected] = false;
 					this.optionsSelected[option] = true;
-					this.lastSelected = option;
 					change = true;
 				}
 			}
 
 			if (change) {
+				this.lastSelected = option;
 				// If a change has occurred, trigger the callback
 				this.changeCallback(this.getSelectedOptions(false));
 			}
