@@ -465,6 +465,20 @@ class Config {
 	}
 
 	/**
+	 * Get the value of the `git-graph.repository.selectMultipleAuthors` Extension Setting.
+	 */
+	get selectMultipleAuthors() {
+		return !!this.config.get('repository.selectMultipleAuthors', true);
+	}
+
+	/**
+	 * Get the value of the `git-graph.repository.selectMultipleBranches` Extension Setting.
+	 */
+	get selectMultipleBranches() {
+		return !!this.config.get('repository.selectMultipleBranches', true);
+	}
+
+	/**
 	 * Get the value of the `git-graph.repository.showCommitsOnlyReferencedByTags` Extension Setting.
 	 */
 	get showCommitsOnlyReferencedByTags() {
