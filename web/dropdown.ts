@@ -309,13 +309,12 @@ class Dropdown {
 				// Multiple dropdown options can be selected
 				if (option === 0) {
 					// Show All was selected
-					if (!this.optionsSelected[0]) {
-						this.optionsSelected[0] = true;
-						for (let i = 1; i < this.optionsSelected.length; i++) {
-							this.optionsSelected[i] = false;
-						}
-						change = true;
+					this.optionsSelected[0] = true;
+					for (let i = 1; i < this.optionsSelected.length; i++) {
+						this.optionsSelected[i] = false;
 					}
+					change = true;
+
 				} else {
 					if (this.optionsSelected[0]) {
 						// Deselect "Show All" if it is enabled
@@ -335,13 +334,11 @@ class Dropdown {
 				this.close();
 				if (option === 0) {
 					// Show All was selected
-					if (!this.optionsSelected[0]) {
-						this.optionsSelected[0] = true;
-						for (let i = 1; i < this.optionsSelected.length; i++) {
-							this.optionsSelected[i] = false;
-						}
-						change = true;
+					this.optionsSelected[0] = true;
+					for (let i = 1; i < this.optionsSelected.length; i++) {
+						this.optionsSelected[i] = false;
 					}
+					change = true;
 				} else if (this.lastSelected !== option) {
 					for (let i = 0; i < this.optionsSelected.length; i++) {
 						this.optionsSelected[i] = false;
