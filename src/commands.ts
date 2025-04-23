@@ -56,6 +56,7 @@ export class CommandManager extends Disposable {
 		this.registerCommand('git-graph.resumeWorkspaceCodeReview', () => this.resumeWorkspaceCodeReview());
 		this.registerCommand('git-graph.version', () => this.version());
 		this.registerCommand('git-graph.openFile', (arg) => this.openFile(arg));
+		this.registerCommand('git-graph.goToCommit', (arg) => this.goToCommit(arg));
 
 		this.registerDisposable(
 			onDidChangeGitExecutable((gitExecutable) => {
@@ -342,6 +343,60 @@ export class CommandManager extends Disposable {
 			});
 		} else {
 			return showErrorMessage('Unable to Open File: The command was not called with the required arguments.');
+		}
+	}
+
+	/**
+	 * Opens a position commit in Git Graph, based on a Git Graph URI (from the Diff View).
+	 * The method run when the `git-graph.goToCommit` command is invoked.
+	 * @param arg The Git Graph URI.
+	 */
+	private goToCommit(arg?: vscode.Uri) {
+		const uri = arg || vscode.window.activeTextEditor?.document.uri;
+		if (typeof uri === 'object' && uri && uri.query) {
+			let commitHash = '';
+
+			if (uri.scheme === 'git-graph') {
+				commitHash = decodeDiffDocUri(uri).commit;
+			}
+			if (uri.scheme === 'gitlens') {
+				commitHash = JSON.parse(uri.query).ref;
+			}
+
+			if (commitHash !== '') {
+				if (GitGraphView.currentPanel) {
+					const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
+					if (!gitExtension) {
+						showErrorMessage('Unable to load Git extension.');
+						return;
+					}
+
+					// Get the API from the Git extension
+					const api = gitExtension.getAPI(1);
+
+					// Access the first repository (assuming there is one)
+					const repository = api.repositories[0];
+					if (!repository) {
+						showErrorMessage('No Git repository found.');
+						return;
+					}
+
+					this.view(repository);
+					setTimeout(() => {
+						GitGraphView.scrollToCommit(commitHash, true, false, true, true);
+					}, 2000);
+				} else {
+					this.view(undefined);
+					setTimeout(() => {
+						GitGraphView.scrollToCommit(commitHash, true, false, true, true);
+					}, 4000);
+				}
+				return;
+			} else {
+				return showErrorMessage('Unable Go To Commit: The commit hash not found.');
+			}
+		} else {
+			return showErrorMessage('Unable Go To Commit: The command was not called with the required arguments.');
 		}
 	}
 

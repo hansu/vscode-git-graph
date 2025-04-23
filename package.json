@@ -92,6 +92,13 @@
 			},
 			{
 				"category": "Git Graph",
+				"command": "git-graph.goToCommit",
+				"title": "Go To Commit",
+				"icon": "$(git-commit)",
+				"enablement": "isInDiffEditor"
+			},
+			{
+				"category": "Git Graph",
 				"command": "git-graph.openFile",
 				"title": "Open File",
 				"icon": "$(go-to-file)",
@@ -1519,11 +1526,20 @@
 		"menus": {
 			"commandPalette": [
 				{
+					"command": "git-graph.goToCommit",
+					"when": "isInDiffEditor"
+				},
+				{
 					"command": "git-graph.openFile",
 					"when": "isInDiffEditor && resourceScheme == git-graph && git-graph:codiconsSupported"
 				}
 			],
 			"editor/title": [
+				{
+					"command": "git-graph.goToCommit",
+					"group": "navigation@-150",
+					"when": "isInDiffEditor"
+				},
 				{
 					"command": "git-graph.openFile",
 					"group": "navigation",
