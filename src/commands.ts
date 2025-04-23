@@ -364,15 +364,13 @@ export class CommandManager extends Disposable {
 			}
 
 			if (commitHash !== '') {
-				if (GitGraphView.currentPanel) {
+				if (GitGraphView.currentPanel) { // graph exist
 					GitGraphView.currentPanel.isPanelVisible = true;
 					this.view(undefined);
 					GitGraphView.scrollToCommit(commitHash, true, false, true, true);
-				} else {
+				} else { // graph is creating
 					this.view(undefined);
-					setTimeout(() => {
-						GitGraphView.scrollToCommit(commitHash, true, false, true, true);
-					}, 4000);
+					GitGraphView.scrollToCommit(commitHash, true, false, true, true);
 				}
 				return;
 			} else {

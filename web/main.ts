@@ -28,6 +28,14 @@ class GitGraphView {
 	};
 	private loadViewTo: GG.LoadGitGraphViewTo = null;
 
+	public scrollToCommitArgs: {
+		hash: string,
+		alwaysCenterCommit: boolean,
+		flash: boolean,
+		openDetails: boolean,
+		persistently: boolean
+	};
+
 	private readonly graph: Graph;
 	private readonly config: Config;
 
@@ -71,6 +79,14 @@ class GitGraphView {
 			configChanges: false,
 			requestingRepoInfo: false,
 			requestingConfig: false
+		};
+
+		this.scrollToCommitArgs = {
+			hash: '',
+			alwaysCenterCommit: false,
+			flash: false,
+			openDetails: false,
+			persistently: false
 		};
 
 		this.controlsElem = document.getElementById('controls')!;
@@ -439,6 +455,10 @@ class GitGraphView {
 		}
 
 		this.finaliseRepoLoad(true);
+
+		if (this.scrollToCommitArgs.persistently) {
+			this.scrollToCommit(this.scrollToCommitArgs.hash, this.scrollToCommitArgs.alwaysCenterCommit, this.scrollToCommitArgs.flash, this.scrollToCommitArgs.openDetails, this.scrollToCommitArgs.persistently);
+		}
 	}
 
 	private finaliseRepoLoad(didLoadRepoData: boolean) {
@@ -1984,6 +2004,8 @@ class GitGraphView {
 	 * @param persistently Persistently find the commit even if it is not exists.
 	 */
 	public scrollToCommit(hash: string, alwaysCenterCommit: boolean, flash: boolean = false, openDetails: boolean = false, persistently: boolean = false) {
+		this.scrollToCommitArgs.persistently = false;
+
 		const elem = findCommitElemWithId(getCommitElems(), this.getCommitId(hash));
 		if (elem === null) {
 			if (persistently) {
@@ -1995,10 +2017,13 @@ class GitGraphView {
 				const lastCommit = commits[commits.length - 1];
 				lastCommit.scrollIntoView();
 
-				// Recursive call
-				setTimeout(() => {
-					this.scrollToCommit(hash, alwaysCenterCommit, flash, openDetails, persistently);
-				}, 500);
+				this.scrollToCommitArgs = {
+					hash: hash,
+					alwaysCenterCommit: alwaysCenterCommit,
+					flash: flash,
+					openDetails: openDetails,
+					persistently: persistently
+				};
 			}
 			// Do nothing
 			return;
@@ -3488,7 +3513,14 @@ window.addEventListener('load', () => {
 				gitGraph.loadRepos(msg.repos, msg.lastActiveRepo, msg.loadViewTo);
 				break;
 			case 'scrollToCommit':
-				gitGraph.scrollToCommit(msg.hash, msg.alwaysCenterCommit, msg.flash, msg.openDetails, msg.persistently);
+				gitGraph.scrollToCommit(msg.hash, msg.alwaysCenterCommit, msg.flash, msg.openDetails, msg.persistently); // if graph exist
+				gitGraph.scrollToCommitArgs = { // if graph is creating
+					hash: msg.hash,
+					alwaysCenterCommit: msg.alwaysCenterCommit,
+					flash: msg.flash,
+					openDetails: msg.openDetails,
+					persistently: msg.persistently
+				};
 				break;
 			case 'merge':
 				refreshOrDisplayError(msg.error, 'Unable to Merge ' + msg.actionOn);
