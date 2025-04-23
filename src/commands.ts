@@ -353,14 +353,17 @@ export class CommandManager extends Disposable {
 	 */
 	private goToCommit(arg?: vscode.Uri) {
 		const uri = arg || vscode.window.activeTextEditor?.document.uri;
-		if (typeof uri === 'object' && uri && uri.query) {
+		if (typeof uri === 'object' && uri) {
 			let commitHash = '';
 
 			if (uri.scheme === 'git-graph') {
 				commitHash = decodeDiffDocUri(uri).commit;
 			}
-			if (uri.scheme === 'gitlens') {
+			if (uri.scheme === 'git' || uri.scheme === 'gitlens') {
 				commitHash = JSON.parse(uri.query).ref;
+			}
+			if (uri.scheme === 'scm-history-item') {
+				commitHash = uri.path.split('..')[1];
 			}
 
 			if (commitHash !== '') {

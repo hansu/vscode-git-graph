@@ -95,7 +95,7 @@
 				"command": "git-graph.goToCommit",
 				"title": "Go To Commit",
 				"icon": "$(git-commit)",
-				"enablement": "isInDiffEditor"
+				"enablement": "isInDiffEditor || resourceScheme == scm-history-item"
 			},
 			{
 				"category": "Git Graph",
@@ -1527,7 +1527,7 @@
 			"commandPalette": [
 				{
 					"command": "git-graph.goToCommit",
-					"when": "isInDiffEditor"
+					"when": "isInDiffEditor || resourceScheme == scm-history-item"
 				},
 				{
 					"command": "git-graph.openFile",
@@ -1538,7 +1538,7 @@
 				{
 					"command": "git-graph.goToCommit",
 					"group": "navigation@-150",
-					"when": "isInDiffEditor"
+					"when": "isInDiffEditor || resourceScheme == scm-history-item"
 				},
 				{
 					"command": "git-graph.openFile",
