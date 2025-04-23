@@ -381,10 +381,9 @@ export class CommandManager extends Disposable {
 						return;
 					}
 
+					GitGraphView.currentPanel.isPanelVisible = true;
 					this.view(repository);
-					setTimeout(() => {
-						GitGraphView.scrollToCommit(commitHash, true, false, true, true);
-					}, 2000);
+					GitGraphView.scrollToCommit(commitHash, true, false, true, true);
 				} else {
 					this.view(undefined);
 					setTimeout(() => {

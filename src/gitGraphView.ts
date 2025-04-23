@@ -26,7 +26,7 @@ export class GitGraphView extends Disposable {
 	private readonly repoManager: RepoManager;
 	private readonly logger: Logger;
 	private isGraphViewLoaded: boolean = false;
-	private isPanelVisible: boolean = true;
+	public isPanelVisible: boolean = true;
 	private currentRepo: string | null = null;
 	private loadViewTo: LoadGitGraphViewTo = null; // Is used by the next call to getHtmlForWebview, and is then reset to null
 
