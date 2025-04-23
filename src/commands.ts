@@ -365,24 +365,8 @@ export class CommandManager extends Disposable {
 
 			if (commitHash !== '') {
 				if (GitGraphView.currentPanel) {
-					const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
-					if (!gitExtension) {
-						showErrorMessage('Unable to load Git extension.');
-						return;
-					}
-
-					// Get the API from the Git extension
-					const api = gitExtension.getAPI(1);
-
-					// Access the first repository (assuming there is one)
-					const repository = api.repositories[0];
-					if (!repository) {
-						showErrorMessage('No Git repository found.');
-						return;
-					}
-
 					GitGraphView.currentPanel.isPanelVisible = true;
-					this.view(repository);
+					this.view(undefined);
 					GitGraphView.scrollToCommit(commitHash, true, false, true, true);
 				} else {
 					this.view(undefined);
