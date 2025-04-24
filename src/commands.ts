@@ -383,6 +383,10 @@ export class CommandManager extends Disposable {
 					showWarningMessage('Warning: no matching Git repository found for this file.');
 				}
 
+				if (commitHash.endsWith('^')) {
+					commitHash = commitHash.slice(0, -1); // it is difficult to find parents, especially when there may be more than one
+				}
+
 				if (GitGraphView.currentPanel) { // graph exist
 					GitGraphView.currentPanel.isPanelVisible = true;
 					await this.view(repository);
