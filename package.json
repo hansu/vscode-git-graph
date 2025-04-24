@@ -93,7 +93,7 @@
 			{
 				"category": "Git Graph",
 				"command": "git-graph.goToCommit",
-				"title": "Go To Commit",
+				"title": "Go to Commit",
 				"icon": "$(git-commit)",
 				"enablement": "isInDiffEditor || resourceScheme == scm-history-item"
 			},
@@ -1556,6 +1556,13 @@
 					"when": "scmProvider == git && config.git-graph.sourceCodeProviderIntegrationLocation == 'More Actions'",
 					"command": "git-graph.view",
 					"group": "inline"
+				}
+			],
+			"editor/context": [
+				{
+				  "command": "git-graph.goToCommit",
+				  "group": "navigation@1",
+				  "when": "isInDiffEditor || resourceScheme == scm-history-item"
 				}
 			]
 		}
