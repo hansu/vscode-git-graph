@@ -956,7 +956,7 @@ body.tagLabelsRightAligned .gitRef.tag{
 }
 
 #controls.fetchSupported{
-	padding-right:162px;
+	padding-right:180px;
 }
 #controls.fetchSupported #currentBtn{
 	right:160px;
