@@ -8,7 +8,7 @@ import { CodeReviewData, CodeReviews, ExtensionState } from './extensionState';
 import { GitGraphView } from './gitGraphView';
 import { Logger } from './logger';
 import { RepoManager } from './repoManager';
-import { GitExecutable, UNABLE_TO_FIND_GIT_MSG, VsCodeVersionRequirement, abbrevCommit, abbrevText, copyToClipboard, doesVersionMeetRequirement, getExtensionVersion, getPathFromUri, getRelativeTimeDiff, getRepoName, getSortedRepositoryPaths, isPathInWorkspace, openFile, resolveToSymbolicPath, showErrorMessage, showInformationMessage } from './utils';
+import { GitExecutable, UNABLE_TO_FIND_GIT_MSG, VsCodeVersionRequirement, abbrevCommit, abbrevText, copyToClipboard, doesVersionMeetRequirement, getExtensionVersion, getPathFromUri, getRelativeTimeDiff, getRepoName, getSortedRepositoryPaths, isPathInWorkspace, openFile, resolveToSymbolicPath, showErrorMessage, showInformationMessage, showWarningMessage } from './utils';
 import { Disposable } from './utils/disposable';
 import { Event } from './utils/event';
 
@@ -351,28 +351,44 @@ export class CommandManager extends Disposable {
 	 * The method run when the `git-graph.goToCommit` command is invoked.
 	 * @param arg The Git Graph URI.
 	 */
-	private goToCommit(arg?: vscode.Uri) {
+	private async goToCommit(arg?: vscode.Uri) {
 		const uri = arg || vscode.window.activeTextEditor?.document.uri;
+		const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
+		const api = gitExtension.getAPI(1);
+		if (!gitExtension) {
+			showErrorMessage('Unable to load Git extension.');
+			return;
+		}
+
 		if (typeof uri === 'object' && uri) {
 			let commitHash = '';
+			let repository = undefined;
 
 			if (uri.scheme === 'git-graph') {
-				commitHash = decodeDiffDocUri(uri).commit;
+				let diffDocUri = decodeDiffDocUri(uri);
+				commitHash = diffDocUri.commit;
+				repository = api.getRepository(diffDocUri.repo);
 			}
 			if (uri.scheme === 'git' || uri.scheme === 'gitlens') {
 				commitHash = JSON.parse(uri.query).ref;
+				repository = api.getRepository(uri);
 			}
 			if (uri.scheme === 'scm-history-item') {
 				commitHash = uri.path.split('..')[1];
+				repository = api.getRepository(uri);
 			}
 
 			if (commitHash !== '') {
+				if (!repository) {
+					showWarningMessage('Warning: no matching Git repository found for this file.');
+				}
+
 				if (GitGraphView.currentPanel) { // graph exist
 					GitGraphView.currentPanel.isPanelVisible = true;
-					this.view(undefined);
+					await this.view(repository);
 					GitGraphView.scrollToCommit(commitHash, true, false, true, true);
 				} else { // graph is creating
-					this.view(undefined);
+					await this.view(repository);
 					GitGraphView.scrollToCommit(commitHash, true, false, true, true);
 				}
 				return;

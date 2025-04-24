@@ -3513,14 +3513,17 @@ window.addEventListener('load', () => {
 				gitGraph.loadRepos(msg.repos, msg.lastActiveRepo, msg.loadViewTo);
 				break;
 			case 'scrollToCommit':
-				gitGraph.scrollToCommit(msg.hash, msg.alwaysCenterCommit, msg.flash, msg.openDetails, msg.persistently); // if graph exist
-				gitGraph.scrollToCommitArgs = { // if graph is creating
-					hash: msg.hash,
-					alwaysCenterCommit: msg.alwaysCenterCommit,
-					flash: msg.flash,
-					openDetails: msg.openDetails,
-					persistently: msg.persistently
-				};
+				if (VSCODE_API.getState()?.currentRepoLoading) { // if graph is creating
+					gitGraph.scrollToCommitArgs = {
+						hash: msg.hash,
+						alwaysCenterCommit: msg.alwaysCenterCommit,
+						flash: msg.flash,
+						openDetails: msg.openDetails,
+						persistently: msg.persistently
+					};
+				} else { // if graph exist
+					gitGraph.scrollToCommit(msg.hash, msg.alwaysCenterCommit, msg.flash, msg.openDetails, msg.persistently);
+				}
 				break;
 			case 'merge':
 				refreshOrDisplayError(msg.error, 'Unable to Merge ' + msg.actionOn);
