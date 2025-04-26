@@ -476,7 +476,7 @@ table { border-collapse: collapse; }
 	position: absolute;
 	top:0;
 	margin:0;
-	left:-21px;
+	left:-13px;
 	z-index:100;
 	overflow:visible;
 	cursor:pointer;
@@ -484,7 +484,9 @@ table { border-collapse: collapse; }
 	width:16px;
 	height:16px;
     background-color: color-mix(in srgb, var(--vscode-editor-background) 90%, rgba(128, 128, 128,1));
-	border-left: 1px solid var(--vscode-editor-background);
+	border-left:1px solid rgba(128,128,128,0.2);
+	border-bottom:1px solid rgba(128,128,128,0.2);
+	border-right:1px solid rgba(128,128,128,0.2);
 }
 
 #cdvSummaryToggleBtn svg{
