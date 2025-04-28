@@ -26,7 +26,7 @@ export class GitGraphView extends Disposable {
 	private readonly repoManager: RepoManager;
 	private readonly logger: Logger;
 	private isGraphViewLoaded: boolean = false;
-	private isPanelVisible: boolean = true;
+	public isPanelVisible: boolean = true;
 	private currentRepo: string | null = null;
 	private loadViewTo: LoadGitGraphViewTo = null; // Is used by the next call to getHtmlForWebview, and is then reset to null
 
@@ -61,6 +61,20 @@ export class GitGraphView extends Disposable {
 		} else {
 			// If Git Graph panel doesn't already exist
 			GitGraphView.currentPanel = new GitGraphView(extensionPath, dataSource, extensionState, avatarManager, repoManager, logger, loadViewTo, column);
+		}
+	}
+
+	/**
+	 * Scroll the view to a commit (if it exists).
+	 * @param hash The hash of the commit to scroll to.
+	 * @param alwaysCenterCommit TRUE => Always scroll the view to be centered on the commit. FALSE => Don't scroll the view if the commit is already within the visible portion of commits.
+	 * @param flash Should the commit flash after it has been scrolled to.
+	 * @param openDetails Open details of the specified commit.
+	 * @param persistently Persistently find the commit even if it is not exists.
+	 */
+	public static scrollToCommit(hash: string, alwaysCenterCommit: boolean, flash: boolean = false, openDetails: boolean = false, persistently: boolean = false) {
+		if (GitGraphView.currentPanel) {
+			GitGraphView.currentPanel.respondScrollToCommit(hash, alwaysCenterCommit, flash, openDetails, persistently);
 		}
 	}
 
@@ -818,6 +832,25 @@ export class GitGraphView extends Disposable {
 			repos: repos,
 			lastActiveRepo: this.extensionState.getLastActiveRepo(),
 			loadViewTo: loadViewTo
+		});
+	}
+
+	/**
+	 * Call the command to scroll to the specified commit to the front-end.
+	 * @param hash The hash of the commit to scroll to.
+	 * @param alwaysCenterCommit TRUE => Always scroll the view to be centered on the commit. FALSE => Don't scroll the view if the commit is already within the visible portion of commits.
+	 * @param flash Should the commit flash after it has been scrolled to.
+	 * @param openDetails Open details of the specified commit.
+	 * @param persistently Persistently find the commit even if it is not exists.
+	 */
+	public respondScrollToCommit(hash: string, alwaysCenterCommit: boolean, flash: boolean = false, openDetails: boolean = false, persistently: boolean = false) {
+		this.sendMessage({
+			command: 'scrollToCommit',
+			hash: hash,
+			alwaysCenterCommit: alwaysCenterCommit,
+			flash: flash,
+			openDetails: openDetails,
+			persistently: persistently
 		});
 	}
 }
