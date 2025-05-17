@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.31.5 - 2025-05-17
+* #48 Fix file view. Bullets were added when toggling file tree/file list view. Thanks [@LariWa](https://github.com/LariWa).
+* #30 Add setting for selection of single branch and/or author (thanks [@rgeorgiev583](https://github.com/rgeorgiev583)) and  
+#52 Implement multi selection using Ctrl (thanks [@LariWa](https://github.com/LariWa)).
+This can be activated with the following settings:
+  * `git-graph.repository.singleBranchSelect`
+  * `git-graph.repository.singleAuthorSelect`
+  
+* #56 Display "Select in Branches Dropdown" in the context menu also when "Show All" in the branches filter is selected. Thanks [@LariWa](https://github.com/LariWa).
+
 ## 1.31.4 - 2025-03-26
 
 * #47 Fix "Commit summary always hides when switching focus(#46)". Thanks [@LariWa](https://github.com/LariWa). 

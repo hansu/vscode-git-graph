@@ -3,6 +3,7 @@
 Fork of mhutchie's Git Graph with further improvements.
 Main improvements:
 
+* Selection of single branch and/or author. Can be activated with `git-graph.repository.singleBranchSelect` and `git-graph.repository.singleAuthorSelect`
 * Added button to collapse commit summary (hansu#3)
 * Added checkbox 'Allow unrelated histories' when merge action
 * New setting `git-graph.toolbarButtonVisibility` to configure the visibility of some items of the toolbar. For example: `{"Remotes": true, "Simplify": true}

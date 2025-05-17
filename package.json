@@ -1,7 +1,7 @@
 {
 	"name": "git-graph-2",
 	"displayName": "Git Graph 2",
-	"version": "1.31.4",
+	"version": "1.31.5",
 	"publisher": "hansu",
 	"author": {
 		"name": "Michael Hutchison",
@@ -1090,15 +1090,15 @@
 					"default": false,
 					"markdownDescription": "Only follow the first parent of commits when discovering the commits to load in the Git Graph View. See [--first-parent](https://git-scm.com/docs/git-log#Documentation/git-log.txt---first-parent) to find out more about this setting. This can be overridden per repository in the Git Graph View's Repository Settings Widget."
 				},
-				"git-graph.repository.selectMultipleAuthors": {
+				"git-graph.repository.singleAuthorSelect": {
 					"type": "boolean",
-					"default": true,
-					"description": "Enables the selection of multiple authors from the Authors dropdown. When set to false, you can only select multiple authors by 'Ctrl' (or 'Cmd' on macOS) + click."
+					"default": false,
+					"description": "Enables the selection of only a single author from the Authors dropdown. Multiple authors can be selected by 'Ctrl' (or 'Cmd' on macOS) + click."
 				},
-				"git-graph.repository.selectMultipleBranches": {
+				"git-graph.repository.singleBranchSelect": {
 					"type": "boolean",
-					"default": true,
-					"description": "Enables the selection of multiple branches from the Branches dropdown.  When set to false, you can only select multiple branches by 'Ctrl' (or 'Cmd' on macOS) + click."
+					"default": false,
+					"description": "Enables the selection of only a single branch from the Branches dropdown. Multiple branches can be selected by 'Ctrl' (or 'Cmd' on macOS) + click."
 				},
 				"git-graph.repository.showCommitsOnlyReferencedByTags": {
 					"type": "boolean",
