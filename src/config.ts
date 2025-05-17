@@ -465,17 +465,17 @@ class Config {
 	}
 
 	/**
-	 * Get the value of the `git-graph.repository.selectMultipleAuthors` Extension Setting.
+	 * Get the value of the `git-graph.repository.singleAuthorSelect` Extension Setting.
 	 */
-	get selectMultipleAuthors() {
-		return !!this.config.get('repository.selectMultipleAuthors', true);
+	get singleAuthorSelect() {
+		return !!this.config.get('repository.singleAuthorSelect', true);
 	}
 
 	/**
-	 * Get the value of the `git-graph.repository.selectMultipleBranches` Extension Setting.
+	 * Get the value of the `git-graph.repository.singleBranchSelect` Extension Setting.
 	 */
-	get selectMultipleBranches() {
-		return !!this.config.get('repository.selectMultipleBranches', true);
+	get singleBranchSelect() {
+		return !!this.config.get('repository.singleBranchSelect', true);
 	}
 
 	/**

@@ -92,14 +92,14 @@ class GitGraphView {
 			this.saveState();
 			this.clearCommits();
 			this.requestLoadRepoInfoAndCommits(true, true);
-		}, !this.config.selectMultipleBranches);
+		}, this.config.singleBranchSelect);
 		this.authorDropdown = new Dropdown('authorDropdown', false, true, 'Authors', (values) => {
 			this.currentAuthors = values;
 			this.maxCommits = this.config.initialLoadCommits;
 			this.saveState();
 			this.clearCommits();
 			this.requestLoadRepoInfoAndCommits(true, true);
-		}, !this.config.selectMultipleAuthors);
+		}, this.config.singleAuthorSelect);
 		this.showRemoteBranchesElem = <HTMLInputElement>document.getElementById('showRemoteBranchesCheckbox')!;
 		this.showRemoteBranchesElem.addEventListener('change', () => {
 			this.saveRepoStateValue(this.currentRepo, 'showRemoteBranchesV2', this.showRemoteBranchesElem.checked ? GG.BooleanOverride.Enabled : GG.BooleanOverride.Disabled);
