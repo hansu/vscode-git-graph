@@ -1372,7 +1372,7 @@ class GitGraphView {
 			},
 			{
 				title: 'Select in Branches Dropdown',
-				visible: visibility.selectInBranchesDropdown && !isSelectedInBranchesDropdown,
+				visible: visibility.selectInBranchesDropdown && (!isSelectedInBranchesDropdown || this.branchDropdown.isShowAllSelected()),
 				onClick: (e) => this.branchDropdown.selectOption(prefixedRefName, e)
 			},
 			{
