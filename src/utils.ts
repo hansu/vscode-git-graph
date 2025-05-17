@@ -544,6 +544,14 @@ export function showInformationMessage(message: string) {
 }
 
 /**
+ * Show a Visual Studio Code Warning Message Dialog with the specified message.
+ * @param message The message to show.
+ */
+export function showWarningMessage(message: string) {
+	return vscode.window.showWarningMessage(message).then(() => { }, () => { });
+}
+
+/**
  * Show a Visual Studio Code Error Message Dialog with the specified message.
  * @param message The message to show.
  */
