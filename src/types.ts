@@ -980,6 +980,15 @@ export interface ResponseLoadRepos extends BaseMessage {
 	readonly loadViewTo: LoadGitGraphViewTo;
 }
 
+export interface ResponseScrollToCommit extends BaseMessage {
+	readonly command: 'scrollToCommit';
+	readonly hash: string;
+	readonly alwaysCenterCommit: boolean;
+	readonly flash: boolean;
+	readonly openDetails: boolean;
+	readonly persistently: boolean;
+}
+
 export const enum MergeActionOn {
 	Branch = 'Branch',
 	RemoteTrackingBranch = 'Remote-tracking Branch',
@@ -1365,6 +1374,7 @@ export type ResponseMessage =
 	| ResponseLoadConfig
 	| ResponseLoadRepoInfo
 	| ResponseLoadRepos
+	| ResponseScrollToCommit
 	| ResponseMerge
 	| ResponseOpenExtensionSettings
 	| ResponseOpenExternalDirDiff

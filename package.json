@@ -92,6 +92,13 @@
 			},
 			{
 				"category": "Git Graph",
+				"command": "git-graph.goToCommit",
+				"title": "Go to Commit",
+				"icon": "$(git-commit)",
+				"enablement": "isInDiffEditor || resourceScheme == scm-history-item"
+			},
+			{
+				"category": "Git Graph",
 				"command": "git-graph.openFile",
 				"title": "Open File",
 				"icon": "$(go-to-file)",
@@ -1529,11 +1536,20 @@
 		"menus": {
 			"commandPalette": [
 				{
+					"command": "git-graph.goToCommit",
+					"when": "isInDiffEditor || resourceScheme == scm-history-item"
+				},
+				{
 					"command": "git-graph.openFile",
 					"when": "isInDiffEditor && resourceScheme == git-graph && git-graph:codiconsSupported"
 				}
 			],
 			"editor/title": [
+				{
+					"command": "git-graph.goToCommit",
+					"group": "navigation@-150",
+					"when": "isInDiffEditor || resourceScheme == scm-history-item"
+				},
 				{
 					"command": "git-graph.openFile",
 					"group": "navigation",
@@ -1550,6 +1566,13 @@
 					"when": "scmProvider == git && config.git-graph.sourceCodeProviderIntegrationLocation == 'More Actions'",
 					"command": "git-graph.view",
 					"group": "inline"
+				}
+			],
+			"editor/context": [
+				{
+				  "command": "git-graph.goToCommit",
+				  "group": "navigation@1",
+				  "when": "isInDiffEditor || resourceScheme == scm-history-item"
 				}
 			]
 		}
