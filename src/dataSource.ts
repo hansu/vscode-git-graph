@@ -1229,6 +1229,15 @@ export class DataSource extends Disposable {
 		return this.runGitCommand(args, repo);
 	}
 
+	/**
+	 * Undo the last commit in a repository (soft reset to HEAD^).
+	 * @param repo The path of the repository.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public undoLastCommit(repo: string) {
+		return this.runGitCommand(['reset', '--soft', 'HEAD^'], repo);
+	}
+
 
 	/* Git Action Methods - Config */
 

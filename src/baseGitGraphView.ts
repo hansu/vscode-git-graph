@@ -549,6 +549,12 @@ export abstract class BaseGitGraphView extends Disposable {
 					error: await this.dataSource.revertCommit(msg.repo, msg.commitHash, msg.parentIndex)
 				});
 				break;
+			case 'undoLastCommit':
+				this.sendMessage({
+					command: 'undoLastCommit',
+					error: await this.dataSource.undoLastCommit(msg.repo)
+				});
+				break;
 			case 'setGlobalViewState':
 				this.sendMessage({
 					command: 'setGlobalViewState',

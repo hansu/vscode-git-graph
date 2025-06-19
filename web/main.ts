@@ -1413,6 +1413,14 @@ class GitGraphView {
 					}
 				}
 			}, {
+				title: 'Reset Last Commit (Soft)' + ELLIPSIS,
+				visible: visibility.undo && hash === this.commitHead,
+				onClick: () => {
+					dialog.showConfirmation('Are you sure you want to reset the last commit? This will keep all changes from the commit as uncommitted changes.', 'Yes, reset the last commit', () => {
+						runAction({ command: 'undoLastCommit', repo: this.currentRepo }, 'Resetting Last Commit');
+					}, target);
+				}
+			}, {
 				title: 'Drop' + ELLIPSIS,
 				visible: visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
 				onClick: () => {
@@ -3702,6 +3710,9 @@ window.addEventListener('load', () => {
 				break;
 			case 'revertCommit':
 				refreshOrDisplayError(msg.error, 'Unable to Revert Commit');
+				break;
+			case 'undoLastCommit':
+				refreshOrDisplayError(msg.error, 'Unable to Reset Last Commit');
 				break;
 			case 'squashCommits':
 				refreshOrDisplayError(msg.error, 'Unable to Squash Commits');

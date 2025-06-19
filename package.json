@@ -228,6 +228,10 @@
 									"type": "boolean",
 									"title": "Revert..."
 								},
+								"undo": {
+									"type": "boolean",
+									"title": "Reset Last Commit (Soft)"
+								},
 								"drop": {
 									"type": "boolean",
 									"title": "Drop..."

@@ -377,6 +377,7 @@ export interface ContextMenuActionsVisibility {
 		readonly merge: boolean;
 		readonly rebase: boolean;
 		readonly reset: boolean;
+		readonly undo: boolean;
 		readonly copyHash: boolean;
 		readonly copySubject: boolean;
 	};
@@ -1184,6 +1185,13 @@ export interface ResponseRevertCommit extends ResponseWithErrorInfo {
 	readonly command: 'revertCommit';
 }
 
+export interface RequestUndoLastCommit extends RepoRequest {
+	readonly command: 'undoLastCommit';
+}
+export interface ResponseUndoLastCommit extends ResponseWithErrorInfo {
+	readonly command: 'undoLastCommit';
+}
+
 export interface RequestSetGlobalViewState extends BaseMessage {
 	readonly command: 'setGlobalViewState';
 	readonly state: GitGraphViewGlobalState;
@@ -1338,6 +1346,7 @@ export type RequestMessage =
 	| RequestResetFileToRevision
 	| RequestResetToCommit
 	| RequestRevertCommit
+	| RequestUndoLastCommit
 	| RequestSetGlobalViewState
 	| RequestSetRepoState
 	| RequestSquashCommits
@@ -1403,6 +1412,7 @@ export type ResponseMessage =
 	| ResponseResetFileToRevision
 	| ResponseResetToCommit
 	| ResponseRevertCommit
+	| ResponseUndoLastCommit
 	| ResponseSetGlobalViewState
 	| ResponseSetWorkspaceViewState
 	| ResponseSquashCommits
