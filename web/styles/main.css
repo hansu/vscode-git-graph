@@ -738,6 +738,13 @@ body.vscode-high-contrast #commitTable tr.commit.findCurrentCommit{
 	outline-style:dotted;
 }
 
+#commitTable tr.commit.commitSelected {
+	background-color:rgba(128,128,128,0.25);
+}
+#commitTable tr.commit.commitSelected:hover, #commitTable tr.commit.commitSelected.contextMenuActive {
+	background-color:rgba(128,128,128,0.35);
+}
+
 #commitTable tr.commit.mute.commitDetailsOpen td.text,
 #commitTable tr.commit.mute.commitDetailsOpen span.description .text,
 #commitTable tr.commit.mute.findCurrentCommit td.text,

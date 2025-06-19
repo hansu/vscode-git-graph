@@ -7,7 +7,7 @@ import { ExtensionState } from './extensionState';
 import { Logger } from './logger';
 import { RepoFileWatcher } from './repoFileWatcher';
 import { RepoManager } from './repoManager';
-import { ErrorInfo, GitConfigLocation, GitGraphViewInitialState, GitPushBranchMode, GitRepoSet, LoadGitGraphViewTo, RequestMessage, ResponseMessage, TabIconColourTheme } from './types';
+import { ErrorInfo, GitConfigLocation, GitGraphViewInitialState, GitPushBranchMode, GitRepoSet, LoadGitGraphViewTo, RequestMessage, RequestSquashCommits, ResponseMessage, TabIconColourTheme } from './types';
 import { UNABLE_TO_FIND_GIT_MSG, UNCOMMITTED, archive, copyFilePathToClipboard, copyToClipboard, createPullRequest, getNonce, openExtensionSettings, openExternalUrl, openFile, showErrorMessage, viewDiff, viewDiffWithWorkingFile, viewFileAtRevision, viewScm } from './utils';
 import { Disposable, toDisposable } from './utils/disposable';
 
@@ -353,6 +353,12 @@ export class GitGraphView extends Disposable {
 				this.sendMessage({
 					command: 'dropStash',
 					error: await this.dataSource.dropStash(msg.repo, msg.selector)
+				});
+				break;
+			case 'squashCommits':
+				this.sendMessage({
+					command: 'squashCommits',
+					error: await this.dataSource.squashCommits(msg.repo, (msg as RequestSquashCommits).commits, (msg as RequestSquashCommits).commitMessage)
 				});
 				break;
 			case 'editRemote':

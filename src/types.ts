@@ -837,6 +837,15 @@ export interface ResponseDropCommit extends ResponseWithErrorInfo {
 	readonly command: 'dropCommit';
 }
 
+export interface RequestSquashCommits extends RepoRequest {
+	readonly command: 'squashCommits';
+	readonly commits: ReadonlyArray<string>;
+	readonly commitMessage: string;
+}
+export interface ResponseSquashCommits extends ResponseWithErrorInfo {
+	readonly command: 'squashCommits';
+}
+
 export interface RequestDropStash extends RepoRequest {
 	readonly command: 'dropStash';
 	readonly selector: string;
@@ -1322,6 +1331,7 @@ export type RequestMessage =
 	| RequestRevertCommit
 	| RequestSetGlobalViewState
 	| RequestSetRepoState
+	| RequestSquashCommits
 	| RequestSetWorkspaceViewState
 	| RequestShowErrorDialog
 	| RequestStartCodeReview
@@ -1385,6 +1395,7 @@ export type ResponseMessage =
 	| ResponseRevertCommit
 	| ResponseSetGlobalViewState
 	| ResponseSetWorkspaceViewState
+	| ResponseSquashCommits
 	| ResponseStartCodeReview
 	| ResponseTagDetails
 	| ResponseUpdateCodeReview

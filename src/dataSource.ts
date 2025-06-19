@@ -1143,6 +1143,35 @@ export class DataSource extends Disposable {
 	}
 
 	/**
+	 * Squash multiple commits into one.
+	 * @param repo The path of the repository.
+	 * @param commits Array of commit hashes to squash (from newest to oldest).
+	 * @param commitMessage The commit message for the squashed commit.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public async squashCommits(repo: string, commits: ReadonlyArray<string>, commitMessage: string): Promise<ErrorInfo> {
+		if (commits.length < 2) {
+			return 'At least 2 commits are required for squashing.';
+		}
+
+		const oldestCommit = commits[commits.length - 1];
+
+		// Reset to the parent of the oldest commit, keeping changes staged
+		const resetResult = await this.runGitCommand(['reset', '--soft', oldestCommit + '^'], repo);
+		if (resetResult !== null) {
+			return resetResult;
+		}
+
+		// Create a new commit with the combined changes
+		const commitArgs = ['commit', '-m', commitMessage];
+		if (getConfig().signCommits) {
+			commitArgs.push('-S');
+		}
+
+		return this.runGitCommand(commitArgs, repo);
+	}
+
+	/**
 	 * Reset the current branch to a specified commit.
 	 * @param repo The path of the repository.
 	 * @param commit The hash of the commit that the current branch should be reset to.
