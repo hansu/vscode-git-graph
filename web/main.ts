@@ -1284,6 +1284,19 @@ class GitGraphView {
 						}, 'Pushing Branch');
 					}, target);
 				}
+			}, {
+				title: 'Pull Branch' + ELLIPSIS,
+				visible: visibility.pull && this.gitRemotes.length > 0,
+				onClick: () => {
+					dialog.showForm('Are you sure you want to update the local branch <b><i>' + escapeHtml(refName) + '</i></b> with the latest changes from <b><i>' + escapeHtml(this.gitRemotes[0] + '/' + refName) + '</i></b>?', [{
+						type: DialogInputType.Checkbox,
+						name: 'Force Update',
+						value: this.config.dialogDefaults.fetchIntoLocalBranch.forceFetch,
+						info: 'Force the local branch to be reset to the remote branch (discard local commits).'
+					}], 'Yes, update', (values) => {
+						runAction({ command: 'fetchIntoLocalBranch', repo: this.currentRepo, remote: this.gitRemotes[0], remoteBranch: refName, localBranch: refName, force: <boolean>values[0] }, 'Updating Branch');
+					}, target);
+				}
 			}
 		], [
 			this.getViewIssueAction(refName, visibility.viewIssue, target),

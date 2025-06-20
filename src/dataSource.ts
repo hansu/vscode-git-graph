@@ -962,7 +962,23 @@ export class DataSource extends Disposable {
 	 * @param force Force fetch the remote branch.
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public fetchIntoLocalBranch(repo: string, remote: string, remoteBranch: string, localBranch: string, force: boolean) {
+	public async fetchIntoLocalBranch(repo: string, remote: string, remoteBranch: string, localBranch: string, force: boolean) {
+		const currentBranch = await this.spawnGit(['symbolic-ref', '--short', 'HEAD'], repo, (stdout) => stdout.trim());
+
+		if (currentBranch === localBranch) {
+			if (!force) {
+				return this.runGitCommand(['pull', remote, remoteBranch], repo);
+			}
+
+			const fetchArgs = ['fetch', remote, remoteBranch];
+			const fetchResult = await this.runGitCommand(fetchArgs, repo);
+			if (fetchResult !== null) {
+				return fetchResult;
+			}
+			return this.runGitCommand(['reset', '--hard', remote + '/' + remoteBranch], repo);
+		}
+
+		// If the branch is not checked out, we can use fetch
 		const args = ['fetch'];
 		if (force) {
 			args.push('-f');
