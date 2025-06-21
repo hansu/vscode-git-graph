@@ -163,6 +163,10 @@
 									"type": "boolean",
 									"title": "Rename Branch..."
 								},
+								"createBranch": {
+									"type": "boolean",
+									"title": "Create Branch..."
+								},
 								"delete": {
 									"type": "boolean",
 									"title": "Delete Branch..."
@@ -325,6 +329,10 @@
 								"pull": {
 									"type": "boolean",
 									"title": "Pull into current branch..."
+								},
+								"createBranch": {
+									"type": "boolean",
+									"title": "Create Branch..."
 								},
 								"viewIssue": {
 									"type": "boolean",

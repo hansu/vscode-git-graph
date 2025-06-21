@@ -361,6 +361,7 @@ export interface ContextMenuActionsVisibility {
 		readonly rebase: boolean;
 		readonly push: boolean;
 		readonly pull: boolean;
+		readonly createBranch: boolean;
 		readonly viewIssue: boolean;
 		readonly createPullRequest: boolean;
 		readonly createArchive: boolean;
@@ -400,6 +401,7 @@ export interface ContextMenuActionsVisibility {
 		readonly fetch: boolean;
 		readonly merge: boolean;
 		readonly pull: boolean;
+		readonly createBranch: boolean;
 		readonly viewIssue: boolean;
 		readonly createPullRequest: boolean;
 		readonly createArchive: boolean;

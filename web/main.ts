@@ -1216,6 +1216,10 @@ class GitGraphView {
 					}, target);
 				}
 			}, {
+				title: 'Create Branch' + ELLIPSIS,
+				visible: visibility.createBranch,
+				onClick: () => this.createBranchAction(target.hash, '', true, target)
+			}, {
 				title: 'Delete Branch' + ELLIPSIS,
 				visible: visibility.delete && this.gitBranchHead !== refName,
 				onClick: () => {
@@ -1529,6 +1533,10 @@ class GitGraphView {
 				title: 'Checkout Branch' + ELLIPSIS,
 				visible: visibility.checkout,
 				onClick: () => this.checkoutBranchAction(refName, remote, null, target)
+			}, {
+				title: 'Create Branch' + ELLIPSIS,
+				visible: visibility.createBranch,
+				onClick: () => this.createBranchAction(target.hash, branchName, true, target)
 			}, {
 				title: 'Delete Remote Branch' + ELLIPSIS,
 				visible: visibility.delete && remote !== '',
