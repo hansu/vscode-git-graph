@@ -1143,6 +1143,34 @@ export class DataSource extends Disposable {
 	}
 
 	/**
+	 * Drop multiple commits via a rebase.
+	 * @param repo The path of the repository.
+	 * @param commits Array of commit hashes to drop (from newest to oldest).
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public async dropCommits(repo: string, commits: ReadonlyArray<string>): Promise<ErrorInfo> {
+		if (commits.length === 0) {
+			return 'No commits selected for dropping.';
+		}
+
+		if (commits.length === 1) {
+			// For a single commit, use the existing dropCommit method
+			return this.dropCommit(repo, commits[0]);
+		}
+
+		// For multiple commits, we need to drop them one by one from newest to oldest
+		// This ensures that the commit hashes remain valid as we rebase
+		for (const commitHash of commits) {
+			const result = await this.dropCommit(repo, commitHash);
+			if (result !== null) {
+				return result;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Squash multiple commits into one.
 	 * @param repo The path of the repository.
 	 * @param commits Array of commit hashes to squash (from newest to oldest).

@@ -7,7 +7,7 @@ import { ExtensionState } from './extensionState';
 import { Logger } from './logger';
 import { RepoFileWatcher } from './repoFileWatcher';
 import { RepoManager } from './repoManager';
-import { ErrorInfo, GitConfigLocation, GitGraphViewInitialState, GitPushBranchMode, GitRepoSet, LoadGitGraphViewTo, RequestMessage, RequestSquashCommits, ResponseMessage } from './types';
+import { ErrorInfo, GitConfigLocation, GitGraphViewInitialState, GitPushBranchMode, GitRepoSet, LoadGitGraphViewTo, RequestDropCommits, RequestMessage, RequestSquashCommits, ResponseMessage } from './types';
 import { UNABLE_TO_FIND_GIT_MSG, UNCOMMITTED, archive, copyFilePathToClipboard, copyToClipboard, createPullRequest, getNonce, openExtensionSettings, openExternalUrl, openFile, showErrorMessage, viewDiff, viewDiffWithWorkingFile, viewFileAtRevision, viewScm } from './utils';
 import { Disposable, toDisposable } from './utils/disposable';
 
@@ -324,6 +324,12 @@ export abstract class BaseGitGraphView extends Disposable {
 				this.sendMessage({
 					command: 'dropCommit',
 					error: await this.dataSource.dropCommit(msg.repo, msg.commitHash)
+				});
+				break;
+			case 'dropCommits':
+				this.sendMessage({
+					command: 'dropCommits',
+					error: await this.dataSource.dropCommits(msg.repo, (msg as RequestDropCommits).commits)
 				});
 				break;
 			case 'dropStash':
