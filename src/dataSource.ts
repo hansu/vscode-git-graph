@@ -1238,6 +1238,31 @@ export class DataSource extends Disposable {
 		return this.runGitCommand(['reset', '--soft', 'HEAD^'], repo);
 	}
 
+	/**
+	 * Edit a commit message using git commit --amend.
+	 * @param repo The path of the repository.
+	 * @param commitHash The commit hash to edit.
+	 * @param message The new commit message.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public async editCommitMessage(repo: string, commitHash: string, message: string): Promise<ErrorInfo> {
+		try {
+			const headCommit = await this.spawnGit(['rev-parse', 'HEAD'], repo, (stdout) => stdout.trim());
+
+			if (headCommit === commitHash) {
+				const args = ['commit', '--amend', '-m', message];
+				if (getConfig().signCommits) {
+					args.push('-S');
+				}
+				return this.runGitCommand(args, repo);
+			} else {
+				return 'Editing commit messages for non-HEAD commits is not yet supported.';
+			}
+		} catch (error) {
+			return error as ErrorInfo;
+		}
+	}
+
 
 	/* Git Action Methods - Config */
 

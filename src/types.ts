@@ -378,6 +378,7 @@ export interface ContextMenuActionsVisibility {
 		readonly rebase: boolean;
 		readonly reset: boolean;
 		readonly undo: boolean;
+		readonly editMessage: boolean;
 		readonly copyHash: boolean;
 		readonly copySubject: boolean;
 	};
@@ -1192,6 +1193,15 @@ export interface ResponseUndoLastCommit extends ResponseWithErrorInfo {
 	readonly command: 'undoLastCommit';
 }
 
+export interface RequestEditCommitMessage extends RepoRequest {
+	readonly command: 'editCommitMessage';
+	readonly commitHash: string;
+	readonly message: string;
+}
+export interface ResponseEditCommitMessage extends ResponseWithErrorInfo {
+	readonly command: 'editCommitMessage';
+}
+
 export interface RequestSetGlobalViewState extends BaseMessage {
 	readonly command: 'setGlobalViewState';
 	readonly state: GitGraphViewGlobalState;
@@ -1317,6 +1327,7 @@ export type RequestMessage =
 	| RequestDropCommit
 	| RequestDropCommits
 	| RequestDropStash
+	| RequestEditCommitMessage
 	| RequestEditRemote
 	| RequestEditUserDetails
 	| RequestEndCodeReview
@@ -1384,6 +1395,7 @@ export type ResponseMessage =
 	| ResponseDropCommit
 	| ResponseDropCommits
 	| ResponseDropStash
+	| ResponseEditCommitMessage
 	| ResponseEditRemote
 	| ResponseEditUserDetails
 	| ResponseExportRepoConfig

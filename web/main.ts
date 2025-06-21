@@ -961,6 +961,39 @@ class GitGraphView {
 		);
 	}
 
+	private editCommitMessageAction(target: DialogTarget & CommitTarget) {
+		const hash = target.hash;
+		const commit = this.commits[this.commitLookup[hash]];
+
+		dialog.showForm(
+			`Edit commit message for <b><i>${abbrevCommit(hash)}</i></b>:`,
+			[{
+				type: DialogInputType.Text,
+				name: 'Commit Message',
+				default: commit.message,
+				placeholder: 'Enter the new commit message'
+			}],
+			'Update Message',
+			(values) => {
+				const newMessage = <string>values[0];
+				if (newMessage.trim() === '') {
+					dialog.showError('Commit message cannot be empty.', null, null, null);
+					return;
+				}
+				if (newMessage === commit.message) {
+					return; // No change needed
+				}
+				runAction({
+					command: 'editCommitMessage',
+					repo: this.currentRepo,
+					commitHash: hash,
+					message: newMessage
+				}, 'Editing Commit Message');
+			},
+			target
+		);
+	}
+
 
 	/* Renderers */
 
@@ -1420,6 +1453,10 @@ class GitGraphView {
 						runAction({ command: 'undoLastCommit', repo: this.currentRepo }, 'Resetting Last Commit');
 					}, target);
 				}
+			}, {
+				title: 'Edit Message' + ELLIPSIS,
+				visible: visibility.editMessage,
+				onClick: () => this.editCommitMessageAction(target)
 			}, {
 				title: 'Drop' + ELLIPSIS,
 				visible: visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
@@ -3609,6 +3646,9 @@ window.addEventListener('load', () => {
 				break;
 			case 'dropCommits':
 				refreshOrDisplayError(msg.error, 'Unable to Drop Commits');
+				break;
+			case 'editCommitMessage':
+				refreshOrDisplayError(msg.error, 'Unable to Edit Commit Message');
 				break;
 			case 'dropStash':
 				refreshOrDisplayError(msg.error, 'Unable to Drop Stash');
