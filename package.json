@@ -30,7 +30,7 @@
 	"license": "SEE LICENSE IN 'LICENSE'",
 	"icon": "resources/icon.png",
 	"engines": {
-		"vscode": "^1.38.0"
+		"vscode": "^1.50.0"
 	},
 	"extensionKind": [
 		"workspace"
@@ -96,6 +96,16 @@
 				"title": "Open File",
 				"icon": "$(go-to-file)",
 				"enablement": "isInDiffEditor && resourceScheme == git-graph && git-graph:codiconsSupported"
+			},
+			{
+				"category": "Git Graph",
+				"command": "git-graph.viewInEditor",
+				"title": "View Git Graph in Editor"
+			},
+			{
+				"category": "Git Graph",
+				"command": "git-graph.viewInPanel",
+				"title": "View Git Graph in Panel"
 			}
 		],
 		"configuration": {
@@ -1211,6 +1221,21 @@
 					"default": "colour",
 					"description": "Specifies the colour theme of the icon displayed on the Git Graph tab."
 				},
+				"git-graph.viewLocation": {
+					"type": "string",
+					"enum": [
+						"editor",
+						"panel",
+						"both"
+					],
+					"enumDescriptions": [
+						"Display Git Graph in the editor area (traditional view)",
+						"Display Git Graph in the panel area (bottom/side panel)",
+						"Allow both display modes (use specific commands to open in each location)"
+					],
+					"default": "editor",
+					"description": "Specifies where to display the Git Graph view by default."
+				},
 				"git-graph.autoCenterCommitDetailsView": {
 					"type": "boolean",
 					"default": true,
@@ -1552,6 +1577,24 @@
 					"group": "inline"
 				}
 			]
+		},
+		"viewsContainers": {
+			"panel": [
+				{
+					"id": "git-graph-panel",
+					"title": "Git Graph",
+					"icon": "$(git-branch)"
+				}
+			]
+		},
+		"views": {
+			"git-graph-panel": [
+				{
+					"type": "webview",
+					"id": "git-graph.panel",
+					"name": "Git Graph"
+				}
+			]
 		}
 	},
 	"scripts": {
@@ -1575,9 +1618,9 @@
 		"@types/babel__core": "7.1.18",
 		"@types/babel__traverse": "7.14.2",
 		"@types/jest": "26.0.19",
-		"@types/node": "8.10.62",
+		"@types/node": "^9.4.6",
 		"@types/prettier": "<2.6.0",
-		"@types/vscode": "1.38.0",
+		"@types/vscode": "1.50.0",
 		"@typescript-eslint/eslint-plugin": "4.10.0",
 		"@typescript-eslint/parser": "4.10.0",
 		"@vscode/vsce": "^2.19.0",

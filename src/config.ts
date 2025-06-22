@@ -598,6 +598,14 @@ class Config {
 	}
 
 	/**
+	 * Get the value of the `git-graph.viewLocation` Extension Setting.
+	 */
+	get viewLocation(): 'editor' | 'panel' | 'both' {
+		const value = this.config.get<string>('viewLocation', 'editor');
+		return value === 'panel' || value === 'both' ? value : 'editor';
+	}
+
+	/**
 	 * Get the Git executable paths configured by the `git.path` Visual Studio Code Setting.
 	 */
 	get gitPaths() {
