@@ -839,6 +839,31 @@ class GitGraphView {
 		this.selectedCommits.clear();
 	}
 
+	private selectCommitRange(fromHash: string, toHash: string) {
+		const fromIndex = this.commitLookup[fromHash];
+		const toIndex = this.commitLookup[toHash];
+
+		if (fromIndex === undefined || toIndex === undefined) return;
+
+		this.clearCommitSelection();
+
+		// Determine the range
+		const startIndex = Math.min(fromIndex, toIndex);
+		const endIndex = Math.max(fromIndex, toIndex);
+
+		// Select all commits in the range
+		for (let i = startIndex; i <= endIndex; i++) {
+			const commit = this.commits[i];
+			if (commit) {
+				this.selectedCommits.add(commit.hash);
+				const commitElem = document.querySelector(`tr.commit[data-id="${i}"]`);
+				if (commitElem) {
+					commitElem.classList.add('commitSelected');
+				}
+			}
+		}
+	}
+
 	private getSelectedCommitsArray(): string[] {
 		return Array.from(this.selectedCommits).sort((a, b) => {
 			const indexA = this.commitLookup[a];
@@ -2526,22 +2551,74 @@ class GitGraphView {
 				const mouseEvent = <MouseEvent>e;
 
 				if (mouseEvent.shiftKey) {
+					if (this.selectedCommits.size > 0) {
+						// Shift-click: select range from first selected commit
+						const anchorCommit = Array.from(this.selectedCommits)[0];
+						this.selectCommitRange(anchorCommit, commit.hash);
+
+						// Check if exactly 2 commits are selected to show diff
+						if (this.selectedCommits.size === 2) {
+							// Get the two selected commits
+							const selectedHashes = Array.from(this.selectedCommits);
+							const commitElems = selectedHashes.map(hash => {
+								const index = this.commitLookup[hash];
+								return document.querySelector(`tr.commit[data-id="${index}"]`) as HTMLElement;
+							}).filter(elem => elem !== null);
+
+							if (commitElems.length === 2) {
+								// Load comparison between the two commits
+								const [firstIndex, secondIndex] = selectedHashes.map(hash => this.commitLookup[hash]);
+								if (firstIndex < secondIndex) {
+									this.loadCommitComparison(commitElems[1], commitElems[0]);
+								} else {
+									this.loadCommitComparison(commitElems[0], commitElems[1]);
+								}
+							}
+						} else if (this.selectedCommits.size > 2) {
+							// More than 2 commits selected, close any open details
+							this.closeCommitDetails(true);
+						}
+					} else {
+						// No commits selected, just select this one
+						this.toggleCommitSelection(commit.hash, eventElem);
+					}
+				} else if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
+					// Ctrl/Cmd-click: toggle individual commit selection
 					this.toggleCommitSelection(commit.hash, eventElem);
+
+					// Check if exactly 2 commits are selected to show diff
+					if (this.selectedCommits.size === 2) {
+						// Get the two selected commits
+						const selectedHashes = Array.from(this.selectedCommits);
+						const commitElems = selectedHashes.map(hash => {
+							const index = this.commitLookup[hash];
+							return document.querySelector(`tr.commit[data-id="${index}"]`) as HTMLElement;
+						}).filter(elem => elem !== null);
+
+						if (commitElems.length === 2) {
+							// Load comparison between the two commits
+							const [firstIndex, secondIndex] = selectedHashes.map(hash => this.commitLookup[hash]);
+							if (firstIndex < secondIndex) {
+								this.loadCommitComparison(commitElems[1], commitElems[0]);
+							} else {
+								this.loadCommitComparison(commitElems[0], commitElems[1]);
+							}
+						}
+					} else if (this.selectedCommits.size > 2) {
+						// More than 2 commits selected, close any open details
+						this.closeCommitDetails(true);
+					}
 				} else if (this.expandedCommit !== null) {
 					if (this.expandedCommit.commitHash === commit.hash) {
 						this.closeCommitDetails(true);
-					} else if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
-						if (this.expandedCommit.compareWithHash === commit.hash) {
-							this.closeCommitComparison(true);
-						} else if (this.expandedCommit.commitElem !== null) {
-							this.loadCommitComparison(this.expandedCommit.commitElem, eventElem);
-						}
 					} else {
 						this.clearCommitSelection();
 						this.loadCommitDetails(eventElem);
 					}
 				} else {
+					// Regular click: select only this commit and load details
 					this.clearCommitSelection();
+					this.toggleCommitSelection(commit.hash, eventElem);
 					this.loadCommitDetails(eventElem);
 				}
 			}
