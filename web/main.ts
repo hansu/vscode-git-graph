@@ -839,6 +839,7 @@ class GitGraphView {
 		this.selectedCommits.clear();
 	}
 
+
 	private selectCommitRange(fromHash: string, toHash: string) {
 		const fromIndex = this.commitLookup[fromHash];
 		const toIndex = this.commitLookup[toHash];
@@ -887,7 +888,9 @@ class GitGraphView {
 	}
 
 	private areSelectedCommitsOnCurrentBranch(): boolean {
-		if (this.selectedCommits.size === 0 || !this.gitBranchHead) return false;
+		if (this.selectedCommits.size === 0 || !this.gitBranchHead) {
+			return false;
+		}
 
 		// Find the commit that the current branch points to
 		let currentBranchCommitIndex = -1;
@@ -898,15 +901,36 @@ class GitGraphView {
 			}
 		}
 
-		if (currentBranchCommitIndex === -1) return false;
+		if (currentBranchCommitIndex === -1) {
+			return false;
+		}
 
-		for (const hash of Array.from(this.selectedCommits)) {
-			const index = this.commitLookup[hash];
-			if (index < currentBranchCommitIndex) {
-				const commit = this.commits[index];
-				if (!commit.heads || !commit.heads.includes(this.gitBranchHead)) {
-					return false;
+		// Build a set of all commits that are ancestors of the current branch head
+		const branchCommits = new Set<string>();
+		const queue = [currentBranchCommitIndex];
+		const visited = new Set<number>();
+
+		while (queue.length > 0) {
+			const index = queue.shift()!;
+			if (visited.has(index)) continue;
+			visited.add(index);
+
+			const commit = this.commits[index];
+			branchCommits.add(commit.hash);
+
+			// Add parent commits to the queue
+			for (const parentHash of commit.parents) {
+				const parentIndex = this.commitLookup[parentHash];
+				if (parentIndex !== undefined && !visited.has(parentIndex)) {
+					queue.push(parentIndex);
 				}
+			}
+		}
+
+		// Check if all selected commits are in the branch
+		for (const hash of Array.from(this.selectedCommits)) {
+			if (!branchCommits.has(hash)) {
+				return false;
 			}
 		}
 
@@ -1489,7 +1513,7 @@ class GitGraphView {
 				}
 			}, {
 				title: 'Edit Message' + ELLIPSIS,
-				visible: visibility.editMessage,
+				visible: visibility.editMessage && this.areSelectedCommitsOnCurrentBranch(),
 				onClick: () => this.editCommitMessageAction(target)
 			}, {
 				title: 'Reset Last Commit' + ELLIPSIS,
@@ -2612,7 +2636,9 @@ class GitGraphView {
 					if (this.expandedCommit.commitHash === commit.hash) {
 						this.closeCommitDetails(true);
 					} else {
+						// Regular click with details open: select only this commit and load details
 						this.clearCommitSelection();
+						this.toggleCommitSelection(commit.hash, eventElem);
 						this.loadCommitDetails(eventElem);
 					}
 				} else {
@@ -2711,6 +2737,19 @@ class GitGraphView {
 				const commit = this.getCommitOfElem(eventElem);
 				if (commit === null) return;
 
+				// Close any open commit details to avoid visual confusion
+				// The commitDetailsOpen class can make commits appear selected
+				if (this.expandedCommit !== null && this.expandedCommit.commitHash !== commit.hash) {
+					this.closeCommitDetails(false);
+				}
+
+				// Only clear and select if the commit is not already selected
+				if (!this.selectedCommits.has(commit.hash)) {
+					this.clearCommitSelection();
+					this.toggleCommitSelection(commit.hash, eventElem);
+				}
+
+				// If the commit is already selected, keep the current selection for multi-select context menu
 				const target: ContextMenuTarget & DialogTarget & CommitTarget = {
 					type: TargetType.Commit,
 					hash: commit.hash,
