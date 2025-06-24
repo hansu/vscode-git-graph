@@ -1463,17 +1463,17 @@ class GitGraphView {
 					}
 				}
 			}, {
-				title: 'Reset Last Commit (Soft)' + ELLIPSIS,
+				title: 'Edit Message' + ELLIPSIS,
+				visible: visibility.editMessage,
+				onClick: () => this.editCommitMessageAction(target)
+			}, {
+				title: 'Reset Last Commit' + ELLIPSIS,
 				visible: visibility.undo && hash === this.commitHead,
 				onClick: () => {
 					dialog.showConfirmation('Are you sure you want to reset the last commit? This will keep all changes from the commit as uncommitted changes.', 'Yes, reset the last commit', () => {
 						runAction({ command: 'undoLastCommit', repo: this.currentRepo }, 'Resetting Last Commit');
 					}, target);
 				}
-			}, {
-				title: 'Edit Message' + ELLIPSIS,
-				visible: visibility.editMessage,
-				onClick: () => this.editCommitMessageAction(target)
 			}, {
 				title: 'Drop' + ELLIPSIS,
 				visible: visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),

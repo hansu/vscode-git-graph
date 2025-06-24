@@ -1272,13 +1272,54 @@ export class DataSource extends Disposable {
 				}
 				return this.runGitCommand(args, repo);
 			} else {
-				return 'Editing commit messages for non-HEAD commits is not yet supported.';
+				return this.rebaseEditCommitMessage(repo, commitHash, message);
 			}
 		} catch (error) {
 			return error as ErrorInfo;
 		}
 	}
 
+	/**
+	 * Edit a commit message for non-HEAD commits using interactive rebase.
+	 * @param repo The path of the repository.
+	 * @param commitHash The commit hash to edit.
+	 * @param message The new commit message.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	private async rebaseEditCommitMessage(repo: string, commitHash: string, message: string): Promise<ErrorInfo> {
+		const parentCommit = await this.spawnGit(['rev-parse', commitHash + '^'], repo, (stdout) => stdout.trim());
+
+		return new Promise<ErrorInfo>((resolve) => {
+			if (this.gitExecutable === null) {
+				return resolve(UNABLE_TO_FIND_GIT_MSG);
+			}
+
+			const args = ['rebase', '-i', parentCommit];
+			if (getConfig().signCommits) {
+				args.push('-S');
+			}
+
+			// Escape the message for shell execution
+			const escapedMessage = message
+				.replace(/\\/g, '\\\\')
+				.replace(/'/g, '\'"\'"\'');
+
+			// The GIT_EDITOR needs to be a command that accepts the filename as an argument
+			// We use a simple echo command that will write only our message to the file
+			const env = Object.assign({}, process.env, this.askpassEnv, {
+				GIT_SEQUENCE_EDITOR: `sed -i.bak "s/^pick ${commitHash.substring(0, 7)}/reword ${commitHash.substring(0, 7)}/" "$1"`,
+				GIT_EDITOR: `sh -c 'echo '"'"'${escapedMessage}'"'"' > "$@"' -- `
+			});
+
+			resolveSpawnOutput(cp.spawn(this.gitExecutable.path, args, { cwd: repo, env }))
+				.then(([status, stdout, stderr]) => {
+					resolve(status.code !== 0 ? getErrorMessage(status.error, stdout, stderr) : null);
+				})
+				.catch((errorMessage) => {
+					resolve(errorMessage);
+				});
+		});
+	}
 
 	/* Git Action Methods - Config */
 
@@ -1674,7 +1715,7 @@ export class DataSource extends Disposable {
 			// Show All
 			args.push('--branches');
 			if (includeTags) args.push('--tags');
-			else if(simplifyByDecoration) args.push('--decorate-refs-exclude=refs/tags/');
+			else if (simplifyByDecoration) args.push('--decorate-refs-exclude=refs/tags/');
 			if (includeCommitsMentionedByReflogs) args.push('--reflog');
 			if (includeRemotes) {
 				if (hideRemotes.length === 0) {

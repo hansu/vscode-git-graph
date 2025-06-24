@@ -238,7 +238,7 @@
 								},
 								"undo": {
 									"type": "boolean",
-									"title": "Reset Last Commit (Soft)"
+									"title": "Reset Last Commit"
 								},
 								"drop": {
 									"type": "boolean",
