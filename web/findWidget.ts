@@ -38,7 +38,7 @@ class FindWidget {
 		document.body.appendChild(this.widgetElem);
 
 		this.inputElem = <HTMLInputElement>document.getElementById('findInput')!;
-		let keyupTimeout: NodeJS.Timer | null = null;
+		let keyupTimeout: NodeJS.Timeout | null = null;
 		this.inputElem.addEventListener('keyup', (e) => {
 			if ((e.keyCode ? e.keyCode === 13 : e.key === 'Enter') && this.text !== '') {
 				if (e.shiftKey) {
@@ -224,7 +224,7 @@ class FindWidget {
 			} catch (e) {
 				findPattern = null;
 				findGlobalPattern = null;
-				this.widgetElem.setAttribute(ATTR_ERROR, e.message);
+				this.widgetElem.setAttribute(ATTR_ERROR, (e as Error).message);
 			}
 			if (findPattern !== null && findGlobalPattern !== null) {
 				let commitElems = getCommitElems(), j = 0, commit, zeroLengthMatch = false;
