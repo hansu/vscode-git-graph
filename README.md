@@ -1,4 +1,5 @@
 # Git Graph extension for Visual Studio Code
+Change 1
 
 Extended version of mhutchies Git Graph.
 Following features were added:
