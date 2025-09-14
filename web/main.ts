@@ -606,6 +606,18 @@ class GitGraphView {
 		return possibleRemotes.find((remote) => remote !== null && this.gitRemotes.includes(remote)) || this.gitRemotes[0];
 	}
 
+	/**
+	 * Get the remote that the specified branch is tracking.
+	 * @param branchName - The name of the branch to get the tracking remote for
+	 * @returns The name of the remote the branch is tracking, or null if not tracking any remote
+	 */
+	private getRemoteForBranch(branchName: string): string | null {
+		if (!this.gitConfig || !this.gitConfig.branches[branchName]) {
+			return null;
+		}
+		return this.gitConfig.branches[branchName].remote;
+	}
+
 	public getRepoConfig(): Readonly<GG.GitRepoConfig> | null {
 		return this.gitConfig;
 	}
@@ -1341,13 +1353,18 @@ class GitGraphView {
 				title: 'Pull Branch' + ELLIPSIS,
 				visible: visibility.pull && this.gitRemotes.length > 0,
 				onClick: () => {
-					dialog.showForm('Are you sure you want to update the local branch <b><i>' + escapeHtml(refName) + '</i></b> with the latest changes from <b><i>' + escapeHtml(this.gitRemotes[0] + '/' + refName) + '</i></b>?', [{
+					const trackingRemote = this.getRemoteForBranch(refName);
+					if (!trackingRemote) {
+						dialog.showError('Cannot pull branch <b><i>' + escapeHtml(refName) + '</i></b> because it is not tracking a remote branch. You may need to set an upstream branch first.', 'Pull Branch', null, null);
+						return;
+					}
+					dialog.showForm('Are you sure you want to update the local branch <b><i>' + escapeHtml(refName) + '</i></b> with the latest changes from <b><i>' + escapeHtml(trackingRemote + '/' + refName) + '</i></b>?', [{
 						type: DialogInputType.Checkbox,
 						name: 'Force Update',
 						value: this.config.dialogDefaults.fetchIntoLocalBranch.forceFetch,
 						info: 'Force the local branch to be reset to the remote branch (discard local commits).'
 					}], 'Yes, update', (values) => {
-						runAction({ command: 'fetchIntoLocalBranch', repo: this.currentRepo, remote: this.gitRemotes[0], remoteBranch: refName, localBranch: refName, force: <boolean>values[0] }, 'Updating Branch');
+						runAction({ command: 'fetchIntoLocalBranch', repo: this.currentRepo, remote: trackingRemote, remoteBranch: refName, localBranch: refName, force: <boolean>values[0] }, 'Updating Branch');
 					}, target);
 				}
 			}
