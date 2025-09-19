@@ -6,6 +6,7 @@ import { DataSource } from './dataSource';
 import { DiffDocProvider, decodeDiffDocUri } from './diffDocProvider';
 import { CodeReviewData, CodeReviews, ExtensionState } from './extensionState';
 import { GitGraphView } from './gitGraphView';
+import { GitGraphPanelView } from './gitGraphPanelView';
 import { Logger } from './logger';
 import { RepoManager } from './repoManager';
 import { GitExecutable, UNABLE_TO_FIND_GIT_MSG, VsCodeVersionRequirement, abbrevCommit, abbrevText, copyToClipboard, doesVersionMeetRequirement, getExtensionVersion, getPathFromUri, getRelativeTimeDiff, getRepoName, getSortedRepositoryPaths, isPathInWorkspace, openFile, resolveToSymbolicPath, showErrorMessage, showInformationMessage } from './utils';
@@ -47,6 +48,8 @@ export class CommandManager extends Disposable {
 
 		// Register Extension Commands
 		this.registerCommand('git-graph.view', (arg) => this.view(arg));
+		this.registerCommand('git-graph.viewInEditor', (arg) => this.viewInEditor(arg));
+		this.registerCommand('git-graph.viewInPanel', (arg) => this.viewInPanel(arg));
 		this.registerCommand('git-graph.addGitRepository', () => this.addGitRepository());
 		this.registerCommand('git-graph.removeGitRepository', () => this.removeGitRepository());
 		this.registerCommand('git-graph.clearAvatarCache', () => this.clearAvatarCache());
@@ -105,6 +108,53 @@ export class CommandManager extends Disposable {
 	 * @param arg An optional argument passed to the command (when invoked from the Visual Studio Code Git Extension).
 	 */
 	private async view(arg: any) {
+		const config = getConfig();
+		if (config.viewLocation === 'panel') {
+			await this.viewInPanel(arg);
+		} else {
+			await this.viewInEditor(arg);
+		}
+	}
+
+	/**
+	 * The method run when the `git-graph.viewInEditor` command is invoked.
+	 * @param arg An optional argument passed to the command.
+	 */
+	private async viewInEditor(arg: any) {
+		const loadRepo = await this.getLoadRepo(arg);
+		GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, loadRepo !== null ? { repo: loadRepo } : null);
+	}
+
+	/**
+	 * The method run when the `git-graph.viewInPanel` command is invoked.
+	 * @param arg An optional argument passed to the command.
+	 */
+	private async viewInPanel(arg: any) {
+		if (this.gitExecutable === null) {
+			showErrorMessage(UNABLE_TO_FIND_GIT_MSG);
+			return;
+		}
+
+		const loadRepo = await this.getLoadRepo(arg);
+		const panelProvider = GitGraphPanelView.getInstance(
+			this.context.extensionPath,
+			this.dataSource,
+			this.extensionState,
+			this.avatarManager,
+			this.repoManager,
+			this.logger
+		);
+
+		// Show the view immediately - VS Code will handle the panel creation
+		panelProvider.show(loadRepo !== null ? { repo: loadRepo } : null);
+	}
+
+	/**
+	 * Get the repository to load based on the command argument and configuration.
+	 * @param arg An optional argument passed to the command.
+	 * @returns The repository path to load, or null.
+	 */
+	private async getLoadRepo(arg: any): Promise<string | null> {
 		let loadRepo: string | null = null;
 
 		if (typeof arg === 'object' && arg.rootUri) {
@@ -120,7 +170,7 @@ export class CommandManager extends Disposable {
 			loadRepo = this.repoManager.getRepoContainingFile(getPathFromUri(vscode.window.activeTextEditor.document.uri));
 		}
 
-		GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, loadRepo !== null ? { repo: loadRepo } : null);
+		return loadRepo;
 	}
 
 	/**

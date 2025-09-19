@@ -5,6 +5,7 @@ import { getConfig } from './config';
 import { DataSource } from './dataSource';
 import { DiffDocProvider } from './diffDocProvider';
 import { ExtensionState } from './extensionState';
+import { GitGraphPanelView } from './gitGraphPanelView';
 import { onStartUp } from './life-cycle/startup';
 import { Logger } from './logger';
 import { RepoManager } from './repoManager';
@@ -45,6 +46,18 @@ export async function activate(context: vscode.ExtensionContext) {
 	const statusBarItem = new StatusBarItem(repoManager.getNumRepos(), repoManager.onDidChangeRepos, onDidChangeConfiguration, logger);
 	const commandManager = new CommandManager(context, avatarManager, dataSource, extensionState, repoManager, gitExecutable, onDidChangeGitExecutable, logger);
 	const diffDocProvider = new DiffDocProvider(dataSource);
+	// Always register the panel view provider (so users can switch modes without restarting)
+	const panelProvider = GitGraphPanelView.getInstance(
+		context.extensionPath,
+		dataSource,
+		extensionState,
+		avatarManager,
+		repoManager,
+		logger
+	);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(GitGraphPanelView.viewType, panelProvider)
+	);
 
 	context.subscriptions.push(
 		vscode.workspace.registerTextDocumentContentProvider(DiffDocProvider.scheme, diffDocProvider),

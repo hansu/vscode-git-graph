@@ -33,6 +33,7 @@ class GitGraphView {
 
 	private moreCommitsAvailable: boolean = false;
 	private expandedCommit: ExpandedCommit | null = null;
+	private selectedCommits: Set<string> = new Set();
 	private maxCommits: number;
 	private scrollTop = 0;
 	private renderedGitBranchHead: string | null = null;
@@ -605,6 +606,18 @@ class GitGraphView {
 		return possibleRemotes.find((remote) => remote !== null && this.gitRemotes.includes(remote)) || this.gitRemotes[0];
 	}
 
+	/**
+	 * Get the remote that the specified branch is tracking.
+	 * @param branchName - The name of the branch to get the tracking remote for
+	 * @returns The name of the remote the branch is tracking, or null if not tracking any remote
+	 */
+	private getRemoteForBranch(branchName: string): string | null {
+		if (!this.gitConfig || !this.gitConfig.branches[branchName]) {
+			return null;
+		}
+		return this.gitConfig.branches[branchName].remote;
+	}
+
 	public getRepoConfig(): Readonly<GG.GitRepoConfig> | null {
 		return this.gitConfig;
 	}
@@ -818,6 +831,228 @@ class GitGraphView {
 			this.gitRepos[this.currentRepo][key] = value;
 			this.saveRepoState();
 		}
+	}
+
+	/* Multi-select Commit Management */
+
+	private toggleCommitSelection(commitHash: string, commitElem: HTMLElement) {
+		if (this.selectedCommits.has(commitHash)) {
+			this.selectedCommits.delete(commitHash);
+			commitElem.classList.remove('commitSelected');
+		} else {
+			this.selectedCommits.add(commitHash);
+			commitElem.classList.add('commitSelected');
+		}
+	}
+
+	private clearCommitSelection() {
+		const selectedElems = document.querySelectorAll('.commitSelected');
+		selectedElems.forEach(elem => elem.classList.remove('commitSelected'));
+		this.selectedCommits.clear();
+	}
+
+
+	private selectCommitRange(fromHash: string, toHash: string) {
+		const fromIndex = this.commitLookup[fromHash];
+		const toIndex = this.commitLookup[toHash];
+
+		if (fromIndex === undefined || toIndex === undefined) return;
+
+		this.clearCommitSelection();
+
+		// Determine the range
+		const startIndex = Math.min(fromIndex, toIndex);
+		const endIndex = Math.max(fromIndex, toIndex);
+
+		// Select all commits in the range
+		for (let i = startIndex; i <= endIndex; i++) {
+			const commit = this.commits[i];
+			if (commit) {
+				this.selectedCommits.add(commit.hash);
+				const commitElem = document.querySelector(`tr.commit[data-id="${i}"]`);
+				if (commitElem) {
+					commitElem.classList.add('commitSelected');
+				}
+			}
+		}
+	}
+
+	private getSelectedCommitsArray(): string[] {
+		return Array.from(this.selectedCommits).sort((a, b) => {
+			const indexA = this.commitLookup[a];
+			const indexB = this.commitLookup[b];
+			return indexA - indexB;
+		});
+	}
+
+	private areSelectedCommitsContiguous(): boolean {
+		if (this.selectedCommits.size < 2) return true;
+
+		const sortedCommits = this.getSelectedCommitsArray();
+		for (let i = 0; i < sortedCommits.length - 1; i++) {
+			const currentIndex = this.commitLookup[sortedCommits[i]];
+			const nextIndex = this.commitLookup[sortedCommits[i + 1]];
+			if (nextIndex - currentIndex !== 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private areSelectedCommitsOnCurrentBranch(): boolean {
+		if (this.selectedCommits.size === 0 || !this.gitBranchHead) {
+			return false;
+		}
+
+		// Find the commit that the current branch points to
+		let currentBranchCommitIndex = -1;
+		for (let i = 0; i < this.commits.length; i++) {
+			if (this.commits[i].heads && this.commits[i].heads.includes(this.gitBranchHead)) {
+				currentBranchCommitIndex = i;
+				break;
+			}
+		}
+
+		if (currentBranchCommitIndex === -1) {
+			return false;
+		}
+
+		// Build a set of all commits that are ancestors of the current branch head
+		const branchCommits = new Set<string>();
+		const queue = [currentBranchCommitIndex];
+		const visited = new Set<number>();
+
+		while (queue.length > 0) {
+			const index = queue.shift()!;
+			if (visited.has(index)) continue;
+			visited.add(index);
+
+			const commit = this.commits[index];
+			branchCommits.add(commit.hash);
+
+			// Add parent commits to the queue
+			for (const parentHash of commit.parents) {
+				const parentIndex = this.commitLookup[parentHash];
+				if (parentIndex !== undefined && !visited.has(parentIndex)) {
+					queue.push(parentIndex);
+				}
+			}
+		}
+
+		// Check if all selected commits are in the branch
+		for (const hash of Array.from(this.selectedCommits)) {
+			if (!branchCommits.has(hash)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private dropCommitsPossible(): boolean {
+		if (this.selectedCommits.size === 0) return false;
+
+		for (const hash of Array.from(this.selectedCommits)) {
+			const index = this.commitLookup[hash];
+			if (!this.graph.dropCommitPossible(index)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private squashCommitsAction(target: DialogTarget & CommitTarget) {
+		const selectedCommits = this.getSelectedCommitsArray();
+		if (selectedCommits.length < 2) return;
+
+		const newestCommit = selectedCommits[0];
+		const newestCommitData = this.commits[this.commitLookup[newestCommit]];
+
+		const commitsList = selectedCommits.map(hash => {
+			const commitData = this.commits[this.commitLookup[hash]];
+			return `<b>${abbrevCommit(hash)}</b> - ${escapeHtml(commitData.message)}`;
+		}).join('<br>');
+
+		dialog.showForm(
+			`Are you sure you want to squash ${selectedCommits.length} commits into one?<br><br>` +
+			`${commitsList}`,
+			[{
+				type: DialogInputType.Text,
+				name: 'Commit Message',
+				default: newestCommitData.message,
+				placeholder: 'Enter the commit message for the squashed commit'
+			}],
+			'Yes, squash commits',
+			(values) => {
+				const commitMessage = <string>values[0];
+				runAction({
+					command: 'squashCommits',
+					repo: this.currentRepo,
+					commits: selectedCommits,
+					commitMessage: commitMessage
+				}, 'Squashing Commits');
+				this.clearCommitSelection();
+			},
+			target
+		);
+	}
+
+	private dropSelectedCommitsAction(target: DialogTarget) {
+		const selectedCommits = this.getSelectedCommitsArray();
+		if (selectedCommits.length === 0) return;
+
+		const commitsList = selectedCommits.map(hash => {
+			const commitData = this.commits[this.commitLookup[hash]];
+			return `<b>${abbrevCommit(hash)}</b> - ${escapeHtml(commitData.message)}`;
+		}).join('<br>');
+
+		dialog.showConfirmation(
+			`Are you sure you want to permanently drop ${selectedCommits.length} commit${selectedCommits.length > 1 ? 's' : ''}?<br><br>${commitsList}` +
+			(this.onlyFollowFirstParent ? '<br/><br/><i>Note: By enabling "Only follow the first parent of commits", some commits may have been hidden from the Git Graph View that could affect the outcome of performing this action.</i>' : ''),
+			'Yes, drop',
+			() => {
+				runAction({
+					command: 'dropCommits',
+					repo: this.currentRepo,
+					commits: selectedCommits
+				}, 'Dropping Commits');
+				this.clearCommitSelection();
+			},
+			target
+		);
+	}
+
+	private editCommitMessageAction(target: DialogTarget & CommitTarget) {
+		const hash = target.hash;
+		const commit = this.commits[this.commitLookup[hash]];
+
+		dialog.showForm(
+			`Edit commit message for <b><i>${abbrevCommit(hash)}</i></b>:`,
+			[{
+				type: DialogInputType.Text,
+				name: 'Commit Message',
+				default: commit.message,
+				placeholder: 'Enter the new commit message'
+			}],
+			'Update Message',
+			(values) => {
+				const newMessage = <string>values[0];
+				if (newMessage.trim() === '') {
+					dialog.showError('Commit message cannot be empty.', null, null, null);
+					return;
+				}
+				if (newMessage === commit.message) {
+					return; // No change needed
+				}
+				runAction({
+					command: 'editCommitMessage',
+					repo: this.currentRepo,
+					commitHash: hash,
+					message: newMessage
+				}, 'Editing Commit Message');
+			},
+			target
+		);
 	}
 
 
@@ -1042,6 +1277,10 @@ class GitGraphView {
 					}, target);
 				}
 			}, {
+				title: 'Create Branch' + ELLIPSIS,
+				visible: visibility.createBranch,
+				onClick: () => this.createBranchAction(target.hash, '', true, target)
+			}, {
 				title: 'Delete Branch' + ELLIPSIS,
 				visible: visibility.delete && this.gitBranchHead !== refName,
 				onClick: () => {
@@ -1110,6 +1349,24 @@ class GitGraphView {
 						}, 'Pushing Branch');
 					}, target);
 				}
+			}, {
+				title: 'Pull Branch' + ELLIPSIS,
+				visible: visibility.pull && this.gitRemotes.length > 0,
+				onClick: () => {
+					const trackingRemote = this.getRemoteForBranch(refName);
+					if (!trackingRemote) {
+						dialog.showError('Cannot pull branch <b><i>' + escapeHtml(refName) + '</i></b> because it is not tracking a remote branch. You may need to set an upstream branch first.', 'Pull Branch', null, null);
+						return;
+					}
+					dialog.showForm('Are you sure you want to update the local branch <b><i>' + escapeHtml(refName) + '</i></b> with the latest changes from <b><i>' + escapeHtml(trackingRemote + '/' + refName) + '</i></b>?', [{
+						type: DialogInputType.Checkbox,
+						name: 'Force Update',
+						value: this.config.dialogDefaults.fetchIntoLocalBranch.forceFetch,
+						info: 'Force the local branch to be reset to the remote branch (discard local commits).'
+					}], 'Yes, update', (values) => {
+						runAction({ command: 'fetchIntoLocalBranch', repo: this.currentRepo, remote: trackingRemote, remoteBranch: refName, localBranch: refName, force: <boolean>values[0] }, 'Updating Branch');
+					}, target);
+				}
 			}
 		], [
 			this.getViewIssueAction(refName, visibility.viewIssue, target),
@@ -1153,10 +1410,37 @@ class GitGraphView {
 		]];
 	}
 
+	private getMultiSelectCommitContextMenuActions(target: DialogTarget & CommitTarget): ContextMenuActions {
+		const visibility = this.config.contextMenuActionsVisibility.commit;
+		const multiSelectActions: ContextMenuAction[] = [];
+
+		// Squash option (requires contiguous commits)
+		if (this.areSelectedCommitsContiguous() && this.areSelectedCommitsOnCurrentBranch()) {
+			multiSelectActions.push({
+				title: 'Squash Selected Commits' + ELLIPSIS,
+				visible: true,
+				onClick: () => this.squashCommitsAction(target)
+			});
+		}
+
+		// Drop option (check if all selected commits can be dropped)
+		if (this.dropCommitsPossible() && this.areSelectedCommitsOnCurrentBranch()) {
+			multiSelectActions.push({
+				title: 'Drop Selected Commits' + ELLIPSIS,
+				visible: visibility.drop,
+				onClick: () => this.dropSelectedCommitsAction(target)
+			});
+		}
+
+		return multiSelectActions.length > 0 ? [multiSelectActions] : [];
+	}
+
 	private getCommitContextMenuActions(target: DialogTarget & CommitTarget): ContextMenuActions {
 		const hash = target.hash, visibility = this.config.contextMenuActionsVisibility.commit;
 		const commit = this.commits[this.commitLookup[hash]];
-		return [[
+		let actions: ContextMenuActions = [];
+
+		return [...actions, [
 			{
 				title: 'Add Tag' + ELLIPSIS,
 				visible: visibility.addTag,
@@ -1245,6 +1529,18 @@ class GitGraphView {
 					}
 				}
 			}, {
+				title: 'Edit Message' + ELLIPSIS,
+				visible: visibility.editMessage && this.areSelectedCommitsOnCurrentBranch(),
+				onClick: () => this.editCommitMessageAction(target)
+			}, {
+				title: 'Reset Last Commit' + ELLIPSIS,
+				visible: visibility.undo && hash === this.commitHead,
+				onClick: () => {
+					dialog.showConfirmation('Are you sure you want to reset the last commit? This will keep all changes from the commit as uncommitted changes.', 'Yes, reset the last commit', () => {
+						runAction({ command: 'undoLastCommit', repo: this.currentRepo }, 'Resetting Last Commit');
+					}, target);
+				}
+			}, {
 				title: 'Drop' + ELLIPSIS,
 				visible: visibility.drop && this.graph.dropCommitPossible(this.commitLookup[hash]),
 				onClick: () => {
@@ -1303,6 +1599,10 @@ class GitGraphView {
 				title: 'Checkout Branch' + ELLIPSIS,
 				visible: visibility.checkout,
 				onClick: () => this.checkoutBranchAction(refName, remote, null, target)
+			}, {
+				title: 'Create Branch' + ELLIPSIS,
+				visible: visibility.createBranch,
+				onClick: () => this.createBranchAction(target.hash, branchName, true, target)
 			}, {
 				title: 'Delete Remote Branch' + ELLIPSIS,
 				visible: visibility.delete && remote !== '',
@@ -2065,7 +2365,7 @@ class GitGraphView {
 	}
 
 	private observeViewScroll() {
-		let active = this.viewElem.scrollTop > 0, timeout: NodeJS.Timer | null = null;
+		let active = this.viewElem.scrollTop > 0, timeout: NodeJS.Timeout | null = null;
 		this.viewElem.addEventListener('scroll', () => {
 			const scrollTop = this.viewElem.scrollTop;
 			if (active !== scrollTop > 0) {
@@ -2286,22 +2586,82 @@ class GitGraphView {
 
 			} else if ((eventElem = eventTarget.closest('.commit')) !== null) {
 				// .commit was clicked
-				if (this.expandedCommit !== null) {
-					const commit = this.getCommitOfElem(eventElem);
-					if (commit === null) return;
+				const commit = this.getCommitOfElem(eventElem);
+				if (commit === null) return;
 
-					if (this.expandedCommit.commitHash === commit.hash) {
-						this.closeCommitDetails(true);
-					} else if ((<MouseEvent>e).ctrlKey || (<MouseEvent>e).metaKey) {
-						if (this.expandedCommit.compareWithHash === commit.hash) {
-							this.closeCommitComparison(true);
-						} else if (this.expandedCommit.commitElem !== null) {
-							this.loadCommitComparison(this.expandedCommit.commitElem, eventElem);
+				const mouseEvent = <MouseEvent>e;
+
+				if (mouseEvent.shiftKey) {
+					if (this.selectedCommits.size > 0) {
+						// Shift-click: select range from first selected commit
+						const anchorCommit = Array.from(this.selectedCommits)[0];
+						this.selectCommitRange(anchorCommit, commit.hash);
+
+						// Check if exactly 2 commits are selected to show diff
+						if (this.selectedCommits.size === 2) {
+							// Get the two selected commits
+							const selectedHashes = Array.from(this.selectedCommits);
+							const commitElems = selectedHashes.map(hash => {
+								const index = this.commitLookup[hash];
+								return document.querySelector(`tr.commit[data-id="${index}"]`) as HTMLElement;
+							}).filter(elem => elem !== null);
+
+							if (commitElems.length === 2) {
+								// Load comparison between the two commits
+								const [firstIndex, secondIndex] = selectedHashes.map(hash => this.commitLookup[hash]);
+								if (firstIndex < secondIndex) {
+									this.loadCommitComparison(commitElems[1], commitElems[0]);
+								} else {
+									this.loadCommitComparison(commitElems[0], commitElems[1]);
+								}
+							}
+						} else if (this.selectedCommits.size > 2) {
+							// More than 2 commits selected, close any open details
+							this.closeCommitDetails(true);
 						}
 					} else {
+						// No commits selected, just select this one
+						this.toggleCommitSelection(commit.hash, eventElem);
+					}
+				} else if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
+					// Ctrl/Cmd-click: toggle individual commit selection
+					this.toggleCommitSelection(commit.hash, eventElem);
+
+					// Check if exactly 2 commits are selected to show diff
+					if (this.selectedCommits.size === 2) {
+						// Get the two selected commits
+						const selectedHashes = Array.from(this.selectedCommits);
+						const commitElems = selectedHashes.map(hash => {
+							const index = this.commitLookup[hash];
+							return document.querySelector(`tr.commit[data-id="${index}"]`) as HTMLElement;
+						}).filter(elem => elem !== null);
+
+						if (commitElems.length === 2) {
+							// Load comparison between the two commits
+							const [firstIndex, secondIndex] = selectedHashes.map(hash => this.commitLookup[hash]);
+							if (firstIndex < secondIndex) {
+								this.loadCommitComparison(commitElems[1], commitElems[0]);
+							} else {
+								this.loadCommitComparison(commitElems[0], commitElems[1]);
+							}
+						}
+					} else if (this.selectedCommits.size > 2) {
+						// More than 2 commits selected, close any open details
+						this.closeCommitDetails(true);
+					}
+				} else if (this.expandedCommit !== null) {
+					if (this.expandedCommit.commitHash === commit.hash) {
+						this.closeCommitDetails(true);
+					} else {
+						// Regular click with details open: select only this commit and load details
+						this.clearCommitSelection();
+						this.toggleCommitSelection(commit.hash, eventElem);
 						this.loadCommitDetails(eventElem);
 					}
 				} else {
+					// Regular click: select only this commit and load details
+					this.clearCommitSelection();
+					this.toggleCommitSelection(commit.hash, eventElem);
 					this.loadCommitDetails(eventElem);
 				}
 			}
@@ -2394,6 +2754,19 @@ class GitGraphView {
 				const commit = this.getCommitOfElem(eventElem);
 				if (commit === null) return;
 
+				// Close any open commit details to avoid visual confusion
+				// The commitDetailsOpen class can make commits appear selected
+				if (this.expandedCommit !== null && this.expandedCommit.commitHash !== commit.hash) {
+					this.closeCommitDetails(false);
+				}
+
+				// Only clear and select if the commit is not already selected
+				if (!this.selectedCommits.has(commit.hash)) {
+					this.clearCommitSelection();
+					this.toggleCommitSelection(commit.hash, eventElem);
+				}
+
+				// If the commit is already selected, keep the current selection for multi-select context menu
 				const target: ContextMenuTarget & DialogTarget & CommitTarget = {
 					type: TargetType.Commit,
 					hash: commit.hash,
@@ -2408,7 +2781,11 @@ class GitGraphView {
 					target.ref = commit.stash.selector;
 					actions = this.getStashContextMenuActions(<RefTarget>target);
 				} else {
-					actions = this.getCommitContextMenuActions(target);
+					if (this.selectedCommits.size > 1 && this.selectedCommits.has(commit.hash)) {
+						actions = this.getMultiSelectCommitContextMenuActions(target);
+					} else {
+						actions = this.getCommitContextMenuActions(target);
+					}
 				}
 
 				contextMenu.show(actions, false, target, <MouseEvent>e, this.viewElem);
@@ -3421,6 +3798,12 @@ window.addEventListener('load', () => {
 			case 'dropCommit':
 				refreshOrDisplayError(msg.error, 'Unable to Drop Commit');
 				break;
+			case 'dropCommits':
+				refreshOrDisplayError(msg.error, 'Unable to Drop Commits');
+				break;
+			case 'editCommitMessage':
+				refreshOrDisplayError(msg.error, 'Unable to Edit Commit Message');
+				break;
 			case 'dropStash':
 				refreshOrDisplayError(msg.error, 'Unable to Drop Stash');
 				break;
@@ -3521,6 +3904,12 @@ window.addEventListener('load', () => {
 				break;
 			case 'revertCommit':
 				refreshOrDisplayError(msg.error, 'Unable to Revert Commit');
+				break;
+			case 'undoLastCommit':
+				refreshOrDisplayError(msg.error, 'Unable to Reset Last Commit');
+				break;
+			case 'squashCommits':
+				refreshOrDisplayError(msg.error, 'Unable to Squash Commits');
 				break;
 			case 'setGlobalViewState':
 				finishOrDisplayError(msg.error, 'Unable to save the Global View State');

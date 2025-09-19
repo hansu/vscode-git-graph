@@ -723,10 +723,11 @@ svg.openFolderIcon, svg.closedFolderIcon, svg.fileIcon{
 	background-color:rgba(128,128,128,0.15);
 }
 #commitTable tr.commit.commitDetailsOpen{
-	background-color:rgba(128,128,128,0.25);
+	background-color:rgba(0,123,255,0.2);
+	border-left:3px solid var(--vscode-focusBorder, #007ACC);
 }
 #commitTable tr.commit.commitDetailsOpen:hover, #commitTable tr.commit.commitDetailsOpen.contextMenuActive, #commitTable tr.commit.commitDetailsOpen.dialogActive, #commitTable tr.commit.commitDetailsOpen.graphVertexActive{
-	background-color:rgba(128,128,128,0.35);
+	background-color:rgba(0,123,255,0.3);
 }
 
 #commitTable tr.commit.findCurrentCommit {
@@ -736,6 +737,13 @@ svg.openFolderIcon, svg.closedFolderIcon, svg.fileIcon{
 }
 body.vscode-high-contrast #commitTable tr.commit.findCurrentCommit{
 	outline-style:dotted;
+}
+
+#commitTable tr.commit.commitSelected {
+	background-color:rgba(128,128,128,0.25);
+}
+#commitTable tr.commit.commitSelected:hover, #commitTable tr.commit.commitSelected.contextMenuActive {
+	background-color:rgba(128,128,128,0.35);
 }
 
 #commitTable tr.commit.mute.commitDetailsOpen td.text,

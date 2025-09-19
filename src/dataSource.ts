@@ -468,7 +468,7 @@ export class DataSource extends Disposable {
 	 * @returns The comparison details.
 	 */
 	public getCommitComparison(repo: string, fromHash: string, toHash: string): Promise<GitCommitComparisonData> {
-		return Promise.all<DiffNameStatusRecord[], DiffNumStatRecord[], GitStatusFiles | null>([
+		return Promise.all([
 			this.getDiffNameStatus(repo, fromHash, toHash === UNCOMMITTED ? '' : toHash),
 			this.getDiffNumStat(repo, fromHash, toHash === UNCOMMITTED ? '' : toHash),
 			toHash === UNCOMMITTED ? this.getStatus(repo) : Promise.resolve(null)
@@ -962,7 +962,23 @@ export class DataSource extends Disposable {
 	 * @param force Force fetch the remote branch.
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public fetchIntoLocalBranch(repo: string, remote: string, remoteBranch: string, localBranch: string, force: boolean) {
+	public async fetchIntoLocalBranch(repo: string, remote: string, remoteBranch: string, localBranch: string, force: boolean) {
+		const currentBranch = await this.spawnGit(['symbolic-ref', '--short', 'HEAD'], repo, (stdout) => stdout.trim());
+
+		if (currentBranch === localBranch) {
+			if (!force) {
+				return this.runGitCommand(['pull', remote, remoteBranch], repo);
+			}
+
+			const fetchArgs = ['fetch', remote, remoteBranch];
+			const fetchResult = await this.runGitCommand(fetchArgs, repo);
+			if (fetchResult !== null) {
+				return fetchResult;
+			}
+			return this.runGitCommand(['reset', '--hard', remote + '/' + remoteBranch], repo);
+		}
+
+		// If the branch is not checked out, we can use fetch
 		const args = ['fetch'];
 		if (force) {
 			args.push('-f');
@@ -1143,6 +1159,63 @@ export class DataSource extends Disposable {
 	}
 
 	/**
+	 * Drop multiple commits via a rebase.
+	 * @param repo The path of the repository.
+	 * @param commits Array of commit hashes to drop (from newest to oldest).
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public async dropCommits(repo: string, commits: ReadonlyArray<string>): Promise<ErrorInfo> {
+		if (commits.length === 0) {
+			return 'No commits selected for dropping.';
+		}
+
+		if (commits.length === 1) {
+			// For a single commit, use the existing dropCommit method
+			return this.dropCommit(repo, commits[0]);
+		}
+
+		// For multiple commits, we need to drop them one by one from newest to oldest
+		// This ensures that the commit hashes remain valid as we rebase
+		for (const commitHash of commits) {
+			const result = await this.dropCommit(repo, commitHash);
+			if (result !== null) {
+				return result;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Squash multiple commits into one.
+	 * @param repo The path of the repository.
+	 * @param commits Array of commit hashes to squash (from newest to oldest).
+	 * @param commitMessage The commit message for the squashed commit.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public async squashCommits(repo: string, commits: ReadonlyArray<string>, commitMessage: string): Promise<ErrorInfo> {
+		if (commits.length < 2) {
+			return 'At least 2 commits are required for squashing.';
+		}
+
+		const oldestCommit = commits[commits.length - 1];
+
+		// Reset to the parent of the oldest commit, keeping changes staged
+		const resetResult = await this.runGitCommand(['reset', '--soft', oldestCommit + '^'], repo);
+		if (resetResult !== null) {
+			return resetResult;
+		}
+
+		// Create a new commit with the combined changes
+		const commitArgs = ['commit', '-m', commitMessage];
+		if (getConfig().signCommits) {
+			commitArgs.push('-S');
+		}
+
+		return this.runGitCommand(commitArgs, repo);
+	}
+
+	/**
 	 * Reset the current branch to a specified commit.
 	 * @param repo The path of the repository.
 	 * @param commit The hash of the commit that the current branch should be reset to.
@@ -1172,6 +1245,81 @@ export class DataSource extends Disposable {
 		return this.runGitCommand(args, repo);
 	}
 
+	/**
+	 * Undo the last commit in a repository (soft reset to HEAD^).
+	 * @param repo The path of the repository.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public undoLastCommit(repo: string) {
+		return this.runGitCommand(['reset', '--soft', 'HEAD^'], repo);
+	}
+
+	/**
+	 * Edit a commit message using git commit --amend.
+	 * @param repo The path of the repository.
+	 * @param commitHash The commit hash to edit.
+	 * @param message The new commit message.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public async editCommitMessage(repo: string, commitHash: string, message: string): Promise<ErrorInfo> {
+		try {
+			const headCommit = await this.spawnGit(['rev-parse', 'HEAD'], repo, (stdout) => stdout.trim());
+
+			if (headCommit === commitHash) {
+				const args = ['commit', '--amend', '-m', message];
+				if (getConfig().signCommits) {
+					args.push('-S');
+				}
+				return this.runGitCommand(args, repo);
+			} else {
+				return this.rebaseEditCommitMessage(repo, commitHash, message);
+			}
+		} catch (error) {
+			return error as ErrorInfo;
+		}
+	}
+
+	/**
+	 * Edit a commit message for non-HEAD commits using interactive rebase.
+	 * @param repo The path of the repository.
+	 * @param commitHash The commit hash to edit.
+	 * @param message The new commit message.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	private async rebaseEditCommitMessage(repo: string, commitHash: string, message: string): Promise<ErrorInfo> {
+		const parentCommit = await this.spawnGit(['rev-parse', commitHash + '^'], repo, (stdout) => stdout.trim());
+
+		return new Promise<ErrorInfo>((resolve) => {
+			if (this.gitExecutable === null) {
+				return resolve(UNABLE_TO_FIND_GIT_MSG);
+			}
+
+			const args = ['rebase', '-i', parentCommit];
+			if (getConfig().signCommits) {
+				args.push('-S');
+			}
+
+			// Escape the message for shell execution
+			const escapedMessage = message
+				.replace(/\\/g, '\\\\')
+				.replace(/'/g, '\'"\'"\'');
+
+			// The GIT_EDITOR needs to be a command that accepts the filename as an argument
+			// We use a simple echo command that will write only our message to the file
+			const env = Object.assign({}, process.env, this.askpassEnv, {
+				GIT_SEQUENCE_EDITOR: `sed -i.bak "s/^pick ${commitHash.substring(0, 7)}/reword ${commitHash.substring(0, 7)}/" "$1"`,
+				GIT_EDITOR: `sh -c 'echo '"'"'${escapedMessage}'"'"' > "$@"' -- `
+			});
+
+			resolveSpawnOutput(cp.spawn(this.gitExecutable.path, args, { cwd: repo, env }))
+				.then(([status, stdout, stderr]) => {
+					resolve(status.code !== 0 ? getErrorMessage(status.error, stdout, stderr) : null);
+				})
+				.catch((errorMessage) => {
+					resolve(errorMessage);
+				});
+		});
+	}
 
 	/* Git Action Methods - Config */
 
@@ -1567,7 +1715,7 @@ export class DataSource extends Disposable {
 			// Show All
 			args.push('--branches');
 			if (includeTags) args.push('--tags');
-			else if(simplifyByDecoration) args.push('--decorate-refs-exclude=refs/tags/');
+			else if (simplifyByDecoration) args.push('--decorate-refs-exclude=refs/tags/');
 			if (includeCommitsMentionedByReflogs) args.push('--reflog');
 			if (includeRemotes) {
 				if (hideRemotes.length === 0) {
