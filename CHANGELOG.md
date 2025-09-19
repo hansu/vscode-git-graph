@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.31.6 - 2025-09-19
+ * #62 Add panel view and bulk commit operations. Thanks [@LeuciRemi](https://github.com/LeuciRemi).
+   * Add support for viewing Git Graph in a panel and/or editor.
+   Enable with setting `"git-graph.viewLocation": "panel"`.
+   * Add multi-selection (Ctrl+click/Shift+click) for commits, add 'Squash Selected Commits' and 'Drop Selected Commits' action for selection
+   * Add 'Reset Last Commit' functionality.
+   * Add 'Edit Message' action to commit context menu.
+   * Add 'Pull Branch' action to branch context menu with "Force Update" option.
+   * Add 'Create Branch' action to branch context menu.
+
 ## 1.31.5 - 2025-05-17
 * #48 Fix file view. Bullets were added when toggling file tree/file list view. Thanks [@LariWa](https://github.com/LariWa).
 * #30 Add setting for selection of single branch and/or author (thanks [@rgeorgiev583](https://github.com/rgeorgiev583)) and  
