@@ -558,7 +558,7 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'editCommitMessage':
 				this.sendMessage({
 					command: 'editCommitMessage',
-					error: await this.dataSource.editCommitMessage(msg.repo, msg.commitHash, msg.message)
+					error: await this.dataSource.editCommitMessage(msg.repo, msg.commitHash, msg.message, msg.noVerify)
 				});
 				break;
 			case 'setGlobalViewState':

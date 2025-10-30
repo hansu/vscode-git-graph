@@ -1195,6 +1195,7 @@ export class DataSource extends Disposable {
 	 * @returns The ErrorInfo from the executed command.
 	 */
 	public async squashCommits(repo: string, commits: ReadonlyArray<string>, commitMessage: string): Promise<ErrorInfo> {
+
 		if (commits.length < 2) {
 			return 'At least 2 commits are required for squashing.';
 		}
@@ -1262,7 +1263,7 @@ export class DataSource extends Disposable {
 	 * @param message The new commit message.
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public async editCommitMessage(repo: string, commitHash: string, message: string): Promise<ErrorInfo> {
+	public async editCommitMessage(repo: string, commitHash: string, message: string, noVerify: boolean): Promise<ErrorInfo> {
 		try {
 			const headCommit = await this.spawnGit(['rev-parse', 'HEAD'], repo, (stdout) => stdout.trim());
 
@@ -1271,6 +1272,8 @@ export class DataSource extends Disposable {
 				if (getConfig().signCommits) {
 					args.push('-S');
 				}
+				if (noVerify) args.push('--no-verify');
+
 				return this.runGitCommand(args, repo);
 			} else {
 				return this.rebaseEditCommitMessage(repo, commitHash, message);

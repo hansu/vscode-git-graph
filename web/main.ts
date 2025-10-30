@@ -1033,7 +1033,8 @@ class GitGraphView {
 				name: 'Commit Message',
 				default: commit.message,
 				placeholder: 'Enter the new commit message'
-			}],
+			},
+			{ type: DialogInputType.Checkbox, name: 'No Verify', value: false }],
 			'Update Message',
 			(values) => {
 				const newMessage = <string>values[0];
@@ -1048,7 +1049,8 @@ class GitGraphView {
 					command: 'editCommitMessage',
 					repo: this.currentRepo,
 					commitHash: hash,
-					message: newMessage
+					message: newMessage,
+					noVerify: <boolean>values[1]
 				}, 'Editing Commit Message');
 			},
 			target
