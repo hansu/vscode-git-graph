@@ -1322,7 +1322,8 @@ class GitGraphView {
 								{ name: 'Force', value: GG.GitPushBranchMode.Force }
 							],
 							default: GG.GitPushBranchMode.Normal
-						}
+						},
+						{ type: DialogInputType.Checkbox, name: 'No Verify', value: false }
 					];
 
 					if (multipleRemotes) {
@@ -1338,6 +1339,7 @@ class GitGraphView {
 					dialog.showForm('Are you sure you want to push the branch <b><i>' + escapeHtml(refName) + '</i></b>' + (multipleRemotes ? '' : ' to the remote <b><i>' + escapeHtml(this.gitRemotes[0]) + '</i></b>') + '?', inputs, 'Yes, push', (values) => {
 						const remotes = multipleRemotes ? <string[]>values.shift() : [this.gitRemotes[0]];
 						const setUpstream = <boolean>values[0];
+						const noVerify = <boolean>values[2];
 						runAction({
 							command: 'pushBranch',
 							repo: this.currentRepo,
@@ -1345,6 +1347,7 @@ class GitGraphView {
 							remotes: remotes,
 							setUpstream: setUpstream,
 							mode: <GG.GitPushBranchMode>values[1],
+							noVerify: noVerify,
 							willUpdateBranchConfig: setUpstream && remotes.length > 0 && (this.gitConfig === null || typeof this.gitConfig.branches[refName] === 'undefined' || this.gitConfig.branches[refName].remote !== remotes[remotes.length - 1])
 						}, 'Pushing Branch');
 					}, target);

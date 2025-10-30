@@ -264,7 +264,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				});
 				break;
 			case 'createPullRequest':
-				errorInfos = [msg.push ? await this.dataSource.pushBranch(msg.repo, msg.sourceBranch, msg.sourceRemote, true, GitPushBranchMode.Normal) : null];
+				errorInfos = [msg.push ? await this.dataSource.pushBranch(msg.repo, msg.sourceBranch, msg.sourceRemote, true, GitPushBranchMode.Normal, false) : null];
 				if (errorInfos[0] === null) {
 					errorInfos.push(await createPullRequest(msg.config, msg.sourceOwner, msg.sourceRepo, msg.sourceBranch));
 				}
@@ -493,7 +493,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				this.sendMessage({
 					command: 'pushBranch',
 					willUpdateBranchConfig: msg.willUpdateBranchConfig,
-					errors: await this.dataSource.pushBranchToMultipleRemotes(msg.repo, msg.branchName, msg.remotes, msg.setUpstream, msg.mode)
+					errors: await this.dataSource.pushBranchToMultipleRemotes(msg.repo, msg.branchName, msg.remotes, msg.setUpstream, msg.mode, msg.noVerify)
 				});
 				break;
 			case 'pushStash':

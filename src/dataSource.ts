@@ -817,11 +817,12 @@ export class DataSource extends Disposable {
 	 * @param mode The mode of the push.
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public pushBranch(repo: string, branchName: string, remote: string, setUpstream: boolean, mode: GitPushBranchMode) {
+	public pushBranch(repo: string, branchName: string, remote: string, setUpstream: boolean, mode: GitPushBranchMode, noVerify: boolean) {
 		let args = ['push'];
 		args.push(remote, branchName);
 		if (setUpstream) args.push('--set-upstream');
 		if (mode !== GitPushBranchMode.Normal) args.push('--' + mode);
+		if (noVerify) args.push('--no-verify');
 
 		return this.runGitCommand(args, repo);
 	}
@@ -835,14 +836,14 @@ export class DataSource extends Disposable {
 	 * @param mode The mode of the push.
 	 * @returns The ErrorInfo's from the executed commands.
 	 */
-	public async pushBranchToMultipleRemotes(repo: string, branchName: string, remotes: string[], setUpstream: boolean, mode: GitPushBranchMode): Promise<ErrorInfo[]> {
+	public async pushBranchToMultipleRemotes(repo: string, branchName: string, remotes: string[], setUpstream: boolean, mode: GitPushBranchMode, noVerify: boolean): Promise<ErrorInfo[]> {
 		if (remotes.length === 0) {
 			return ['No remote(s) were specified to push the branch ' + branchName + ' to.'];
 		}
 
 		const results: ErrorInfo[] = [];
 		for (let i = 0; i < remotes.length; i++) {
-			const result = await this.pushBranch(repo, branchName, remotes[i], setUpstream, mode);
+			const result = await this.pushBranch(repo, branchName, remotes[i], setUpstream, mode, noVerify);
 			results.push(result);
 			if (result !== null) break;
 		}
