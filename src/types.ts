@@ -1098,6 +1098,7 @@ export interface RequestPushBranch extends RepoRequest {
 	readonly branchName: string;
 	readonly remotes: string[];
 	readonly setUpstream: boolean;
+	readonly noVerify: boolean;
 	readonly mode: GitPushBranchMode;
 	readonly willUpdateBranchConfig: boolean;
 }
@@ -1202,6 +1203,7 @@ export interface RequestEditCommitMessage extends RepoRequest {
 	readonly command: 'editCommitMessage';
 	readonly commitHash: string;
 	readonly message: string;
+	readonly noVerify: boolean;
 }
 export interface ResponseEditCommitMessage extends ResponseWithErrorInfo {
 	readonly command: 'editCommitMessage';
