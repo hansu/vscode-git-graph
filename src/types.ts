@@ -287,6 +287,7 @@ export interface GitGraphViewWorkspaceState {
 
 export interface CommitDetailsViewConfig {
 	readonly autoCenter: boolean;
+	readonly autoScroll: boolean;
 	readonly fileTreeCompactFolders: boolean;
 	readonly fileViewType: FileViewType;
 	readonly location: CommitDetailsViewLocation;
@@ -345,6 +346,7 @@ export const enum CommitDetailsViewLocation {
 	Inline,
 	DockedToBottom
 }
+
 
 export const enum CommitOrdering {
 	Date = 'date',

@@ -250,6 +250,25 @@ describe('Config', () => {
 				expect(value).toBe(CommitDetailsViewLocation.Inline);
 			});
 		});
+
+		describe('autoScroll', () => {
+			it('Should return true by default when the configuration value is unknown', () => {
+				const value = config.commitDetailsView.autoScroll;
+				expect(value).toBe(true);
+			});
+
+			it('Should return false when the configuration value is false', () => {
+				vscode.mockExtensionSettingReturnValue('commitDetailsView.autoScroll', false);
+				const value = config.commitDetailsView.autoScroll;
+				expect(value).toBe(false);
+			});
+
+			it('Should return true when the configuration value is true', () => {
+				vscode.mockExtensionSettingReturnValue('commitDetailsView.autoScroll', true);
+				const value = config.commitDetailsView.autoScroll;
+				expect(value).toBe(true);
+			});
+		});
 	});
 
 	describe('contextMenuActionsVisibility', () => {
