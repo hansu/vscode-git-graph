@@ -66,6 +66,7 @@ class Config {
 	get commitDetailsView(): CommitDetailsViewConfig {
 		return {
 			autoCenter: !!this.getRenamedExtensionSetting('commitDetailsView.autoCenter', 'autoCenterCommitDetailsView', true),
+			autoScroll: !!this.config.get<boolean>('commitDetailsView.autoScroll', true),
 			fileTreeCompactFolders: !!this.getRenamedExtensionSetting('commitDetailsView.fileView.fileTree.compactFolders', 'commitDetailsViewFileTreeCompactFolders', true),
 			fileViewType: this.getRenamedExtensionSetting<string>('commitDetailsView.fileView.type', 'defaultFileViewType', 'File Tree') === 'File List'
 				? FileViewType.List

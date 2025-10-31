@@ -3035,17 +3035,23 @@ class GitGraphView {
 
 		if (!refresh) {
 			if (isDocked) {
-				let elemTop = this.controlsElem.clientHeight + expandedCommit.commitElem.offsetTop;
-				if (elemTop - 8 < this.viewElem.scrollTop) {
-					// Commit is above what is visible on screen
-					this.viewElem.scroll(0, elemTop - 8);
-				} else if (elemTop - this.viewElem.clientHeight + 32 > this.viewElem.scrollTop) {
-					// Commit is below what is visible on screen
-					this.viewElem.scroll(0, elemTop - this.viewElem.clientHeight + 32);
+				if (!this.config.commitDetailsView.autoScroll) {
+					// Do not auto-scroll when opening details (docked)
+				} else {
+					let elemTop = this.controlsElem.clientHeight + expandedCommit.commitElem.offsetTop;
+					if (elemTop - 8 < this.viewElem.scrollTop) {
+						// Commit is above what is visible on screen
+						this.viewElem.scroll(0, elemTop - 8);
+					} else if (elemTop - this.viewElem.clientHeight + 32 > this.viewElem.scrollTop) {
+						// Commit is below what is visible on screen
+						this.viewElem.scroll(0, elemTop - this.viewElem.clientHeight + 32);
+					}
 				}
 			} else {
 				let elemTop = this.controlsElem.clientHeight + elem.offsetTop, cdvHeight = this.gitRepos[this.currentRepo].cdvHeight;
-				if (this.config.commitDetailsView.autoCenter) {
+				if (!this.config.commitDetailsView.autoScroll) {
+					// Do not auto-scroll when opening details (inline)
+				} else if (this.config.commitDetailsView.autoCenter) {
 					// Center Commit Detail View setting is enabled
 					// elemTop - commit height [24px] + (commit details view height + commit height [24px]) / 2 - (view height) / 2
 					this.viewElem.scroll(0, elemTop - 12 + (cdvHeight - this.viewElem.clientHeight) / 2);

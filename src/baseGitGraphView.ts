@@ -84,7 +84,12 @@ export abstract class BaseGitGraphView extends Disposable {
 					this.respondLoadRepos(event.repos, loadViewTo);
 				}
 			}),
-
+			// Refresh the webview when autoScroll configuration changes so it takes effect immediately
+			vscode.workspace.onDidChangeConfiguration((e) => {
+				if (e.affectsConfiguration('git-graph.commitDetailsView.autoScroll')) {
+					this.update();
+				}
+			}),
 			// Subscribe to events triggered when an avatar is available
 			this.avatarManager.onAvatar((event) => {
 				this.sendMessage({
