@@ -141,6 +141,7 @@ class GitGraphView {
 			this.expandedCommit = prevState.expandedCommit;
 			this.avatars = prevState.avatars;
 			this.gitConfig = prevState.gitConfig;
+			this.selectedCommits = new Set(prevState.selectedCommits || []);
 			this.loadRepoInfo(prevState.gitBranches, prevState.gitBranchHead, prevState.gitRemotes, prevState.gitStashes, true);
 			this.loadCommits(prevState.commits, prevState.commitHead, prevState.gitTags, prevState.moreCommitsAvailable, prevState.onlyFollowFirstParent);
 			this.findWidget.restoreState(prevState.findWidget);
@@ -786,6 +787,7 @@ class GitGraphView {
 			onlyFollowFirstParent: this.onlyFollowFirstParent,
 			expandedCommit: expandedCommit,
 			scrollTop: this.scrollTop,
+			selectedCommits: Array.from(this.selectedCommits),
 			findWidget: this.findWidget.getState(),
 			settingsWidget: this.settingsWidget.getState()
 		});
@@ -1205,6 +1207,19 @@ class GitGraphView {
 					}
 				}
 			}
+		}
+
+		// Restore visual selection state
+		if (this.selectedCommits.size > 0) {
+			this.selectedCommits.forEach(commitHash => {
+				const commitIndex = this.commitLookup[commitHash];
+				if (commitIndex !== undefined) {
+					const commitElem = document.querySelector(`tr.commit[data-id="${commitIndex}"]`);
+					if (commitElem) {
+						commitElem.classList.add('commitSelected');
+					}
+				}
+			});
 		}
 
 		if (this.config.stickyHeader) {
