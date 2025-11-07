@@ -799,6 +799,11 @@
 					],
 					"description": "Specifies the colours used on the graph."
 				},
+				"git-graph.graph.blink": {
+					"type": "string",
+					"default": "#0085d9",
+					"description": "The color flickers when focusing on the current commit"
+				},
 				"git-graph.graph.style": {
 					"type": "string",
 					"enum": [
@@ -1634,7 +1639,8 @@
 		"test-and-report-coverage": "jest --verbose --coverage"
 	},
 	"dependencies": {
-		"iconv-lite": "0.5.0"
+		"iconv-lite": "0.5.0",
+		"vsce": "^2.15.0"
 	},
 	"devDependencies": {
 		"@types/babel__core": "7.1.18",

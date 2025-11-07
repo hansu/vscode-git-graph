@@ -294,7 +294,8 @@ class Config {
 			grid: { x: 16, y: 24, offsetX: 16, offsetY: 12, expandY: 250 },
 			uncommittedChanges: this.config.get<string>('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes') === 'Open Circle at the Checked Out Commit'
 				? GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit
-				: GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges
+				: GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges,
+			blink: this.config.get('graph.blink', 'none')
 		};
 	}
 

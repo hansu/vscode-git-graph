@@ -166,9 +166,7 @@ class GitGraphView {
 		const currentBtn = document.getElementById('currentBtn')!, fetchBtn = document.getElementById('fetchBtn')!, findBtn = document.getElementById('findBtn')!, settingsBtn = document.getElementById('settingsBtn')!, terminalBtn = document.getElementById('terminalBtn')!;
 		currentBtn.innerHTML = SVG_ICONS.current;
 		currentBtn.addEventListener('click', () => {
-			if (this.commitHead) {
-				this.scrollToCommit(this.commitHead, true, true);
-			}
+			scrollToDot();
 		});
 		fetchBtn.title = 'Fetch' + (this.config.fetchAndPrune ? ' & Prune' : '') + ' from Remote(s)';
 		fetchBtn.innerHTML = SVG_ICONS.download;
@@ -2339,8 +2337,14 @@ class GitGraphView {
 	private observeWebviewStyleChanges() {
 		let fontFamily = getVSCodeStyle(CSS_PROP_FONT_FAMILY),
 			editorFontFamily = getVSCodeStyle(CSS_PROP_EDITOR_FONT_FAMILY),
-			findMatchColour = getVSCodeStyle(CSS_PROP_FIND_MATCH_HIGHLIGHT_BACKGROUND),
-			selectionBackgroundColor = !!getVSCodeStyle(CSS_PROP_SELECTION_BACKGROUND);
+
+			selectionBackgroundColor = !!getVSCodeStyle(CSS_PROP_SELECTION_BACKGROUND),
+
+			findMatchColour = initialState.config.graph.blink;
+
+		if (findMatchColour === '' || findMatchColour === 'none' || findMatchColour === null) {
+			findMatchColour = getVSCodeStyle(CSS_PROP_FIND_MATCH_HIGHLIGHT_BACKGROUND);
+		}
 
 		const setFlashColour = (colour: string) => {
 			document.body.style.setProperty('--git-graph-flashPrimary', modifyColourOpacity(colour, 0.7));
@@ -4524,4 +4528,46 @@ function generateSignatureHtml(signature: GG.GitSignature) {
 function closeDialogAndContextMenu() {
 	if (dialog.isOpen()) dialog.close();
 	if (contextMenu.isOpen()) contextMenu.close();
+}
+
+
+function scrollToDot() {
+	const headDots = document.getElementsByClassName('commitHeadDot');
+	if (headDots.length === 1) {
+		(headDots[0] as HTMLElement).parentElement?.scrollIntoView({ block: 'center' });
+
+		const commitParent = headDots[0].closest('.commit') as HTMLElement;
+		if (commitParent) {
+
+			let view = document.getElementById('view');
+			if (view === null) {
+				return;
+			}
+
+			// 获取commitHeadDot的bodor的颜色
+			let headercolor = window.getComputedStyle(headDots[0] as HTMLElement).borderColor;
+			document.body.style.setProperty('--git-graph-flashPrimary', modifyColourOpacity(headercolor, 0.7));
+			document.body.style.setProperty('--git-graph-flashSecondary', modifyColourOpacity(headercolor, 0.5));
+
+			// 添加类以开始动画
+			commitParent.classList.add('flash');
+
+			// 在一段时间后移除动画
+			setTimeout(() => {
+				commitParent.classList.remove('flash');
+			}, 850); // 在4秒后移除动画
+		}
+
+	} else {
+		const commits = document.getElementsByClassName('commit');
+		if (commits.length === 0) {
+			return;
+		}
+		const lastCommit = commits[commits.length - 1];
+
+		lastCommit.scrollIntoView();
+
+		// 递归调用
+		setTimeout(scrollToDot, 500); // 500毫秒后调用
+	}
 }
