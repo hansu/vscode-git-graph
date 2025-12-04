@@ -415,6 +415,11 @@ export async function openFile(repo: string, filePath: string, hash: string | nu
  * @param type The Git file status of the change.
  * @returns A promise resolving to the ErrorInfo of the executed command.
  */
+function makeGitUri(absoluteFilePath: string, ref: string) {
+	const query = encodeURIComponent(JSON.stringify({ path: absoluteFilePath, ref }));
+	return vscode.Uri.parse('git:' + absoluteFilePath + '?' + query);
+}
+
 export function viewDiff(repo: string, fromHash: string, toHash: string, oldFilePath: string, newFilePath: string, type: GitFileStatus) {
 	if (type !== GitFileStatus.Untracked) {
 		let abbrevFromHash = abbrevCommit(fromHash), abbrevToHash = toHash !== UNCOMMITTED ? abbrevCommit(toHash) : 'Present', pathComponents = newFilePath.split('/');
@@ -426,10 +431,16 @@ export function viewDiff(repo: string, fromHash: string, toHash: string, oldFile
 		let title = pathComponents[pathComponents.length - 1] + ' (' + desc + ')';
 		if (fromHash === UNCOMMITTED) fromHash = 'HEAD';
 
-		// absolute path for right side to allow blame
-		const rightUri = vscode.Uri.file(path.join(repo, newFilePath));
-		// left side stays virtual
-		const leftUri = encodeDiffDocUri(repo, oldFilePath, fromHash === toHash ? fromHash + '^' : fromHash, type, DiffSide.Old);
+		const rightAbs = path.join(repo, newFilePath);
+		const rightUri = vscode.Uri.file(rightAbs);
+		const leftAbs = path.join(repo, oldFilePath);
+		let leftUri: vscode.Uri;
+		if (fromHash === 'HEAD' && toHash === UNCOMMITTED) {
+			leftUri = vscode.Uri.file(leftAbs);
+		} else {
+			const leftRef = fromHash === toHash ? fromHash + '^' : fromHash;
+			leftUri = makeGitUri(leftAbs, leftRef);
+		}
 		return vscode.commands.executeCommand('vscode.diff', leftUri, rightUri, title, {
 			preview: true,
 			viewColumn: getConfig().openNewTabEditorGroup
