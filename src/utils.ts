@@ -426,11 +426,7 @@ export function viewDiff(repo: string, fromHash: string, toHash: string, oldFile
 		let title = pathComponents[pathComponents.length - 1] + ' (' + desc + ')';
 		if (fromHash === UNCOMMITTED) fromHash = 'HEAD';
 
-		// absolute path for right side to allow blame
-		const rightUri = vscode.Uri.file(path.join(repo, newFilePath));
-		// left side stays virtual
-		const leftUri = encodeDiffDocUri(repo, oldFilePath, fromHash === toHash ? fromHash + '^' : fromHash, type, DiffSide.Old);
-		return vscode.commands.executeCommand('vscode.diff', leftUri, rightUri, title, {
+		return vscode.commands.executeCommand('vscode.diff', encodeDiffDocUri(repo, oldFilePath, fromHash === toHash ? fromHash + '^' : fromHash, type, DiffSide.Old), encodeDiffDocUri(repo, newFilePath, toHash, type, DiffSide.New), title, {
 			preview: true,
 			viewColumn: getConfig().openNewTabEditorGroup
 		}).then(
