@@ -8,7 +8,7 @@ Main improvements:
 * Added button to collapse commit summary (hansu#3)
 * Added checkbox 'Allow unrelated histories' when merge action
 * New setting `git-graph.toolbarButtonVisibility` to configure the visibility of some items of the toolbar. For example: `{"Remotes": true, "Simplify": true}
-* Added simplifyByDecoration checkbox (hansu#33)
+* Added simplifyByDecoration checkbox (hansu#23)
 * Fix right clicks triggers native context menu on macOS (hansu#38)
 * Added button to jump to HEAD (hansu#14)
 * Added collapse/expand buttons to commit diff view (hansu#6)

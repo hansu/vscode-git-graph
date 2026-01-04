@@ -33,7 +33,7 @@ The setting `git-graph.commitDetailsView.initiallyHideSummary` is removed as Git
 
 * Add checkbox 'Allow unrelated histories' when merge action. Thanks [@LaksVister](https://github.com/LaksVister).
 * New setting `git-graph.toolbarButtonVisibility` to configure the visibility of some items of the toolbar. For example: `{"Remotes": true, "Simplify": true}`
-* #33 Add simplifyByDecoration checkbox. Thanks [@XUJINKAI](https://github.com/XUJINKAI).
+* #23 Add simplifyByDecoration checkbox. Thanks [@XUJINKAI](https://github.com/XUJINKAI).
 * #38 Fix right clicks triggers native context menu on macOS. Thanks [@ipcjs](https://github.com/ipcjs).
 
 ## 1.31.1 - 2024-05-25
