@@ -233,7 +233,9 @@ code{
 #commitTable tr.commit.mute td.text, #commitTable tr.commit.mute span.description .text{
 	opacity:0.5;
 }
-
+#commitTable tr.commit.pathDimmed td.text, #commitTable tr.commit.pathDimmed span.description .text{
+	opacity:0.4;
+}
 #commitTable.fixedLayout table{
 	table-layout:fixed;
 }
@@ -740,7 +742,9 @@ body.vscode-high-contrast #commitTable tr.commit.findCurrentCommit{
 }
 
 #commitTable tr.commit.mute.findCurrentCommit td.text,
-#commitTable tr.commit.mute.findCurrentCommit span.description .text{
+#commitTable tr.commit.mute.findCurrentCommit span.description .text,
+#commitTable tr.commit.pathDimmed.findCurrentCommit td.text,
+#commitTable tr.commit.pathDimmed.findCurrentCommit span.description .text{
 	opacity:1;
 }
 
@@ -862,18 +866,17 @@ body.tagLabelsRightAligned .gitRef.tag{
 	z-index:12;
 }
 
-#repoControl, #branchControl, #showRemoteBranchesControl, #simplifyByDecorationControl{
+#repoControl, #branchControl, #showRemoteBranchesControl, #simplifyByDecorationControl, #pathFilterControl{
 	display:inline-block;
 	white-space:nowrap;
 	margin:0 10px;
 }
-#repoDropdown, #branchDropdown #authorDropdown{
+#repoDropdown, #branchDropdown, #pathFilterDropdown, #authorDropdown{
 	margin-left:3px;
 }
 #showRemoteBranchesControl > .customCheckbox, #simplifyByDecorationControl > .customCheckbox{
 	margin-right:6px;
 }
-
 .dropdownCurrentValue{
 	max-width:30vw;
 }
@@ -1069,6 +1072,14 @@ label > input[type=checkbox]:checked ~ .customCheckbox:after{
 	border:solid var(--vscode-editor-foreground);
 	border-width:0 2px 2px 0;
 	transform:rotate(45deg);
+}
+
+#simplifyByDecorationControl.disabled{
+	opacity:0.4;
+	cursor:not-allowed;
+}
+#simplifyByDecorationControl.disabled:hover > .customCheckbox{
+	background-color:rgba(128,128,128,0.1);
 }
 
 

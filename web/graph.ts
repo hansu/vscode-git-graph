@@ -12,6 +12,7 @@ interface Line {
 	readonly p1: Point;
 	readonly p2: Point;
 	readonly lockedFirst: boolean; // TRUE => The line is locked to p1, FALSE => The line is locked to p2
+	readonly isDashed: boolean;
 }
 
 interface Pixel {
@@ -23,6 +24,7 @@ interface PlacedLine {
 	readonly p2: Pixel;
 	readonly isCommitted: boolean;
 	readonly lockedFirst: boolean; // TRUE => The line is locked to p1, FALSE => The line is locked to p2
+	readonly isDashed: boolean;
 }
 
 interface UnavailablePoint {
@@ -45,8 +47,8 @@ class Branch {
 		this.colour = colour;
 	}
 
-	public addLine(p1: Point, p2: Point, isCommitted: boolean, lockedFirst: boolean) {
-		this.lines.push({ p1: p1, p2: p2, lockedFirst: lockedFirst });
+	public addLine(p1: Point, p2: Point, isCommitted: boolean, lockedFirst: boolean, isDashed: boolean = false) {
+		this.lines.push({ p1: p1, p2: p2, lockedFirst: lockedFirst, isDashed: isDashed });
 		if (isCommitted) {
 			if (p2.x === 0 && p2.y < this.numUncommitted) this.numUncommitted = p2.y;
 		} else {
@@ -90,16 +92,16 @@ class Branch {
 					if (x1 === x2) { // The line is vertical, extend the endpoint past the expansion
 						y2 += config.grid.expandY;
 					} else if (line.lockedFirst) { // If the line is locked to the first point, the transition stays in its normal position
-						lines.push({ p1: { x: x1, y: y1 }, p2: { x: x2, y: y2 }, isCommitted: i >= this.numUncommitted, lockedFirst: line.lockedFirst }); // Display the normal transition
-						lines.push({ p1: { x: x2, y: y1 + config.grid.y }, p2: { x: x2, y: y2 + config.grid.expandY }, isCommitted: i >= this.numUncommitted, lockedFirst: line.lockedFirst }); // Extend the line over the expansion from the transition end point
+						lines.push({ p1: { x: x1, y: y1 }, p2: { x: x2, y: y2 }, isCommitted: i >= this.numUncommitted, lockedFirst: line.lockedFirst, isDashed: line.isDashed }); // Display the normal transition
+						lines.push({ p1: { x: x2, y: y1 + config.grid.y }, p2: { x: x2, y: y2 + config.grid.expandY }, isCommitted: i >= this.numUncommitted, lockedFirst: line.lockedFirst, isDashed: line.isDashed }); // Extend the line over the expansion from the transition end point
 						continue;
 					} else { // If the line is locked to the second point, the transition moves to after the expansion
-						lines.push({ p1: { x: x1, y: y1 }, p2: { x: x1, y: y2 - config.grid.y + config.grid.expandY }, isCommitted: i >= this.numUncommitted, lockedFirst: line.lockedFirst }); // Extend the line over the expansion to the new transition start point
+						lines.push({ p1: { x: x1, y: y1 }, p2: { x: x1, y: y2 - config.grid.y + config.grid.expandY }, isCommitted: i >= this.numUncommitted, lockedFirst: line.lockedFirst, isDashed: line.isDashed }); // Extend the line over the expansion to the new transition start point
 						y1 += config.grid.expandY; y2 += config.grid.expandY;
 					}
 				}
 			}
-			lines.push({ p1: { x: x1, y: y1 }, p2: { x: x2, y: y2 }, isCommitted: i >= this.numUncommitted, lockedFirst: line.lockedFirst });
+			lines.push({ p1: { x: x1, y: y1 }, p2: { x: x2, y: y2 }, isCommitted: i >= this.numUncommitted, lockedFirst: line.lockedFirst, isDashed: line.isDashed });
 		}
 
 		// Simplify consecutive lines that are straight by removing the 'middle' point
@@ -107,7 +109,7 @@ class Branch {
 		while (i < lines.length - 1) {
 			line = lines[i];
 			nextLine = lines[i + 1];
-			if (line.p1.x === line.p2.x && line.p2.x === nextLine.p1.x && nextLine.p1.x === nextLine.p2.x && line.p2.y === nextLine.p1.y && line.isCommitted === nextLine.isCommitted) {
+			if (line.p1.x === line.p2.x && line.p2.x === nextLine.p1.x && nextLine.p1.x === nextLine.p2.x && line.p2.y === nextLine.p1.y && line.isCommitted === nextLine.isCommitted && line.isDashed === nextLine.isDashed) {
 				line.p2.y = nextLine.p2.y;
 				lines.splice(i + 1, 1);
 			} else {
@@ -122,8 +124,8 @@ class Branch {
 			x2 = line.p2.x; y2 = line.p2.y;
 
 			// If the new point belongs to a different path, render the current path and reset it for the new path
-			if (curPath !== '' && i > 0 && line.isCommitted !== lines[i - 1].isCommitted) {
-				Branch.drawPath(svg, curPath, lines[i - 1].isCommitted, colour, config.uncommittedChanges);
+			if (curPath !== '' && i > 0 && (line.isCommitted !== lines[i - 1].isCommitted || line.isDashed !== lines[i - 1].isDashed)) {
+				Branch.drawPath(svg, curPath, lines[i - 1].isCommitted, colour, config.uncommittedChanges, lines[i - 1].isDashed);
 				curPath = '';
 			}
 
@@ -142,18 +144,21 @@ class Branch {
 		}
 
 		if (curPath !== '') {
-			Branch.drawPath(svg, curPath, lines[lines.length - 1].isCommitted, colour, config.uncommittedChanges); // Draw the remaining path
+			Branch.drawPath(svg, curPath, lines[lines.length - 1].isCommitted, colour, config.uncommittedChanges, lines[lines.length - 1].isDashed); // Draw the remaining path
 		}
 	}
 
-	private static drawPath(svg: SVGElement, path: string, isCommitted: boolean, colour: string, uncommittedChanges: GG.GraphUncommittedChangesStyle) {
+	private static drawPath(svg: SVGElement, path: string, isCommitted: boolean, colour: string, uncommittedChanges: GG.GraphUncommittedChangesStyle, isDashed: boolean = false) {
 		const shadow = svg.appendChild(document.createElementNS(SVG_NAMESPACE, 'path')), line = svg.appendChild(document.createElementNS(SVG_NAMESPACE, 'path'));
 		shadow.setAttribute('class', 'shadow');
 		shadow.setAttribute('d', path);
 		line.setAttribute('class', 'line');
 		line.setAttribute('d', path);
 		line.setAttribute('stroke', isCommitted ? colour : '#808080');
-		if (!isCommitted && uncommittedChanges === GG.GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit) {
+		if (isDashed) {
+			line.setAttribute('stroke-dasharray', '4 2');
+			line.setAttribute('stroke-opacity', '0.6');
+		} else if (!isCommitted && uncommittedChanges === GG.GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit) {
 			line.setAttribute('stroke-dasharray', '2px');
 		}
 	}
@@ -173,6 +178,8 @@ class Vertex {
 	private onBranch: Branch | null = null;
 	private isCommitted: boolean = true;
 	private isCurrent: boolean = false;
+	private syntheticParent: boolean = false;
+	private pathFilterDimmed: boolean = false;
 	private nextX: number = 0;
 	private connections: UnavailablePoint[] = [];
 
@@ -292,6 +299,22 @@ class Vertex {
 		this.isCurrent = true;
 	}
 
+	public hasSyntheticParent() {
+		return this.syntheticParent;
+	}
+
+	public setSyntheticParent(value: boolean) {
+		this.syntheticParent = value;
+	}
+
+	public isPathFilterDimmed() {
+		return this.pathFilterDimmed;
+	}
+
+	public setPathFilterDimmed(value: boolean) {
+		this.pathFilterDimmed = value;
+	}
+
 
 	/* Rendering */
 
@@ -314,6 +337,10 @@ class Vertex {
 			circle.setAttribute('fill', colour);
 		}
 		svg.appendChild(circle);
+
+		if (this.pathFilterDimmed) {
+			circle.setAttribute('opacity', '0.4');
+		}
 
 		if (this.isStash && !this.isCurrent) {
 			circle.setAttribute('r', '4.5');
@@ -346,6 +373,7 @@ class Graph {
 	private commitHead: string | null = null;
 	private commitLookup: { [hash: string]: number } = {};
 	private onlyFollowFirstParent: boolean = false;
+	private pathFilterActive: boolean = false;
 	private expandedCommitIndex: number = -1;
 
 	private readonly viewElem: HTMLElement;
@@ -390,11 +418,12 @@ class Graph {
 
 	/* Graph Operations */
 
-	public loadCommits(commits: ReadonlyArray<GG.GitCommit>, commitHead: string | null, commitLookup: { [hash: string]: number }, onlyFollowFirstParent: boolean) {
+	public loadCommits(commits: ReadonlyArray<GG.GitCommit>, commitHead: string | null, commitLookup: { [hash: string]: number }, onlyFollowFirstParent: boolean, pathFilterActive: boolean = false) {
 		this.commits = commits;
 		this.commitHead = commitHead;
 		this.commitLookup = commitLookup;
 		this.onlyFollowFirstParent = onlyFollowFirstParent;
+		this.pathFilterActive = pathFilterActive;
 		this.vertices = [];
 		this.branches = [];
 		this.availableColours = [];
@@ -403,7 +432,8 @@ class Graph {
 		const nullVertex = new Vertex(NULL_VERTEX_ID, false);
 		let i: number, j: number;
 		for (i = 0; i < commits.length; i++) {
-			this.vertices.push(new Vertex(i, commits[i].stash !== null));
+			const v = new Vertex(i, commits[i].stash !== null);
+			this.vertices.push(v);
 		}
 		for (i = 0; i < commits.length; i++) {
 			for (j = 0; j < commits[i].parents.length; j++) {
@@ -412,9 +442,21 @@ class Graph {
 					// Parent is the <commitLookup[parentHash]>th vertex
 					this.vertices[i].addParent(this.vertices[commitLookup[parentHash]]);
 					this.vertices[commitLookup[parentHash]].addChild(this.vertices[i]);
+					if (pathFilterActive && commits[i].isSyntheticParent) {
+						this.vertices[i].setSyntheticParent(true);
+					}
 				} else if (!this.onlyFollowFirstParent || j === 0) {
 					// Parent is not one of the vertices of the graph, and the parent isn't being hidden by the onlyFollowFirstParent condition.
 					this.vertices[i].addParent(nullVertex);
+				}
+			}
+		}
+
+		// Mark non-matching commits as dimmed when path filter is active
+		if (pathFilterActive) {
+			for (i = 0; i < commits.length; i++) {
+				if (!commits[i].isPathFilterMatch) {
+					this.vertices[i].setPathFilterDimmed(true);
 				}
 			}
 		}
@@ -432,7 +474,14 @@ class Graph {
 		i = 0;
 		while (i < this.vertices.length) {
 			if (this.vertices[i].getNextParent() !== null || this.vertices[i].isNotOnBranch()) {
+				const prevParent = this.vertices[i].getNextParent();
 				this.determinePath(i);
+				// Safety net: if determinePath made no progress on parent processing,
+				// force-skip to prevent infinite loop (defensive against rewritten topologies).
+				if (!this.vertices[i].isNotOnBranch() && this.vertices[i].getNextParent() !== null
+					&& this.vertices[i].getNextParent() === prevParent) {
+					this.vertices[i].registerParentProcessed();
+				}
 			} else {
 				i++;
 			}
@@ -589,6 +638,14 @@ class Graph {
 		return muted;
 	}
 
+	public getPathFilterDimmedCommits(): boolean[] {
+		const dimmed: boolean[] = [];
+		for (let i = 0; i < this.commits.length; i++) {
+			dimmed[i] = !this.commits[i].isPathFilterMatch;
+		}
+		return dimmed;
+	}
+
 
 	/**
 	 * Get the index of the first parent of the commit at the specified index.
@@ -718,7 +775,7 @@ class Graph {
 				} else {
 					curPoint = curVertex.getNextPoint(); // Parent couldn't be found, choose the next available point for the vertex
 				}
-				parentBranch.addLine(lastPoint, curPoint, vertex.getIsCommitted(), !foundPointToParent && curVertex !== parentVertex ? lastPoint.x < curPoint.x : true);
+				parentBranch.addLine(lastPoint, curPoint, vertex.getIsCommitted(), !foundPointToParent && curVertex !== parentVertex ? lastPoint.x < curPoint.x : true, vertex.hasSyntheticParent());
 				curVertex.registerUnavailablePoint(curPoint.x, parentVertex, parentBranch);
 				lastPoint = curPoint;
 
@@ -727,15 +784,27 @@ class Graph {
 					break;
 				}
 			}
+			if (!foundPointToParent) {
+				// Parent is on a branch but unreachable via existing connection points
+				// (can happen with rewritten parent topologies in path-filtered mode).
+				vertex.registerParentProcessed();
+			}
 		} else {
 			// Branch is normal
 			let branch = new Branch(this.getAvailableColour(startAt));
 			vertex.addToBranch(branch, lastPoint.x);
 			vertex.registerUnavailablePoint(lastPoint.x, vertex, branch);
+			if (parentVertex === null) {
+				// No parents - end branch at this vertex (e.g., truncated commit in path-filtered mode)
+				branch.setEnd(startAt);
+				this.branches.push(branch);
+				this.availableColours[branch.getColour()] = startAt;
+				return;
+			}
 			for (i = startAt + 1; i < this.vertices.length; i++) {
 				curVertex = this.vertices[i];
 				curPoint = parentVertex === curVertex && !parentVertex.isNotOnBranch() ? curVertex.getPoint() : curVertex.getNextPoint();
-				branch.addLine(lastPoint, curPoint, vertex.getIsCommitted(), lastPoint.x < curPoint.x);
+				branch.addLine(lastPoint, curPoint, vertex.getIsCommitted(), lastPoint.x < curPoint.x, vertex.hasSyntheticParent());
 				curVertex.registerUnavailablePoint(curPoint.x, parentVertex, branch);
 				lastPoint = curPoint;
 
@@ -752,8 +821,13 @@ class Graph {
 					}
 				}
 			}
-			if (i === this.vertices.length && parentVertex !== null && parentVertex.id === NULL_VERTEX_ID) {
+			if (i === this.vertices.length && parentVertex !== null) {
 				// Vertex is the last in the graph, so no more branch can be formed to the parent
+				if (parentVertex.id === NULL_VERTEX_ID && this.pathFilterActive) {
+					// Draw a short dashed continuation line below the last vertex
+					const continuationPoint: Point = { x: lastPoint.x, y: this.vertices.length };
+					branch.addLine(lastPoint, continuationPoint, vertex.getIsCommitted(), true, true);
+				}
 				vertex.registerParentProcessed();
 			}
 			branch.setEnd(i);

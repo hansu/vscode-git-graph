@@ -12,6 +12,7 @@ class Dropdown {
 	private readonly multipleAllowed: boolean;
 	private readonly selectMultipleWithCtrl: boolean;
 	private readonly changeCallback: (values: string[]) => void;
+	private readonly filterSubmitCallback: ((value: string) => void) | null;
 
 	private options: ReadonlyArray<DropdownOption> = [];
 	private optionsSelected: boolean[] = [];
@@ -36,12 +37,14 @@ class Dropdown {
 	 * @param changeCallback A callback to be invoked when the selected item(s) of the dropdown changes.
 	 * @returns The Dropdown instance.
 	 * @param selectMultipleWithCtrl Select multiple items using Ctrl
+	 * @param filterSubmitCallback Optional callback invoked when Enter is pressed in the filter input with non-empty text.
 	 */
-	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void, selectMultipleWithCtrl: boolean = false) {
+	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void, selectMultipleWithCtrl: boolean = false, filterSubmitCallback: ((value: string) => void) | null = null) {
 		this.showInfo = showInfo;
 		this.multipleAllowed = multipleAllowed;
 		this.selectMultipleWithCtrl = selectMultipleWithCtrl;
 		this.changeCallback = changeCallback;
+		this.filterSubmitCallback = filterSubmitCallback;
 		this.elem = document.getElementById(id)!;
 
 		this.menuElem = document.createElement('div');
@@ -90,6 +93,15 @@ class Dropdown {
 		}, true);
 		document.addEventListener('contextmenu', () => this.close(), true);
 		this.filterInput.addEventListener('keyup', () => this.filter());
+		this.filterInput.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' && this.filterSubmitCallback !== null) {
+				const value = this.filterInput.value.trim();
+				if (value !== '') {
+					this.close();
+					this.filterSubmitCallback(value);
+				}
+			}
+		});
 	}
 
 	/**

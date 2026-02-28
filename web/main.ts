@@ -47,6 +47,7 @@ class GitGraphView {
 	private readonly settingsWidget: SettingsWidget;
 	private readonly repoDropdown: Dropdown;
 	private readonly branchDropdown: Dropdown;
+	private readonly pathFilterDropdown: Dropdown;
 	private readonly authorDropdown: Dropdown;
 
 	private readonly viewElem: HTMLElement;
@@ -56,6 +57,7 @@ class GitGraphView {
 	private readonly footerElem: HTMLElement;
 	private readonly showRemoteBranchesElem: HTMLInputElement;
 	private readonly simplifyByDecorationElem: HTMLInputElement;
+	private workspaceFolderPaths: { readonly [repo: string]: readonly string[] };
 	private readonly refreshBtnElem: HTMLElement;
 
 	constructor(viewElem: HTMLElement, prevState: WebViewState | null) {
@@ -112,6 +114,16 @@ class GitGraphView {
 			this.refresh(true);
 		});
 
+		this.workspaceFolderPaths = initialState.workspaceFolderPaths;
+		this.pathFilterDropdown = new Dropdown('pathFilterDropdown', false, false, 'Paths', (values) => {
+			this.handlePathFilterChange(values[0]);
+		}, false, (value) => {
+			this.saveRepoStateValue(this.currentRepo, 'pathFilter', value);
+			this.maxCommits = this.config.initialLoadCommits;
+			this.refresh(true);
+			this.restorePathFilterState(this.currentRepo);
+		});
+
 		this.refreshBtnElem = document.getElementById('refreshBtn')!;
 		this.refreshBtnElem.addEventListener('click', () => {
 			if (!this.refreshBtnElem.classList.contains(CLASS_REFRESHING)) {
@@ -148,6 +160,7 @@ class GitGraphView {
 			this.settingsWidget.restoreState(prevState.settingsWidget);
 			this.showRemoteBranchesElem.checked = getShowRemoteBranches(this.gitRepos[prevState.currentRepo].showRemoteBranchesV2);
 			this.simplifyByDecorationElem.checked = getSimplifyByDecoration(this.gitRepos[prevState.currentRepo].simplifyByDecoration);
+			this.restorePathFilterState(prevState.currentRepo);
 		}
 
 		let loadViewTo = initialState.loadViewTo;
@@ -190,8 +203,11 @@ class GitGraphView {
 
 	/* Loading Data */
 
-	public loadRepos(repos: GG.GitRepoSet, lastActiveRepo: string | null, loadViewTo: GG.LoadGitGraphViewTo) {
+	public loadRepos(repos: GG.GitRepoSet, lastActiveRepo: string | null, loadViewTo: GG.LoadGitGraphViewTo, workspaceFolderPaths?: { readonly [repo: string]: readonly string[] }) {
 		this.gitRepos = repos;
+		if (workspaceFolderPaths) {
+			this.workspaceFolderPaths = workspaceFolderPaths;
+		}
 		this.saveState();
 
 		let newRepo: string;
@@ -223,6 +239,7 @@ class GitGraphView {
 			this.loadRepo(newRepo);
 			return true;
 		} else {
+			this.restorePathFilterState(this.currentRepo);
 			this.finaliseRepoLoad(false);
 			return false;
 		}
@@ -233,6 +250,7 @@ class GitGraphView {
 		this.currentRepoLoading = true;
 		this.showRemoteBranchesElem.checked = getShowRemoteBranches(this.gitRepos[this.currentRepo].showRemoteBranchesV2);
 		this.simplifyByDecorationElem.checked = getSimplifyByDecoration(this.gitRepos[this.currentRepo].simplifyByDecoration);
+		this.restorePathFilterState(this.currentRepo);
 		this.maxCommits = this.config.initialLoadCommits;
 		this.gitConfig = null;
 		this.gitRemotes = [];
@@ -245,6 +263,80 @@ class GitGraphView {
 		this.settingsWidget.close();
 		this.saveState();
 		this.refresh(true);
+	}
+
+	private restorePathFilterState(repo: string) {
+		const repoState = this.gitRepos[repo];
+		const options = this.getPathFilterOptions();
+		const wsPaths = this.workspaceFolderPaths[repo] || [];
+
+		let selectedValue: string;
+		if (repoState.pathFilter === PATH_FILTER_WS_ALL && wsPaths.length > 0) {
+			selectedValue = wsPaths.length === 1 ? wsPaths[0] : PATH_FILTER_WS_ALL;
+		} else if (repoState.pathFilter !== null && repoState.pathFilter !== PATH_FILTER_WS_ALL) {
+			const matchingOption = options.find((o) => o.value === repoState.pathFilter);
+			selectedValue = matchingOption ? repoState.pathFilter : SHOW_ALL_BRANCHES;
+		} else {
+			selectedValue = SHOW_ALL_BRANCHES;
+		}
+
+		this.pathFilterDropdown.setOptions(options, [selectedValue]);
+		this.updateSimplifyState();
+	}
+
+	private isPathFilterActive(): boolean {
+		const repoState = this.gitRepos[this.currentRepo];
+		if (repoState.pathFilter === PATH_FILTER_WS_ALL) {
+			const paths = this.workspaceFolderPaths[this.currentRepo] || [];
+			return paths.length > 0;
+		}
+		return repoState.pathFilter !== null;
+	}
+
+	private updateSimplifyState() {
+		const pathActive = this.isPathFilterActive();
+		this.simplifyByDecorationElem.disabled = pathActive;
+		const label = document.getElementById('simplifyByDecorationControl')!;
+		if (pathActive) {
+			label.classList.add(CLASS_DISABLED);
+		} else {
+			label.classList.remove(CLASS_DISABLED);
+		}
+	}
+
+	private getPathFilterOptions(): DropdownOption[] {
+		const options: DropdownOption[] = [{ name: 'All', value: SHOW_ALL_BRANCHES }];
+		const wsPaths = this.workspaceFolderPaths[this.currentRepo] || [];
+		if (wsPaths.length > 1) {
+			options.push({ name: 'Workspace (all)', value: PATH_FILTER_WS_ALL });
+		}
+		for (const p of wsPaths) {
+			options.push({ name: p, value: p });
+		}
+		// Custom paths can be entered via the dropdown's filter input (Enter key)
+		const repoState = this.gitRepos[this.currentRepo];
+		if (repoState.pathFilter !== null && repoState.pathFilter !== PATH_FILTER_WS_ALL && !wsPaths.includes(repoState.pathFilter)) {
+			options.push({ name: repoState.pathFilter, value: repoState.pathFilter });
+		}
+		return options;
+	}
+
+	private handlePathFilterChange(selected: string) {
+		if (selected === SHOW_ALL_BRANCHES) {
+			this.saveRepoStateValue(this.currentRepo, 'pathFilter', null);
+		} else if (selected === PATH_FILTER_WS_ALL) {
+			this.saveRepoStateValue(this.currentRepo, 'pathFilter', PATH_FILTER_WS_ALL);
+		} else {
+			this.saveRepoStateValue(this.currentRepo, 'pathFilter', selected);
+		}
+		this.maxCommits = this.config.initialLoadCommits;
+		this.updateSimplifyState();
+		this.refresh(true);
+	}
+
+	private getWorkspacePathsForCurrentRepo(): string | null {
+		const paths = this.workspaceFolderPaths[this.currentRepo] || [];
+		return paths.length > 0 ? paths.join(', ') : null;
 	}
 
 	private loadRepoInfo(branchOptions: ReadonlyArray<string>, branchHead: string | null, remotes: ReadonlyArray<string>, stashes: ReadonlyArray<GG.GitStash>, isRepo: boolean) {
@@ -332,7 +424,7 @@ class GitGraphView {
 		}
 	}
 
-	private loadCommits(commits: GG.GitCommit[], commitHead: string | null, tags: ReadonlyArray<string>, moreAvailable: boolean, onlyFollowFirstParent: boolean) {
+	private loadCommits(commits: GG.GitCommit[], commitHead: string | null, tags: ReadonlyArray<string>, moreAvailable: boolean, onlyFollowFirstParent: boolean, pathFilterActive: boolean = false) {
 		// This list of tags is just used to provide additional information in the dialogs. Tag information included in commits is used for all other purposes (e.g. rendering, context menus)
 		const tagsChanged = !arraysStrictlyEqual(this.gitTags, tags);
 		this.gitTags = tags;
@@ -404,7 +496,7 @@ class GitGraphView {
 
 		this.saveState();
 
-		this.graph.loadCommits(this.commits, this.commitHead, this.commitLookup, this.onlyFollowFirstParent);
+		this.graph.loadCommits(this.commits, this.commitHead, this.commitLookup, this.onlyFollowFirstParent, pathFilterActive);
 		this.render();
 
 		if (currentRepoLoading && this.config.onRepoLoad.scrollToHead && this.commitHead !== null) {
@@ -507,7 +599,7 @@ class GitGraphView {
 		if (msg.error === null) {
 			const refreshState = this.currentRepoRefreshState;
 			if (refreshState.inProgress && refreshState.loadCommitsRefreshId === msg.refreshId) {
-				this.loadCommits(msg.commits, msg.head, msg.tags, msg.moreCommitsAvailable, msg.onlyFollowFirstParent);
+				this.loadCommits(msg.commits, msg.head, msg.tags, msg.moreCommitsAvailable, msg.onlyFollowFirstParent, msg.pathFilterActive);
 			}
 		} else {
 			const error = this.gitBranches.length === 0 && msg.error.indexOf('bad revision \'HEAD\'') > -1
@@ -588,7 +680,9 @@ class GitGraphView {
 
 	private getCommitOfElem(elem: HTMLElement) {
 		let id = parseInt(elem.dataset.id!);
-		return id < this.commits.length ? this.commits[id] : null;
+		if (id >= this.commits.length) return null;
+		const commit = this.commits[id];
+		return commit;
 	}
 
 	public getCommits(): ReadonlyArray<GG.GitCommit> {
@@ -670,13 +764,16 @@ class GitGraphView {
 			maxCommits: this.maxCommits,
 			showTags: getShowTags(repoState.showTags),
 			showRemoteBranches: getShowRemoteBranches(repoState.showRemoteBranchesV2),
-			simplifyByDecoration: getSimplifyByDecoration(repoState.simplifyByDecoration),
+			simplifyByDecoration: this.isPathFilterActive() ? false : getSimplifyByDecoration(repoState.simplifyByDecoration),
 			includeCommitsMentionedByReflogs: getIncludeCommitsMentionedByReflogs(repoState.includeCommitsMentionedByReflogs),
 			onlyFollowFirstParent: getOnlyFollowFirstParent(repoState.onlyFollowFirstParent),
 			commitOrdering: getCommitOrdering(repoState.commitOrdering),
 			remotes: this.gitRemotes,
 			hideRemotes: repoState.hideRemotes,
-			stashes: this.gitStashes
+			stashes: this.gitStashes,
+			pathFilter: repoState.pathFilter === PATH_FILTER_WS_ALL
+				? this.getWorkspacePathsForCurrentRepo()
+				: repoState.pathFilter
 		});
 	}
 
@@ -1099,6 +1196,7 @@ class GitGraphView {
 		const vertexColours = this.graph.getVertexColours();
 		const widthsAtVertices = this.config.referenceLabels.branchLabelsAlignedToGraph ? this.graph.getWidthsAtVertices() : [];
 		const mutedCommits = this.graph.getMutedCommits(currentHash);
+		const dimmedCommits = this.graph.getPathFilterDimmedCommits();
 		const textFormatter = new TextFormatter(this.commits, this.gitRepos[this.currentRepo].issueLinkingConfig, {
 			emoji: true,
 			issueLinking: true,
@@ -1113,6 +1211,7 @@ class GitGraphView {
 
 		for (let i = 0; i < this.commits.length; i++) {
 			let commit = this.commits[i];
+
 			let message = '<span class="text">' + textFormatter.format(commit.message) + '</span>';
 			let date = formatShortDate(commit.date);
 			let branchLabels = getBranchLabels(commit.heads, commit.remotes);
@@ -1152,7 +1251,7 @@ class GitGraphView {
 				) + '."></span>'
 				: '';
 
-			html += '<tr class="commit' + (commit.hash === currentHash ? ' current' : '') + (mutedCommits[i] ? ' mute' : '') + '"' + (commit.hash !== UNCOMMITTED ? '' : ' id="uncommittedChanges"') + ' data-id="' + i + '" data-color="' + vertexColours[i] + '">' +
+			html += '<tr class="commit' + (commit.hash === currentHash ? ' current' : '') + (mutedCommits[i] ? ' mute' : '') + (dimmedCommits[i] ? ' pathDimmed' : '') + '"' + (commit.hash !== UNCOMMITTED ? '' : ' id="uncommittedChanges"') + ' data-id="' + i + '" data-color="' + vertexColours[i] + '">' +
 				(this.config.referenceLabels.branchLabelsAlignedToGraph ? '<td>' + getResizeColHtml(0) + (refBranches !== '' ? '<span style="margin-left:' + (widthsAtVertices[i] - 4) + 'px"' + refBranches.substring(5) : '') + '</td><td>' + getResizeColHtml(1) + '<span class="description">' + commitDot : '<td>' + getResizeColHtml(0) + '</td><td>' + getResizeColHtml(1) + '<span class="description">' + commitDot + refBranches) + (this.config.referenceLabels.tagLabelsOnRight ? message + refTags : refTags + message) + '</span></td>' +
 				(colVisibility.date ? '<td class="dateCol text" title="' + date.title + '">' + getResizeColHtml(2) + date.formatted + '</td>' : '') +
 				(colVisibility.author ? '<td class="authorCol text" title="' + escapeHtml(commit.author + ' <' + commit.email + '>') + '">' + getResizeColHtml(3) + (this.config.fetchAvatars ? '<span class="avatar" data-email="' + escapeHtml(commit.email) + '">' + (typeof this.avatars[commit.email] === 'string' ? '<img class="avatarImg" src="' + this.avatars[commit.email] + '">' : '') + '</span>' : '') + escapeHtml(commit.author) + '</td>' : '') +
@@ -3868,7 +3967,7 @@ window.addEventListener('load', () => {
 				gitGraph.processLoadRepoInfoResponse(msg);
 				break;
 			case 'loadRepos':
-				gitGraph.loadRepos(msg.repos, msg.lastActiveRepo, msg.loadViewTo);
+				gitGraph.loadRepos(msg.repos, msg.lastActiveRepo, msg.loadViewTo, msg.workspaceFolderPaths);
 				break;
 			case 'merge':
 				refreshOrDisplayError(msg.error, 'Unable to Merge ' + msg.actionOn);
