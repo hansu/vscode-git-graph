@@ -161,15 +161,46 @@ export class DataSource extends Disposable {
 	 * @param stashes An array of all stashes in the repository.
 	 * @returns The commits in the repository.
 	 */
-	public getCommits(repo: string, branches: ReadonlyArray<string> | null, authors: ReadonlyArray<string> | null, maxCommits: number, showTags: boolean, showRemoteBranches: boolean, includeCommitsMentionedByReflogs: boolean, onlyFollowFirstParent: boolean, commitOrdering: CommitOrdering, remotes: ReadonlyArray<string>, hideRemotes: ReadonlyArray<string>, stashes: ReadonlyArray<GitStash>, simplifyByDecoration: boolean): Promise<GitCommitData> {
+	public getCommits(repo: string, branches: ReadonlyArray<string> | null, authors: ReadonlyArray<string> | null, maxCommits: number, showTags: boolean, showRemoteBranches: boolean, includeCommitsMentionedByReflogs: boolean, onlyFollowFirstParent: boolean, commitOrdering: CommitOrdering, remotes: ReadonlyArray<string>, hideRemotes: ReadonlyArray<string>, stashes: ReadonlyArray<GitStash>, simplifyByDecoration: boolean, pathFilter: string | null): Promise<GitCommitData> {
 		const config = getConfig();
-		return Promise.all([
-			this.getLog(repo, branches, authors, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, simplifyByDecoration),
-			this.getRefs(repo, showRemoteBranches, config.showRemoteHeads, hideRemotes).then((refData: GitRefData) => refData, (errorMessage: string) => errorMessage)
-		]).then(async (results) => {
-			let commits: GitCommitRecord[] = results[0], refData: GitRefData | string = results[1], i;
-			let moreCommitsAvailable = commits.length === maxCommits + 1;
-			if (moreCommitsAvailable) commits.pop();
+		const pathFilterActive = pathFilter !== null && pathFilter !== '';
+		const showTagsConfig = showTags && config.showCommitsOnlyReferencedByTags;
+
+		// Build commits query first (spawn #1) to maintain mock-compatible spawn order
+		let commitsPromise: Promise<{ commits: (GitCommitRecord & { isPathFilterMatch?: boolean; isSyntheticParent?: boolean })[], moreCommitsAvailable: boolean }>;
+
+		if (pathFilterActive) {
+			// Spawn matching hashes (classification) and simplified topology in parallel.
+			// getLog uses --full-history --simplify-merges when pathFilter is set,
+			// so git handles topology filtering and parent rewriting natively.
+			const matchHashesPromise = this.getMatchingHashes(repo, branches, authors, maxCommits + 1, showTagsConfig, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, simplifyByDecoration, pathFilter!);
+			const logPromise = this.getLog(repo, branches, authors, maxCommits + 1, showTagsConfig, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, simplifyByDecoration, pathFilter!);
+			commitsPromise = Promise.all([matchHashesPromise, logPromise]).then(([{ hashes }, logCommits]) => {
+				const moreAvailable = logCommits.length === maxCommits + 1;
+				if (moreAvailable) logCommits.pop();
+				return {
+					commits: logCommits.map(c => ({
+						...c,
+						isPathFilterMatch: hashes.has(c.hash),
+						isSyntheticParent: !hashes.has(c.hash)
+					})),
+					moreCommitsAvailable: moreAvailable
+				};
+			});
+		} else {
+			commitsPromise = this.getLog(repo, branches, authors, maxCommits + 1, showTagsConfig, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, simplifyByDecoration, null).then((commits) => ({
+				commits: commits,
+				moreCommitsAvailable: commits.length === maxCommits + 1
+			}));
+		}
+
+		// Refs query (spawn #2) after commits to preserve spawn order
+		const refsPromise = this.getRefs(repo, showRemoteBranches, config.showRemoteHeads, hideRemotes).then((refData: GitRefData) => refData, (errorMessage: string) => errorMessage);
+
+		return Promise.all([commitsPromise, refsPromise]).then(async (results) => {
+			let { commits, moreCommitsAvailable } = results[0];
+			let refData: GitRefData | string = results[1], i;
+			if (!pathFilterActive && moreCommitsAvailable) commits.pop();
 
 			// It doesn't matter if getRefs() was rejected if no commits exist
 			if (typeof refData === 'string') {
@@ -180,6 +211,23 @@ export class DataSource extends Disposable {
 				} else {
 					// No commits exist, so getRefs() will always return an error. Set refData to the default value
 					refData = { head: null, heads: [], tags: [], remotes: [] };
+				}
+			}
+
+			// Fallback: if HEAD still not in filtered commits (e.g. not in getLog result)
+			if (typeof refData !== 'string' && refData.head !== null
+				&& pathFilterActive
+				&& !commits.some((c) => c.hash === refData.head)) {
+				const headCommit = await this.getCommitRecord(repo, refData.head);
+				if (headCommit !== null) {
+					const commitHashSet = new Set(commits.map((c) => c.hash));
+					const rewrittenParents = headCommit.parents.filter((p) => commitHashSet.has(p));
+					let insertIdx = 0;
+					while (insertIdx < commits.length && commits[insertIdx].date > headCommit.date) {
+						insertIdx++;
+					}
+					const headParentsChanged = headCommit.parents.length !== rewrittenParents.length || headCommit.parents.some((p, idx) => p !== rewrittenParents[idx]);
+					commits.splice(insertIdx, 0, { ...headCommit, parents: rewrittenParents, isPathFilterMatch: false, isSyntheticParent: headParentsChanged });
 				}
 			}
 
@@ -200,7 +248,11 @@ export class DataSource extends Disposable {
 
 			for (i = 0; i < commits.length; i++) {
 				commitLookup[commits[i].hash] = i;
-				commitNodes.push({ ...commits[i], heads: [], tags: [], remotes: [], stash: null });
+				commitNodes.push({
+					...commits[i], heads: [], tags: [], remotes: [], stash: null,
+					isSyntheticParent: commits[i].isSyntheticParent ?? false,
+					isPathFilterMatch: commits[i].isPathFilterMatch ?? true
+				});
 			}
 
 			/* Insert Stashes */
@@ -231,7 +283,9 @@ export class DataSource extends Disposable {
 						selector: stash.selector,
 						baseHash: stash.baseHash,
 						untrackedFilesHash: stash.untrackedFilesHash
-					}
+					},
+					isSyntheticParent: false,
+					isPathFilterMatch: true
 				});
 			}
 			for (i = 0; i < commitNodes.length; i++) {
@@ -265,10 +319,11 @@ export class DataSource extends Disposable {
 				head: refData.head,
 				tags: unique(refData.tags.map((tag) => tag.name)),
 				moreCommitsAvailable: moreCommitsAvailable,
-				error: null
+				error: null,
+				pathFilterActive: pathFilterActive
 			};
 		}).catch((errorMessage) => {
-			return { commits: [], head: null, tags: [], moreCommitsAvailable: false, error: errorMessage };
+			return { commits: [], head: null, tags: [], moreCommitsAvailable: false, error: errorMessage, pathFilterActive: false };
 		});
 	}
 
@@ -1707,8 +1762,11 @@ export class DataSource extends Disposable {
 	 * @param stashes An array of all stashes in the repository.
 	 * @returns An array of commits.
 	 */
-	private getLog(repo: string, branches: ReadonlyArray<string> | null, authors: ReadonlyArray<string> | null, num: number, includeTags: boolean, includeRemotes: boolean, includeCommitsMentionedByReflogs: boolean, onlyFollowFirstParent: boolean, order: CommitOrdering, remotes: ReadonlyArray<string>, hideRemotes: ReadonlyArray<string>, stashes: ReadonlyArray<GitStash>, simplifyByDecoration: boolean) {
-		const args = ['-c', 'log.showSignature=false', 'log', '--max-count=' + num, '--format=' + this.gitFormatLog, '--' + order + '-order'];
+	/**
+	 * Build the common branch/remote/tag arguments for git log commands.
+	 */
+	private buildLogBranchArgs(branches: ReadonlyArray<string> | null, authors: ReadonlyArray<string> | null, includeTags: boolean, includeRemotes: boolean, includeCommitsMentionedByReflogs: boolean, onlyFollowFirstParent: boolean, remotes: ReadonlyArray<string>, hideRemotes: ReadonlyArray<string>, stashes: ReadonlyArray<GitStash>, simplifyByDecoration: boolean): string[] {
+		const args: string[] = [];
 		if (simplifyByDecoration) {
 			args.push('--simplify-by-decoration');
 		}
@@ -1745,9 +1803,28 @@ export class DataSource extends Disposable {
 
 			args.push('HEAD');
 		}
-		args.push('--');
+		return args;
+	}
 
-
+	private getLog(repo: string, branches: ReadonlyArray<string> | null, authors: ReadonlyArray<string> | null, num: number, includeTags: boolean, includeRemotes: boolean, includeCommitsMentionedByReflogs: boolean, onlyFollowFirstParent: boolean, order: CommitOrdering, remotes: ReadonlyArray<string>, hideRemotes: ReadonlyArray<string>, stashes: ReadonlyArray<GitStash>, simplifyByDecoration: boolean, pathFilter: string | null, sinceDate?: number, beforeDate?: number, startCommit?: string) {
+		const args = ['-c', 'log.showSignature=false', 'log', '--max-count=' + num, '--format=' + this.gitFormatLog, '--' + order + '-order'];
+		if (sinceDate !== undefined) {
+			args.push('--after=' + sinceDate);
+		}
+		if (beforeDate !== undefined) {
+			args.push('--before=' + beforeDate);
+		}
+		if (startCommit) {
+			args.push(startCommit);
+		} else {
+			args.push(...this.buildLogBranchArgs(branches, authors, includeTags, includeRemotes, includeCommitsMentionedByReflogs, onlyFollowFirstParent, remotes, hideRemotes, stashes, simplifyByDecoration));
+		}
+		if (pathFilter !== null && pathFilter !== '') {
+			args.push('--full-history', '--simplify-merges', '--');
+			args.push(...this.parsePathFilter(pathFilter));
+		} else {
+			args.push('--');
+		}
 
 		return this.spawnGit(args, repo, (stdout) => {
 			let lines = stdout.split(EOL_REGEX);
@@ -1760,6 +1837,58 @@ export class DataSource extends Disposable {
 			return commits;
 		});
 	}
+
+	/**
+	 * Get matching commit hashes for a path filter.
+	 * @returns Ordered matches (date DESC) and a Set for quick lookup.
+	 */
+	private getMatchingHashes(repo: string, branches: ReadonlyArray<string> | null, authors: ReadonlyArray<string> | null, num: number, includeTags: boolean, includeRemotes: boolean, includeCommitsMentionedByReflogs: boolean, onlyFollowFirstParent: boolean, order: CommitOrdering, remotes: ReadonlyArray<string>, hideRemotes: ReadonlyArray<string>, stashes: ReadonlyArray<GitStash>, simplifyByDecoration: boolean, pathFilter: string): Promise<{ matches: { hash: string, date: number }[], hashes: Set<string> }> {
+		const args = ['-c', 'log.showSignature=false', 'log', '--max-count=' + num, '--format=%H%x00%ct', '--' + order + '-order'];
+		args.push(...this.buildLogBranchArgs(branches, authors, includeTags, includeRemotes, includeCommitsMentionedByReflogs, onlyFollowFirstParent, remotes, hideRemotes, stashes, simplifyByDecoration));
+		args.push('--');
+		args.push(...this.parsePathFilter(pathFilter));
+
+		return this.spawnGit(args, repo, (stdout) => {
+			const matches: { hash: string, date: number }[] = [];
+			const hashes = new Set<string>();
+			const lines = stdout.split(EOL_REGEX);
+			for (let i = 0; i < lines.length - 1; i++) {
+				const parts = lines[i].split('\x00');
+				if (parts.length !== 2) continue;
+				matches.push({ hash: parts[0], date: parseInt(parts[1]) });
+				hashes.add(parts[0]);
+			}
+			return { matches, hashes };
+		});
+	}
+
+	/**
+	 * Parse a comma-separated path filter string into an array of trimmed, non-empty paths.
+	 */
+	private parsePathFilter(filter: string): string[] {
+		return filter.split(',').map((p) => p.trim()).filter((p) => p !== '');
+	}
+
+	/**
+	 * Get a single commit record by hash.
+	 * @param repo The path of the repository.
+	 * @param hash The commit hash to retrieve.
+	 * @returns The commit record, or null if not found.
+	 */
+	private getCommitRecord(repo: string, hash: string): Promise<GitCommitRecord | null> {
+		return this.spawnGit(
+			['-c', 'log.showSignature=false', 'log', '--max-count=1', '--format=' + this.gitFormatLog, hash],
+			repo,
+			(stdout) => {
+				const line = stdout.split(EOL_REGEX)[0];
+				if (!line) return null;
+				const parts = line.split(GIT_LOG_SEPARATOR);
+				if (parts.length !== 6) return null;
+				return { hash: parts[0], parents: parts[1] !== '' ? parts[1].split(' ') : [], author: parts[2], email: parts[3], date: parseInt(parts[4]), message: parts[5] };
+			}
+		);
+	}
+
 
 	/**
 	 * Get the references in a repository.
@@ -2194,6 +2323,7 @@ interface GitCommitData {
 	tags: string[];
 	moreCommitsAvailable: boolean;
 	error: ErrorInfo;
+	pathFilterActive: boolean;
 }
 
 export interface GitCommitDetailsData {

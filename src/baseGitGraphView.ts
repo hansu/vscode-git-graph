@@ -8,7 +8,7 @@ import { Logger } from './logger';
 import { RepoFileWatcher } from './repoFileWatcher';
 import { RepoManager } from './repoManager';
 import { ErrorInfo, GitConfigLocation, GitGraphViewInitialState, GitPushBranchMode, GitRepoSet, LoadGitGraphViewTo, RequestDropCommits, RequestMessage, RequestSquashCommits, ResponseMessage } from './types';
-import { UNABLE_TO_FIND_GIT_MSG, UNCOMMITTED, archive, copyFilePathToClipboard, copyToClipboard, createPullRequest, getNonce, openExtensionSettings, openExternalUrl, openFile, showErrorMessage, viewDiff, viewDiffWithWorkingFile, viewFileAtRevision, viewScm } from './utils';
+import { UNABLE_TO_FIND_GIT_MSG, UNCOMMITTED, archive, copyFilePathToClipboard, copyToClipboard, createPullRequest, getNonce, getPathFromUri, openExtensionSettings, openExternalUrl, openFile, pathWithTrailingSlash, showErrorMessage, viewDiff, viewDiffWithWorkingFile, viewFileAtRevision, viewScm } from './utils';
 import { Disposable, toDisposable } from './utils/disposable';
 
 /**
@@ -83,6 +83,11 @@ export abstract class BaseGitGraphView extends Disposable {
 				} else {
 					this.respondLoadRepos(event.repos, loadViewTo);
 				}
+			}),
+			// Refresh workspace folder paths when workspace folders change
+			vscode.workspace.onDidChangeWorkspaceFolders(() => {
+				if (!this.isVisible || !this.isGraphViewLoaded) return;
+				this.respondLoadRepos(this.repoManager.getRepos(), null);
 			}),
 			// Refresh the webview when autoScroll configuration changes so it takes effect immediately
 			vscode.workspace.onDidChangeConfiguration((e) => {
@@ -403,7 +408,7 @@ export abstract class BaseGitGraphView extends Disposable {
 					command: 'loadCommits',
 					refreshId: msg.refreshId,
 					onlyFollowFirstParent: msg.onlyFollowFirstParent,
-					...await this.dataSource.getCommits(msg.repo, msg.branches, msg.authors, msg.maxCommits, msg.showTags, msg.showRemoteBranches, msg.includeCommitsMentionedByReflogs, msg.onlyFollowFirstParent, msg.commitOrdering, msg.remotes, msg.hideRemotes, msg.stashes, msg.simplifyByDecoration)
+					...await this.dataSource.getCommits(msg.repo, msg.branches, msg.authors, msg.maxCommits, msg.showTags, msg.showRemoteBranches, msg.includeCommitsMentionedByReflogs, msg.onlyFollowFirstParent, msg.commitOrdering, msg.remotes, msg.hideRemotes, msg.stashes, msg.simplifyByDecoration, msg.pathFilter)
 				});
 				break;
 			case 'loadConfig':
@@ -709,7 +714,8 @@ export abstract class BaseGitGraphView extends Disposable {
 			loadViewTo: this.loadViewTo,
 			repos: this.repoManager.getRepos(),
 			loadRepoInfoRefreshId: this.loadRepoInfoRefreshId,
-			loadCommitsRefreshId: this.loadCommitsRefreshId
+			loadCommitsRefreshId: this.loadCommitsRefreshId,
+			workspaceFolderPaths: getWorkspaceFolderRelativePaths(this.repoManager.getRepos())
 		};
 		const globalState = this.extensionState.getGlobalViewState();
 		const workspaceState = this.extensionState.getWorkspaceViewState();
@@ -735,6 +741,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				<div id="controls"${stickyClassAttr}>
 					<span id="repoControl"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
 					<span id="branchControl"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
+					<span id="pathFilterControl"><span class="unselectable">Paths: </span><div id="pathFilterDropdown" class="dropdown"></div></span>
 					<span id="authorControl"><span class="unselectable">Authors: </span><div id="authorDropdown" class="dropdown"></div></span>
 					<label ${hideRemotes} id="showRemoteBranchesControl" title="Show Remote Branches"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Remotes</label>
 					<label ${hideSimplify} id="simplifyByDecorationControl" title="Simplify By Decoration"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>Simplify</label>
@@ -817,9 +824,38 @@ export abstract class BaseGitGraphView extends Disposable {
 			command: 'loadRepos',
 			repos: repos,
 			lastActiveRepo: this.extensionState.getLastActiveRepo(),
-			loadViewTo: loadViewTo
+			loadViewTo: loadViewTo,
+			workspaceFolderPaths: getWorkspaceFolderRelativePaths(repos)
 		});
 	}
+}
+
+/**
+ * Compute workspace folder relative paths for each repository.
+ * @param repos The set of known repositories.
+ * @returns A mapping from repo path to an array of workspace folder relative paths within that repo.
+ */
+function getWorkspaceFolderRelativePaths(repos: GitRepoSet): { [repo: string]: string[] } {
+	const result: { [repo: string]: string[] } = {};
+	const wsFolders = vscode.workspace.workspaceFolders || [];
+	const wsPaths = wsFolders.map((f) => getPathFromUri(f.uri));
+	const repoPaths = Object.keys(repos);
+	for (let i = 0; i < repoPaths.length; i++) {
+		const repoPath = repoPaths[i];
+		const repoPathWithSlash = pathWithTrailingSlash(repoPath);
+		const paths: string[] = [];
+		for (let j = 0; j < wsPaths.length; j++) {
+			if (wsPaths[j] === repoPath) {
+				// Workspace folder is the repo root — no filtering needed
+				continue;
+			}
+			if (wsPaths[j].startsWith(repoPathWithSlash)) {
+				paths.push(path.posix.relative(repoPath, wsPaths[j]));
+			}
+		}
+		result[repoPath] = paths;
+	}
+	return result;
 }
 
 /**
