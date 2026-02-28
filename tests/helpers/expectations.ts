@@ -6,7 +6,7 @@ export function expectRenamedExtensionSettingToHaveBeenCalled(newSection: string
 }
 
 export function waitForExpect(expect: () => void) {
-	return new Promise((resolve, reject) => {
+	return new Promise<void>((resolve, reject) => {
 		let attempts = 0;
 		const testInterval = setInterval(() => {
 			try {
