@@ -59,6 +59,7 @@ export class CommandManager extends Disposable {
 		this.registerCommand('git-graph.resumeWorkspaceCodeReview', () => this.resumeWorkspaceCodeReview());
 		this.registerCommand('git-graph.version', () => this.version());
 		this.registerCommand('git-graph.openFile', (arg) => this.openFile(arg));
+		this.registerCommand('git-graph.openWithPathFilter', (arg) => this.openWithPathFilter(arg));
 
 		this.registerDisposable(
 			onDidChangeGitExecutable((gitExecutable) => {
@@ -392,6 +393,43 @@ export class CommandManager extends Disposable {
 			});
 		} else {
 			return showErrorMessage('Unable to Open File: The command was not called with the required arguments.');
+		}
+	}
+
+
+	/**
+	 * The method run when the `git-graph.openWithPathFilter` command is invoked.
+	 * Opens Git Graph with a path filter applied to the selected file or folder.
+	 * @param arg The URI of the file or folder from the Explorer context menu.
+	 */
+	private async openWithPathFilter(arg: vscode.Uri) {
+		if (!(arg instanceof vscode.Uri)) {
+			return;
+		}
+
+		const absPath = getPathFromUri(arg);
+		const repo = this.repoManager.getRepoContainingFile(absPath);
+		if (repo === null) {
+			showErrorMessage('The selected path is not within a known Git repository.');
+			return;
+		}
+
+		const relativePath = absPath.startsWith(repo + '/') ? absPath.substring(repo.length + 1) : absPath.substring(repo.length);
+		const loadViewTo = { repo: repo, pathFilter: relativePath };
+
+		const config = getConfig();
+		if (config.viewLocation === 'panel') {
+			const panelProvider = GitGraphPanelView.getInstance(
+				this.context.extensionPath,
+				this.dataSource,
+				this.extensionState,
+				this.avatarManager,
+				this.repoManager,
+				this.logger
+			);
+			panelProvider.show(loadViewTo);
+		} else {
+			GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, loadViewTo);
 		}
 	}
 

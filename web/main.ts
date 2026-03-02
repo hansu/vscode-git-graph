@@ -235,12 +235,22 @@ class GitGraphView {
 			this.loadViewTo = null;
 		}
 
+		if (this.loadViewTo !== null && this.loadViewTo.pathFilter !== undefined) {
+			this.gitRepos[this.loadViewTo.repo].pathFilter = this.loadViewTo.pathFilter;
+			sendMessage({ command: 'setRepoState', repo: this.loadViewTo.repo, state: this.gitRepos[this.loadViewTo.repo] });
+		}
+
 		if (this.currentRepo !== newRepo) {
 			this.loadRepo(newRepo);
 			return true;
 		} else {
 			this.restorePathFilterState(this.currentRepo);
-			this.finaliseRepoLoad(false);
+			if (this.loadViewTo !== null && this.loadViewTo.pathFilter !== undefined) {
+				this.maxCommits = this.config.initialLoadCommits;
+				this.refresh(true);
+			} else {
+				this.finaliseRepoLoad(false);
+			}
 			return false;
 		}
 	}
