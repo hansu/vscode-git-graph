@@ -2385,7 +2385,7 @@ describe('DataSource', () => {
 
 		it('Should return the commits (with pathFilter)', async () => {
 			// Setup
-			// Spawn order: getMatchingHashes(#1) + getLog(#2) (parallel) → getRefs(#3)
+			// Spawn order: getMatchingHashes(#1) + getLog(#2) (parallel) → getRefs(#3) → findNearestAncestor(#4,#5)
 			// Mock #1: getMatchingHashes (hash + date, default simplification)
 			mockGitSuccessOnce(
 				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b\x001587559258\n' +
@@ -2408,16 +2408,26 @@ describe('DataSource', () => {
 				'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2 refs/tags/tag1\n' +
 				'2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c refs/tags/tag1^{}\n'
 			);
+			// Mock #4: findNearestAncestorInSet for orphaned 'feature' branch (4d5e6f... → 1a2b3c...)
+			mockGitSuccessOnce(
+				'4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e\n' +
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b\n'
+			);
+			// Mock #5: findNearestAncestorInSet for orphaned tag1 (a1b2c3... → 2b3c4d...)
+			mockGitSuccessOnce(
+				'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2\n' +
+				'2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c\n'
+			);
 			vscode.mockExtensionSettingReturnValue('repository.showCommitsOnlyReferencedByTags', true);
 			vscode.mockExtensionSettingReturnValue('repository.showRemoteHeads', true);
 			vscode.mockExtensionSettingReturnValue('repository.showUncommittedChanges', false);
 			date.setCurrentTime(1587559259);
 
 			// Run
-			await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false, 'src/main.ts');
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false, 'src/main.ts');
 
 			// Assert
-			expect(spyOnSpawn).toHaveBeenCalledTimes(3); // getMatchingHashes + getLog + getRefs
+			expect(spyOnSpawn).toHaveBeenCalledTimes(5); // getMatchingHashes + getLog + getRefs + 2x findNearestAncestor
 			// calls[0] = getMatchingHashes: should have path filter after '--' (no --full-history)
 			const matchingHashesCall = spyOnSpawn.mock.calls[0];
 			expect(matchingHashesCall[1]).not.toContain('--full-history');
@@ -2435,6 +2445,14 @@ describe('DataSource', () => {
 			const logSimplifyIdx = logCall[1].indexOf('--simplify-merges');
 			expect(logFullHistoryIdx).toBeLessThan(logDashIndex);
 			expect(logSimplifyIdx).toBeLessThan(logDashIndex);
+			// Verify orphaned refs are annotated to nearest ancestor commits
+			// 'feature' branch (4d5e6f...) should be annotated to commit 1a2b3c...
+			expect(result.commits.find(c => c.hash === '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b')!.heads).toContain('feature');
+			// tag1 (non-annotated entry a1b2c3...) should be annotated to commit 2b3c4d...
+			expect(result.commits.find(c => c.hash === '2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c')!.tags.map(t => t.name)).toContain('tag1');
+			// rev-list calls should have --max-count=1000
+			expect(spyOnSpawn.mock.calls[3][1]).toContain('--max-count=1000');
+			expect(spyOnSpawn.mock.calls[4][1]).toContain('--max-count=1000');
 		});
 	});
 

@@ -314,6 +314,53 @@ export class DataSource extends Disposable {
 				}
 			}
 
+			/* Annotate orphaned refs to nearest ancestor (path filter only) */
+			if (pathFilterActive) {
+				const orphanedByHash = new Map<string, { heads: string[], tags: { name: string, annotated: boolean }[], remotes: { name: string, remote: string | null }[] }>();
+
+				const addOrphaned = (hash: string) => {
+					if (!orphanedByHash.has(hash)) {
+						orphanedByHash.set(hash, { heads: [], tags: [], remotes: [] });
+					}
+					return orphanedByHash.get(hash)!;
+				};
+
+				for (i = 0; i < refData.heads.length; i++) {
+					if (typeof commitLookup[refData.heads[i].hash] !== 'number') {
+						addOrphaned(refData.heads[i].hash).heads.push(refData.heads[i].name);
+					}
+				}
+				if (showTags) {
+					for (i = 0; i < refData.tags.length; i++) {
+						if (typeof commitLookup[refData.tags[i].hash] !== 'number') {
+							addOrphaned(refData.tags[i].hash).tags.push({ name: refData.tags[i].name, annotated: refData.tags[i].annotated });
+						}
+					}
+				}
+				for (i = 0; i < refData.remotes.length; i++) {
+					if (typeof commitLookup[refData.remotes[i].hash] !== 'number') {
+						let name = refData.remotes[i].name;
+						let remote = remotes.find(remote => name.startsWith(remote + '/'));
+						addOrphaned(refData.remotes[i].hash).remotes.push({ name: name, remote: remote ? remote : null });
+					}
+				}
+
+				const orphanedEntries = Array.from(orphanedByHash.entries());
+				const ancestors = await Promise.all(
+					orphanedEntries.map(([hash]) => this.findNearestAncestorInSet(repo, hash, commitLookup))
+				);
+				for (let j = 0; j < orphanedEntries.length; j++) {
+					const ancestor = ancestors[j];
+					if (ancestor !== null) {
+						const node = commitNodes[commitLookup[ancestor]];
+						const refs = orphanedEntries[j][1];
+						node.heads.push(...refs.heads);
+						node.tags.push(...refs.tags);
+						node.remotes.push(...refs.remotes);
+					}
+				}
+			}
+
 			return {
 				commits: commitNodes,
 				head: refData.head,
@@ -1885,6 +1932,30 @@ export class DataSource extends Disposable {
 				const parts = line.split(GIT_LOG_SEPARATOR);
 				if (parts.length !== 6) return null;
 				return { hash: parts[0], parents: parts[1] !== '' ? parts[1].split(' ') : [], author: parts[2], email: parts[3], date: parseInt(parts[4]), message: parts[5] };
+			}
+		);
+	}
+
+	/**
+	 * Find the nearest ancestor of a given commit that exists in the commitLookup.
+	 * Used to annotate orphaned refs (whose commits are not in the filtered result) to their closest ancestor.
+	 * @param repo The path of the repository.
+	 * @param hash The commit hash to find an ancestor for.
+	 * @param commitLookup A lookup of commit hashes to their index in the commit list.
+	 * @returns The hash of the nearest ancestor in commitLookup, or null if none found.
+	 */
+	private findNearestAncestorInSet(repo: string, hash: string, commitLookup: { [hash: string]: number }): Promise<string | null> {
+		return this.spawnGit(
+			['rev-list', '--max-count=1000', hash],
+			repo,
+			(stdout) => {
+				const lines = stdout.split(EOL_REGEX);
+				for (let i = 0; i < lines.length; i++) {
+					if (lines[i] !== '' && typeof commitLookup[lines[i]] === 'number') {
+						return lines[i];
+					}
+				}
+				return null;
 			}
 		);
 	}
