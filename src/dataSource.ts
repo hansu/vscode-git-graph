@@ -815,13 +815,15 @@ export class DataSource extends Disposable {
 	 * @param remote The remote to push the branch to.
 	 * @param setUpstream Set the branches upstream.
 	 * @param mode The mode of the push.
+	 * @param noVerify If `squash` is enabled, pass `--no-verify` when creating the squash commit (skip commit hooks).
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public pushBranch(repo: string, branchName: string, remote: string, setUpstream: boolean, mode: GitPushBranchMode) {
+	public pushBranch(repo: string, branchName: string, remote: string, setUpstream: boolean, mode: GitPushBranchMode, noVerify: boolean) {
 		let args = ['push'];
 		args.push(remote, branchName);
 		if (setUpstream) args.push('--set-upstream');
 		if (mode !== GitPushBranchMode.Normal) args.push('--' + mode);
+		if (noVerify) args.push('--no-verify');
 
 		return this.runGitCommand(args, repo);
 	}
@@ -833,16 +835,17 @@ export class DataSource extends Disposable {
 	 * @param remotes The remotes to push the branch to.
 	 * @param setUpstream Set the branches upstream.
 	 * @param mode The mode of the push.
+	 * @param noVerify If `squash` is enabled, pass `--no-verify` when creating the squash commit (skip commit hooks).
 	 * @returns The ErrorInfo's from the executed commands.
 	 */
-	public async pushBranchToMultipleRemotes(repo: string, branchName: string, remotes: string[], setUpstream: boolean, mode: GitPushBranchMode): Promise<ErrorInfo[]> {
+	public async pushBranchToMultipleRemotes(repo: string, branchName: string, remotes: string[], setUpstream: boolean, mode: GitPushBranchMode, noVerify: boolean): Promise<ErrorInfo[]> {
 		if (remotes.length === 0) {
 			return ['No remote(s) were specified to push the branch ' + branchName + ' to.'];
 		}
 
 		const results: ErrorInfo[] = [];
 		for (let i = 0; i < remotes.length; i++) {
-			const result = await this.pushBranch(repo, branchName, remotes[i], setUpstream, mode);
+			const result = await this.pushBranch(repo, branchName, remotes[i], setUpstream, mode, noVerify);
 			results.push(result);
 			if (result !== null) break;
 		}
@@ -994,9 +997,10 @@ export class DataSource extends Disposable {
 	 * @param remote The name of the remote containing the remote branch.
 	 * @param createNewCommit Is `--no-ff` enabled if a merge is required.
 	 * @param squash Is `--squash` enabled if a merge is required.
+	 * @param noVerify If `squash` is enabled, pass `--no-verify` when creating the squash commit (skip commit hooks).
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public pullBranch(repo: string, branchName: string, remote: string, createNewCommit: boolean, squash: boolean) {
+	public pullBranch(repo: string, branchName: string, remote: string, createNewCommit: boolean, squash: boolean, noVerify: boolean) {
 		const args = ['pull', remote, branchName], config = getConfig();
 		if (squash) {
 			args.push('--squash');
@@ -1008,7 +1012,7 @@ export class DataSource extends Disposable {
 		}
 		return this.runGitCommand(args, repo).then((pullStatus) => {
 			return pullStatus === null && squash
-				? this.commitSquashIfStagedChangesExist(repo, remote + '/' + branchName, MergeActionOn.Branch, config.squashPullMessageFormat, config.signCommits)
+				? this.commitSquashIfStagedChangesExist(repo, remote + '/' + branchName, MergeActionOn.Branch, config.squashPullMessageFormat, config.signCommits, noVerify)
 				: pullStatus;
 		});
 	}
@@ -1033,11 +1037,13 @@ export class DataSource extends Disposable {
 	 * @param obj The object to be merged into the current branch.
 	 * @param actionOn Is the merge on a branch, remote-tracking branch or commit.
 	 * @param createNewCommit Is `--no-ff` enabled.
+	 * @param allowUnrelatedHistories Is `--allow-unrelated-histories` enabled.
 	 * @param squash Is `--squash` enabled.
+	 * @param noVerify If `squash` is enabled, pass `--no-verify` when creating the squash commit (skip commit hooks).
 	 * @param noCommit Is `--no-commit` enabled.
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public merge(repo: string, obj: string, actionOn: MergeActionOn, createNewCommit: boolean, allowUnrelatedHistories: boolean, squash: boolean, noCommit: boolean) {
+	public merge(repo: string, obj: string, actionOn: MergeActionOn, createNewCommit: boolean, allowUnrelatedHistories: boolean, squash: boolean, noVerify: boolean, noCommit: boolean) {
 		const args = ['merge', obj], config = getConfig();
 		if (squash) {
 			args.push('--squash');
@@ -1055,7 +1061,7 @@ export class DataSource extends Disposable {
 		}
 		return this.runGitCommand(args, repo).then((mergeStatus) => {
 			return mergeStatus === null && squash && !noCommit
-				? this.commitSquashIfStagedChangesExist(repo, obj, actionOn, config.squashMergeMessageFormat, config.signCommits)
+				? this.commitSquashIfStagedChangesExist(repo, obj, actionOn, config.squashMergeMessageFormat, config.signCommits, noVerify)
 				: mergeStatus;
 		});
 	}
@@ -1191,9 +1197,11 @@ export class DataSource extends Disposable {
 	 * @param repo The path of the repository.
 	 * @param commits Array of commit hashes to squash (from newest to oldest).
 	 * @param commitMessage The commit message for the squashed commit.
+	 * @param noVerify If enabled, pass `--no-verify` when creating the squashed commit (skip commit hooks).
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public async squashCommits(repo: string, commits: ReadonlyArray<string>, commitMessage: string): Promise<ErrorInfo> {
+	public async squashCommits(repo: string, commits: ReadonlyArray<string>, commitMessage: string, noVerify: boolean): Promise<ErrorInfo> {
+
 		if (commits.length < 2) {
 			return 'At least 2 commits are required for squashing.';
 		}
@@ -1210,6 +1218,9 @@ export class DataSource extends Disposable {
 		const commitArgs = ['commit', '-m', commitMessage];
 		if (getConfig().signCommits) {
 			commitArgs.push('-S');
+		}
+		if (noVerify) {
+			commitArgs.push('--no-verify');
 		}
 
 		return this.runGitCommand(commitArgs, repo);
@@ -1261,7 +1272,7 @@ export class DataSource extends Disposable {
 	 * @param message The new commit message.
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public async editCommitMessage(repo: string, commitHash: string, message: string): Promise<ErrorInfo> {
+	public async editCommitMessage(repo: string, commitHash: string, message: string, noVerify: boolean): Promise<ErrorInfo> {
 		try {
 			const headCommit = await this.spawnGit(['rev-parse', 'HEAD'], repo, (stdout) => stdout.trim());
 
@@ -1270,6 +1281,8 @@ export class DataSource extends Disposable {
 				if (getConfig().signCommits) {
 					args.push('-S');
 				}
+				if (noVerify) args.push('--no-verify');
+
 				return this.runGitCommand(args, repo);
 			} else {
 				return this.rebaseEditCommitMessage(repo, commitHash, message);
@@ -1950,14 +1963,18 @@ export class DataSource extends Disposable {
 	 * @param obj The object being squash merged into the current branch.
 	 * @param actionOn Is the merge on a branch, remote-tracking branch or commit.
 	 * @param squashMessageFormat The format to be used in the commit message of the squash.
+	 * @param noVerify If enabled, pass `--no-verify` when creating the squash commit (skip commit hooks).
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	private commitSquashIfStagedChangesExist(repo: string, obj: string, actionOn: MergeActionOn, squashMessageFormat: SquashMessageFormat, signCommits: boolean): Promise<ErrorInfo> {
+	private commitSquashIfStagedChangesExist(repo: string, obj: string, actionOn: MergeActionOn, squashMessageFormat: SquashMessageFormat, signCommits: boolean, noVerify: boolean): Promise<ErrorInfo> {
 		return this.areStagedChanges(repo).then((changes) => {
 			if (changes) {
 				const args = ['commit'];
 				if (signCommits) {
 					args.push('-S');
+				}
+				if (noVerify) {
+					args.push('--no-verify');
 				}
 				if (squashMessageFormat === SquashMessageFormat.Default) {
 					args.push('-m', 'Merge ' + actionOn.toLowerCase() + ' \'' + obj + '\'');

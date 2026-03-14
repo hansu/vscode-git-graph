@@ -189,7 +189,7 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'checkoutBranch':
 				errorInfos = [await this.dataSource.checkoutBranch(msg.repo, msg.branchName, msg.remoteBranch)];
 				if (errorInfos[0] === null && msg.pullAfterwards !== null) {
-					errorInfos.push(await this.dataSource.pullBranch(msg.repo, msg.pullAfterwards.branchName, msg.pullAfterwards.remote, msg.pullAfterwards.createNewCommit, msg.pullAfterwards.squash));
+					errorInfos.push(await this.dataSource.pullBranch(msg.repo, msg.pullAfterwards.branchName, msg.pullAfterwards.remote, msg.pullAfterwards.createNewCommit, msg.pullAfterwards.squash, msg.pullAfterwards.noVerify));
 				}
 				this.sendMessage({
 					command: 'checkoutBranch',
@@ -269,7 +269,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				});
 				break;
 			case 'createPullRequest':
-				errorInfos = [msg.push ? await this.dataSource.pushBranch(msg.repo, msg.sourceBranch, msg.sourceRemote, true, GitPushBranchMode.Normal) : null];
+				errorInfos = [msg.push ? await this.dataSource.pushBranch(msg.repo, msg.sourceBranch, msg.sourceRemote, true, GitPushBranchMode.Normal, false) : null];
 				if (errorInfos[0] === null) {
 					errorInfos.push(await createPullRequest(msg.config, msg.sourceOwner, msg.sourceRepo, msg.sourceBranch));
 				}
@@ -346,7 +346,7 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'squashCommits':
 				this.sendMessage({
 					command: 'squashCommits',
-					error: await this.dataSource.squashCommits(msg.repo, (msg as RequestSquashCommits).commits, (msg as RequestSquashCommits).commitMessage)
+					error: await this.dataSource.squashCommits(msg.repo, (msg as RequestSquashCommits).commits, (msg as RequestSquashCommits).commitMessage, (msg as RequestSquashCommits).noVerify)
 				});
 				break;
 			case 'editRemote':
@@ -443,7 +443,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				this.sendMessage({
 					command: 'merge',
 					actionOn: msg.actionOn,
-					error: await this.dataSource.merge(msg.repo, msg.obj, msg.actionOn, msg.createNewCommit, msg.allowUnrelatedHistories, msg.squash, msg.noCommit)
+					error: await this.dataSource.merge(msg.repo, msg.obj, msg.actionOn, msg.createNewCommit, msg.allowUnrelatedHistories, msg.squash, msg.noVerify, msg.noCommit)
 				});
 				break;
 			case 'openExtensionSettings':
@@ -491,14 +491,14 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'pullBranch':
 				this.sendMessage({
 					command: 'pullBranch',
-					error: await this.dataSource.pullBranch(msg.repo, msg.branchName, msg.remote, msg.createNewCommit, msg.squash)
+					error: await this.dataSource.pullBranch(msg.repo, msg.branchName, msg.remote, msg.createNewCommit, msg.squash, msg.noVerify)
 				});
 				break;
 			case 'pushBranch':
 				this.sendMessage({
 					command: 'pushBranch',
 					willUpdateBranchConfig: msg.willUpdateBranchConfig,
-					errors: await this.dataSource.pushBranchToMultipleRemotes(msg.repo, msg.branchName, msg.remotes, msg.setUpstream, msg.mode)
+					errors: await this.dataSource.pushBranchToMultipleRemotes(msg.repo, msg.branchName, msg.remotes, msg.setUpstream, msg.mode, msg.noVerify)
 				});
 				break;
 			case 'pushStash':
@@ -563,7 +563,7 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'editCommitMessage':
 				this.sendMessage({
 					command: 'editCommitMessage',
-					error: await this.dataSource.editCommitMessage(msg.repo, msg.commitHash, msg.message)
+					error: await this.dataSource.editCommitMessage(msg.repo, msg.commitHash, msg.message, msg.noVerify)
 				});
 				break;
 			case 'setGlobalViewState':
