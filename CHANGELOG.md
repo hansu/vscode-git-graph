@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.31.7 - 2026-03-14
+ * #77 Add 'No Verify' option for push, merge and squash action (#68). Thanks [@th0was14](https://github.com/@th0was14).
+ * #70 Fix preserve commit selection state across tab switches. Thanks [@LeuciRemi](https://github.com/LeuciRemi).
+ * #69 Add `commitDetailsView.autoScroll` setting to control auto-scrolling (#63). Thanks [@LeuciRemi](https://github.com/LeuciRemi).
+
 ## 1.31.6 - 2025-09-19
  * #62 Add panel view and bulk commit operations. Thanks [@LeuciRemi](https://github.com/LeuciRemi).
    * Add support for viewing Git Graph in a panel and/or editor.
