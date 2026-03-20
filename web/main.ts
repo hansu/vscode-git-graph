@@ -3112,7 +3112,7 @@ class GitGraphView {
 				}
 			}, () => this.saveState());
 
-			observeElemScroll('cdvFilesView', expandedCommit.scrollTop.fileView, (scrollTop) => {
+			observeElemScroll('cdvFilesViewWrapper', expandedCommit.scrollTop.fileView, (scrollTop) => {
 				if (this.expandedCommit === null) return;
 				this.expandedCommit.scrollTop.fileView = scrollTop;
 				if (this.expandedCommit.contextMenuOpen.fileView > -1) {
