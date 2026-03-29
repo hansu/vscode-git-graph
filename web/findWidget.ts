@@ -1,3 +1,5 @@
+import { SVG_ICONS, getText } from './utils';
+
 const CLASS_FIND_CURRENT_COMMIT = 'findCurrentCommit';
 const CLASS_FIND_MATCH = 'findMatch';
 
@@ -34,7 +36,7 @@ class FindWidget {
 		this.view = view;
 		this.widgetElem = document.createElement('div');
 		this.widgetElem.className = 'findWidget';
-		this.widgetElem.innerHTML = '<input id="findInput" type="text" placeholder="查找" disabled/><span id="findCaseSensitive" class="findModifier" title="匹配大小写">Aa</span><span id="findRegex" class="findModifier" title="使用正则表达式">.*</span><span id="findPosition"></span><span id="findPrev" title="上一个匹配项 (Shift+Enter)"></span><span id="findNext" title="下一个匹配项 (Enter)"></span><span id="findOpenCdv" title="为当前匹配项打开提交详情视图"></span><span id="findClose" title="关闭 (Escape)"></span>';
+		this.widgetElem.innerHTML = '<input id="findInput" type="text" placeholder="' + getText('ui.findPlaceholder') + '" disabled/><span id="findCaseSensitive" class="findModifier" title="' + getText('ui.findCaseSensitive') + '">Aa</span><span id="findRegex" class="findModifier" title="' + getText('ui.findRegex') + '">.*</span><span id="findPosition"></span><span id="findPrev" title="' + getText('ui.findPreviousMatch') + '"></span><span id="findNext" title="' + getText('ui.findNextMatch') + '"></span><span id="findOpenCdv" title="' + getText('ui.findOpenCommitDetailsView') + '"></span><span id="findClose" title="' + getText('ui.findClose') + '"></span>';
 		document.body.appendChild(this.widgetElem);
 
 		this.inputElem = <HTMLInputElement>document.getElementById('findInput')!;
@@ -298,7 +300,7 @@ class FindWidget {
 					}
 				}
 				if (zeroLengthMatch) {
-					this.widgetElem.setAttribute(ATTR_ERROR, '不能使用会产生零长度匹配的正则表达式');
+					this.widgetElem.setAttribute(ATTR_ERROR, getText('ui.noZeroLengthMatch'));
 					this.clearMatches();
 					this.matches = [];
 				}
@@ -366,7 +368,7 @@ class FindWidget {
 			this.matches[this.position].elem.classList.add(CLASS_FIND_CURRENT_COMMIT);
 			if (scrollToCommit) this.view.scrollToCommit(this.matches[position].hash, false);
 		}
-		this.positionElem.innerHTML = this.matches.length > 0 ? (this.position + 1) + ' / ' + this.matches.length : '无结果';
+		this.positionElem.innerHTML = this.matches.length > 0 ? (this.position + 1) + ' / ' + this.matches.length : getText('ui.noResults');
 		this.view.saveState();
 	}
 

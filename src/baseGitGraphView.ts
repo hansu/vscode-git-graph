@@ -533,7 +533,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				break;
 			case 'rescanForRepos':
 				if (!(await this.repoManager.searchWorkspaceForRepos())) {
-					showErrorMessage('当前工作区中未找到 Git 仓库。');
+					showErrorMessage(vscode.l10n.t('ui.noRepositories'));
 				}
 				break;
 			case 'resetFileToRevision':
@@ -703,7 +703,212 @@ export abstract class BaseGitGraphView extends Disposable {
 				simplifyByDecoration: config.simplifyByDecoration,
 				showStashes: config.showStashes,
 				showTags: config.showTags,
-				toolbarButtonVisibility: config.toolbarButtonVisibility
+				toolbarButtonVisibility: config.toolbarButtonVisibility,
+				language: config.language
+			},
+			i18n: {
+				GIT_FILE_CHANGE_TYPES: {
+					'A': vscode.l10n.t('git.fileChangeTypes.added'),
+					'M': vscode.l10n.t('git.fileChangeTypes.modified'),
+					'D': vscode.l10n.t('git.fileChangeTypes.deleted'),
+					'R': vscode.l10n.t('git.fileChangeTypes.renamed'),
+					'U': vscode.l10n.t('git.fileChangeTypes.untracked')
+				},
+				GIT_SIGNATURE_STATUS_DESCRIPTIONS: {
+					'G': vscode.l10n.t('git.signatureStatusDescriptions.valid'),
+					'U': vscode.l10n.t('git.signatureStatusDescriptions.unknown'),
+					'X': vscode.l10n.t('git.signatureStatusDescriptions.expired'),
+					'Y': vscode.l10n.t('git.signatureStatusDescriptions.expiredKey'),
+					'R': vscode.l10n.t('git.signatureStatusDescriptions.revokedKey'),
+					'E': vscode.l10n.t('git.signatureStatusDescriptions.unchecked'),
+					'B': vscode.l10n.t('git.signatureStatusDescriptions.bad')
+				},
+				UNCOMMITTED_CHANGES: vscode.l10n.t('ui.uncommittedChanges'),
+				SHOW_ALL_BRANCHES: vscode.l10n.t('ui.showAllBranches'),
+				LOADING: vscode.l10n.t('ui.loading'),
+				REFRESHING: vscode.l10n.t('ui.refreshing'),
+				NO_COMMITS: vscode.l10n.t('ui.noCommits'),
+				NO_REPOSITORIES: vscode.l10n.t('ui.noRepositories'),
+				RESCAN_FOR_REPOS: vscode.l10n.t('ui.rescanForRepos'),
+				UNABLE_TO_LOAD: vscode.l10n.t('ui.unableToLoad'),
+				UNABLE_TO_FIND_GIT: vscode.l10n.t('ui.unableToFindGit'),
+				REPOSITORY_SETTINGS: vscode.l10n.t('ui.repositorySettings'),
+				GENERAL: vscode.l10n.t('ui.general'),
+				EDIT_NAME: vscode.l10n.t('ui.editName'),
+				DELETE_NAME: vscode.l10n.t('ui.deleteName'),
+				EDIT_INITIAL_BRANCHES: vscode.l10n.t('ui.editInitialBranches'),
+				CLEAR_INITIAL_BRANCHES: vscode.l10n.t('ui.clearInitialBranches'),
+				SHOW_STASHES: vscode.l10n.t('ui.showStashes'),
+				SHOW_TAGS: vscode.l10n.t('ui.showTags'),
+				INCLUDE_COMMITS_MENTIONED_BY_REFLOGS: vscode.l10n.t('ui.includeCommitsMentionedByReflogs'),
+				ONLY_FOLLOW_FIRST_PARENT: vscode.l10n.t('ui.onlyFollowFirstParent'),
+				USER_DETAILS: vscode.l10n.t('ui.userDetails'),
+				USER_NAME: vscode.l10n.t('ui.userName'),
+				USER_EMAIL: vscode.l10n.t('ui.userEmail'),
+				EDIT: vscode.l10n.t('ui.edit'),
+				REMOVE: vscode.l10n.t('ui.remove'),
+				ADD_USER_DETAILS: vscode.l10n.t('ui.addUserDetails'),
+				REMOTE_CONFIGURATION: vscode.l10n.t('ui.remoteConfiguration'),
+				REMOTE: vscode.l10n.t('ui.remote'),
+				URL: vscode.l10n.t('ui.url'),
+				TYPE: vscode.l10n.t('ui.type'),
+				ACTIONS: vscode.l10n.t('ui.actions'),
+				CLICK_TO_SHOW_BRANCHES: vscode.l10n.t('ui.clickToShowBranches'),
+				CLICK_TO_HIDE_BRANCHES: vscode.l10n.t('ui.clickToHideBranches'),
+				FETCH_URL: vscode.l10n.t('ui.fetchUrl'),
+				FETCH: vscode.l10n.t('ui.fetch'),
+				FETCH_FROM_REMOTE: vscode.l10n.t('ui.fetchFromRemote'),
+				PRUNE_REMOTE: vscode.l10n.t('ui.pruneRemote'),
+				EDIT_REMOTE: vscode.l10n.t('ui.editRemote'),
+				DELETE_REMOTE: vscode.l10n.t('ui.deleteRemote'),
+				PUSH_URL: vscode.l10n.t('ui.pushUrl'),
+				PUSH: vscode.l10n.t('ui.push'),
+				NO_REMOTES_CONFIGURED: vscode.l10n.t('ui.noRemotesConfigured'),
+				ADD_REMOTE: vscode.l10n.t('ui.addRemote'),
+				ISSUE_LINKING: vscode.l10n.t('ui.issueLinking'),
+				ISSUE_REGEX: vscode.l10n.t('ui.issueRegex'),
+				ISSUE_URL: vscode.l10n.t('ui.issueUrl'),
+				ADD_ISSUE_LINKING: vscode.l10n.t('ui.addIssueLinking'),
+				PULL_REQUEST_CREATION: vscode.l10n.t('ui.pullRequestCreation'),
+				PROVIDER: vscode.l10n.t('ui.provider'),
+				SOURCE_REPOSITORY: vscode.l10n.t('ui.sourceRepository'),
+				DESTINATION_REPOSITORY: vscode.l10n.t('ui.destinationRepository'),
+				DESTINATION_BRANCH: vscode.l10n.t('ui.destinationBranch'),
+				CONFIGURE_PULL_REQUEST_INTEGRATION: vscode.l10n.t('ui.configurePullRequestIntegration'),
+				GIT_GRAPH_CONFIGURATION: vscode.l10n.t('ui.gitGraphConfiguration'),
+				OPEN_GIT_GRAPH_EXTENSION_SETTINGS: vscode.l10n.t('ui.openGitGraphExtensionSettings'),
+				EXPORT_REPOSITORY_CONFIG: vscode.l10n.t('ui.exportRepositoryConfig'),
+				REPOS: vscode.l10n.t('ui.repos'),
+				BRANCHES: vscode.l10n.t('ui.branches'),
+				AUTHORS: vscode.l10n.t('ui.authors'),
+				FETCH_AND_PRUNE: vscode.l10n.t('ui.fetchAndPrune'),
+				FROM_REMOTES: vscode.l10n.t('ui.fromRemotes'),
+				OPENING_TERMINAL: vscode.l10n.t('ui.openingTerminal'),
+				UNABLE_TO_LOAD_REPO_INFO: vscode.l10n.t('ui.unableToLoadRepoInfo'),
+				UNABLE_TO_LOAD_COMMITS: vscode.l10n.t('ui.unableToLoadCommits'),
+				RETRY: vscode.l10n.t('ui.retry'),
+				HEAD: vscode.l10n.t('ui.head'),
+				CONFIGURE_INITIAL_BRANCHES: vscode.l10n.t('ui.configureInitialBranches'),
+				CONFIGURE_INITIAL_BRANCHES_DESCRIPTION: vscode.l10n.t('ui.configureInitialBranchesDescription'),
+				CONFIGURE_INITIAL_BRANCHES_NOTE: vscode.l10n.t('ui.configureInitialBranchesNote'),
+				USE_GLOBALLY: vscode.l10n.t('ui.useGlobally'),
+				USE_GLOBALLY_DESCRIPTION: vscode.l10n.t('ui.useGloballyDescription'),
+				PRUNE_TAGS: vscode.l10n.t('ui.pruneTags'),
+				PRUNE_TAGS_DESCRIPTION: vscode.l10n.t('ui.pruneTagsDescription'),
+				CANNOT_CONFIGURE_PULL_REQUEST_INTEGRATION: vscode.l10n.t('ui.cannotConfigurePullRequestIntegration'),
+				CANNOT_CONFIGURE_PULL_REQUEST_INTEGRATION_DESCRIPTION: vscode.l10n.t('ui.cannotConfigurePullRequestIntegrationDescription'),
+				CONFIRM_REMOVE_PULL_REQUEST_INTEGRATION: vscode.l10n.t('ui.confirmRemovePullRequestIntegration'),
+				YES_REMOVE: vscode.l10n.t('ui.yesRemove'),
+				ISSUE_URL_DESCRIPTION: vscode.l10n.t('ui.issueUrlDescription'),
+				USE_GLOBALLY_ISSUE_LINKING: vscode.l10n.t('ui.useGloballyIssueLinking'),
+				USE_GLOBALLY_ISSUE_LINKING_DESCRIPTION: vscode.l10n.t('ui.useGloballyIssueLinkingDescription'),
+				CONFIGURE_PULL_REQUEST_CREATION_STEP1: vscode.l10n.t('ui.configurePullRequestCreationStep1'),
+				CONFIGURE_PULL_REQUEST_CREATION_STEP2: vscode.l10n.t('ui.configurePullRequestCreationStep2'),
+				SAVE_CONFIGURATION: vscode.l10n.t('ui.saveConfiguration'),
+				FIND_PLACEHOLDER: vscode.l10n.t('ui.findPlaceholder'),
+				FIND_CASE_SENSITIVE: vscode.l10n.t('ui.findCaseSensitive'),
+				FIND_REGEX: vscode.l10n.t('ui.findRegex'),
+				FIND_PREVIOUS_MATCH: vscode.l10n.t('ui.findPreviousMatch'),
+				FIND_NEXT_MATCH: vscode.l10n.t('ui.findNextMatch'),
+				FIND_OPEN_COMMIT_DETAILS_VIEW: vscode.l10n.t('ui.findOpenCommitDetailsView'),
+				FIND_CLOSE: vscode.l10n.t('ui.findClose'),
+				cancel: vscode.l10n.t('ui.cancel'),
+				close: vscode.l10n.t('ui.close'),
+				error: vscode.l10n.t('ui.error'),
+				filter: vscode.l10n.t('ui.filter'),
+				noResults: vscode.l10n.t('ui.noResults'),
+				none: vscode.l10n.t('ui.none'),
+				noZeroLengthMatch: vscode.l10n.t('ui.noZeroLengthMatch'),
+				loading: vscode.l10n.t('ui.loading'),
+				name: vscode.l10n.t('ui.name'),
+				fileSystemDefaultName: vscode.l10n.t('ui.fileSystemDefaultName'),
+				initialBranches: vscode.l10n.t('ui.initialBranches'),
+				local: vscode.l10n.t('ui.local'),
+				global: vscode.l10n.t('ui.global'),
+				onlyApplicableWhenShowingAllBranches: vscode.l10n.t('ui.onlyApplicableWhenShowingAllBranches'),
+				whenDiscoveringCommitsToLoadDoNotFollowAllParentCommitsOnlyFollowTheFirstParentCommit: vscode.l10n.t('ui.whenDiscoveringCommitsToLoadDoNotFollowAllParentCommitsOnlyFollowTheFirstParentCommit'),
+				userDetailsAreUsedByGitToRecordTheAuthorAndCommitterOfCommitObjects: vscode.l10n.t('ui.userDetailsAreUsedByGitToRecordTheAuthorAndCommitterOfCommitObjects'),
+				notSet: vscode.l10n.t('ui.notSet'),
+				issueLinkingConvertsIssueNumbersInCommitAndTagMessagesToHyperlinksThatOpenTheIssueInYourIssueTrackingSystemIfABranchNameContainsAnIssueNumberYouCanViewTheIssueViaTheBranchSContextMenu: vscode.l10n.t('ui.issueLinkingConvertsIssueNumbersInCommitAndTagMessagesToHyperlinksThatOpenTheIssueInYourIssueTrackingSystemIfABranchNameContainsAnIssueNumberYouCanViewTheIssueViaTheBranchSContextMenu'),
+				pullRequestCreationAutomatesTheOpeningAndPreFillingOfPullRequestFormsDirectlyFromTheBranchSContextMenu: vscode.l10n.t('ui.pullRequestCreationAutomatesTheOpeningAndPreFillingOfPullRequestFormsDirectlyFromTheBranchSContextMenu'),
+				specifyANameForThisRepository: vscode.l10n.t('ui.specifyANameForThisRepository'),
+				saveName: vscode.l10n.t('ui.saveName'),
+				areYouSureYouWantToDeleteTheManuallyConfiguredNameForThisRepository: vscode.l10n.t('ui.areYouSureYouWantToDeleteTheManuallyConfiguredNameForThisRepository'),
+				andUseTheFileSystemsDefaultName: vscode.l10n.t('ui.andUseTheFileSystemsDefaultName'),
+				yesDelete: vscode.l10n.t('ui.yesDelete'),
+				checkedOutBranch: vscode.l10n.t('ui.checkedOutBranch'),
+				specificBranches: vscode.l10n.t('ui.specificBranches'),
+				saveConfiguration: vscode.l10n.t('ui.saveConfiguration'),
+				areYouSureYouWantToClearTheBranchesInitiallyShownWhenLoadingThisRepositoryInTheGitGraphView: vscode.l10n.t('ui.areYouSureYouWantToClearTheBranchesInitiallyShownWhenLoadingThisRepositoryInTheGitGraphView'),
+				yesClear: vscode.l10n.t('ui.yesClear'),
+				setTheUsernameAndEmailThatGitUsesToRecordTheAuthorAndCommitterOfCommitObjects: vscode.l10n.t('ui.setTheUsernameAndEmailThatGitUsesToRecordTheAuthorAndCommitterOfCommitObjects'),
+				setUserDetails: vscode.l10n.t('ui.setUserDetails'),
+				areYouSureYouWantToRemoveThe: vscode.l10n.t('ui.areYouSureYouWantToRemoveThe'),
+				configurationThatGitUsesToRecordTheAuthorAndCommitterOfCommits: vscode.l10n.t('ui.configurationThatGitUsesToRecordTheAuthorAndCommitterOfCommits'),
+				removeUserDetails: vscode.l10n.t('ui.removeUserDetails'),
+				leaveBlankToUseFetchUrl: vscode.l10n.t('ui.leaveBlankToUseFetchUrl'),
+				addARemoteRepositoryToThisRepository: vscode.l10n.t('ui.addARemoteRepositoryToThisRepository'),
+				fetchUrl: vscode.l10n.t('ui.fetchUrl'),
+				pushUrl: vscode.l10n.t('ui.pushUrl'),
+				fetchImmediately: vscode.l10n.t('ui.fetchImmediately'),
+				addingRemote: vscode.l10n.t('ui.addingRemote'),
+				editRemoteRepository: vscode.l10n.t('ui.editRemoteRepository'),
+				saveChanges: vscode.l10n.t('ui.saveChanges'),
+				savingRemoteChanges: vscode.l10n.t('ui.savingRemoteChanges'),
+				areYouSureYouWantToDeleteTheRemoteRepository: vscode.l10n.t('ui.areYouSureYouWantToDeleteTheRemoteRepository'),
+				deletingRemote: vscode.l10n.t('ui.deletingRemote'),
+				areYouSureYouWantToFetchFromTheRemoteRepository: vscode.l10n.t('ui.areYouSureYouWantToFetchFromTheRemoteRepository'),
+				prune: vscode.l10n.t('ui.prune'),
+				beforeFetchDeleteRemoteTrackingReferencesThatNoLongerExistOnTheRemote: vscode.l10n.t('ui.beforeFetchDeleteRemoteTrackingReferencesThatNoLongerExistOnTheRemote'),
+				yesFetch: vscode.l10n.t('ui.yesFetch'),
+				fetchingFromRemote: vscode.l10n.t('ui.fetchingFromRemote'),
+				areYouSureYouWantToPruneRemoteTrackingReferencesThatNoLongerExistOnTheRemoteRepository: vscode.l10n.t('ui.areYouSureYouWantToPruneRemoteTrackingReferencesThatNoLongerExistOnTheRemoteRepository'),
+				yesPrune: vscode.l10n.t('ui.yesPrune'),
+				pruningRemote: vscode.l10n.t('ui.pruningRemote'),
+				clickTo: vscode.l10n.t('ui.clickTo'),
+				show: vscode.l10n.t('ui.show'),
+				hide: vscode.l10n.t('ui.hide'),
+				theBranchesForThisRemoteRepository: vscode.l10n.t('ui.theBranchesForThisRemoteRepository'),
+				areYouSureYouWantToRemove: vscode.l10n.t('ui.areYouSureYouWantToRemove'),
+				theLocallyConfiguredInThisRepository: vscode.l10n.t('ui.theLocallyConfiguredInThisRepository'),
+				issueLinking: vscode.l10n.t('ui.issueLinking'),
+				theGloballyConfiguredIssueLinkingInGitGraph: vscode.l10n.t('ui.theGloballyConfiguredIssueLinkingInGitGraph'),
+				exportingGitGraphRepositoryConfigurationWillGenerateAFileThatCanBeCommittedToThisRepositorySoThatOtherCollaboratorsCanUseTheSameConfiguration: vscode.l10n.t('ui.exportingGitGraphRepositoryConfigurationWillGenerateAFileThatCanBeCommittedToThisRepositorySoThatOtherCollaboratorsCanUseTheSameConfiguration'),
+				yesExport: vscode.l10n.t('ui.yesExport'),
+				exportingRepositoryConfiguration: vscode.l10n.t('ui.exportingRepositoryConfiguration'),
+				editIssueLinkingForThisRepository: vscode.l10n.t('ui.editIssueLinkingForThisRepository'),
+				addIssueLinkingForThisRepository: vscode.l10n.t('ui.addIssueLinkingForThisRepository'),
+				theFollowingExampleWillLink: vscode.l10n.t('ui.theFollowingExampleWillLink'),
+				inCommitMessagesTo: vscode.l10n.t('ui.inCommitMessagesTo'),
+				theIssueRegexHasBeenAutomaticallyDetectedFromTheCommitMessagesInThisRepositoryAndPreFilledPleaseReviewAndModifyIfNecessary: vscode.l10n.t('ui.theIssueRegexHasBeenAutomaticallyDetectedFromTheCommitMessagesInThisRepositoryAndPreFilledPleaseReviewAndModifyIfNecessary'),
+				aRegularExpressionThatMatchesYourIssueNumbersContainingOneOrMoreCapturingGroupsThatWillBeSubstitutedIntoTheIssueUrl: vscode.l10n.t('ui.aRegularExpressionThatMatchesYourIssueNumbersContainingOneOrMoreCapturingGroupsThatWillBeSubstitutedIntoTheIssueUrl'),
+				save: vscode.l10n.t('ui.save'),
+				theRegularExpressionDoesNotContainAnyCapturingGroups: vscode.l10n.t('ui.theRegularExpressionDoesNotContainAnyCapturingGroups'),
+				invalidIssueRegex: vscode.l10n.t('ui.invalidIssueRegex'),
+				return: vscode.l10n.t('ui.return'),
+				invalidIssueUrl: vscode.l10n.t('ui.invalidIssueUrl'),
+				theIssueUrlDoesNotContainAnyPlaceholdersForReplacingTheIssueNumberComponentsCapturedByTheIssueRegex: vscode.l10n.t('ui.theIssueUrlDoesNotContainAnyPlaceholdersForReplacingTheIssueNumberComponentsCapturedByTheIssueRegex'),
+				nonRemoteRepository: vscode.l10n.t('ui.nonRemoteRepository'),
+				sourceRemoteRepository: vscode.l10n.t('ui.sourceRemoteRepository'),
+				correspondsToTheRemoteRepositoryForTheSourceOfThePullRequest: vscode.l10n.t('ui.correspondsToTheRemoteRepositoryForTheSourceOfThePullRequest'),
+				destinationRemoteRepository: vscode.l10n.t('ui.destinationRemoteRepository'),
+				correspondsToTheRemoteRepositoryForTheDestinationOfThePullRequest: vscode.l10n.t('ui.correspondsToTheRemoteRepositoryForTheDestinationOfThePullRequest'),
+				nextStep: vscode.l10n.t('ui.nextStep'),
+				theNameOfTheBranchThatIsTheTargetDestinationOfThePullRequest: vscode.l10n.t('ui.theNameOfTheBranchThatIsTheTargetDestinationOfThePullRequest'),
+				hostRootUrl: vscode.l10n.t('ui.hostRootUrl'),
+				theRootUrlOfTheHostForThePullRequestProviderE: vscode.l10n.t('ui.theRootUrlOfTheHostForThePullRequestProviderE'),
+				sourceOwner: vscode.l10n.t('ui.sourceOwner'),
+				theOwnerOfTheRepositoryThatIsTheSourceOfThePullRequest: vscode.l10n.t('ui.theOwnerOfTheRepositoryThatIsTheSourceOfThePullRequest'),
+				sourceRepo: vscode.l10n.t('ui.sourceRepo'),
+				theNameOfTheRepositoryThatIsTheSourceOfThePullRequest: vscode.l10n.t('ui.theNameOfTheRepositoryThatIsTheSourceOfThePullRequest'),
+				destOwner: vscode.l10n.t('ui.destOwner'),
+				theOwnerOfTheRepositoryThatIsTheTargetDestinationOfThePullRequest: vscode.l10n.t('ui.theOwnerOfTheRepositoryThatIsTheTargetDestinationOfThePullRequest'),
+				destRepo: vscode.l10n.t('ui.destRepo'),
+				destProjectId: vscode.l10n.t('ui.destProjectId'),
+				theProjectIdInGitLabForThePullRequestTargetLeaveBlankToUseTheDefaultTargetConfiguredInGitLab: vscode.l10n.t('ui.theProjectIdInGitLabForThePullRequestTargetLeaveBlankToUseTheDefaultTargetConfiguredInGitLab'),
+				destinationBranch: vscode.l10n.t('ui.destinationBranch'),
+				cannot: vscode.l10n.t('ui.cannot'),
+				invalidCharactersEntered: vscode.l10n.t('ui.invalidCharactersEntered')
 			},
 			lastActiveRepo: this.extensionState.getLastActiveRepo(),
 			loadViewTo: this.loadViewTo,
@@ -731,27 +936,27 @@ export abstract class BaseGitGraphView extends Disposable {
 			if (!config.toolbarButtonVisibility.remotes) { hideRemotes = 'style="display: none"'; }
 			if (!config.toolbarButtonVisibility.simplify) { hideSimplify = 'style="display: none"'; }
 			body = `<body>
-			<div id="view" tabindex="-1">
-				<div id="controls"${stickyClassAttr}>
-					<span id="repoControl"><span class="unselectable">存储库: </span><div id="repoDropdown" class="dropdown"></div></span>
-					<span id="branchControl"><span class="unselectable">分支: </span><div id="branchDropdown" class="dropdown"></div></span>
-					<span id="authorControl"><span class="unselectable">作者: </span><div id="authorDropdown" class="dropdown"></div></span>
-					<label ${hideRemotes} id="showRemoteBranchesControl" title="显示远程分支"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>远程仓库</label>
-					<label ${hideSimplify} id="simplifyByDecorationControl" title="按装饰简化"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>简化</label>
-					<div id="currentBtn" title="当前"></div>
-					<div id="findBtn" title="查找"></div>
-					<div id="terminalBtn" title="为此存储库打开终端"></div>
-					<div id="settingsBtn" title="存储库设置"></div>
-					<div id="fetchBtn"></div>
-					<div id="refreshBtn"></div>
+				<div id="view" tabindex="-1">
+					<div id="controls"${stickyClassAttr}>
+						<span id="repoControl"><span class="unselectable">` + vscode.l10n.t('ui.repos') + `: </span><div id="repoDropdown" class="dropdown"></div></span>
+						<span id="branchControl"><span class="unselectable">` + vscode.l10n.t('ui.branches') + `: </span><div id="branchDropdown" class="dropdown"></div></span>
+						<span id="authorControl"><span class="unselectable">` + vscode.l10n.t('ui.authors') + `: </span><div id="authorDropdown" class="dropdown"></div></span>
+						<label ${hideRemotes} id="showRemoteBranchesControl" title="` + vscode.l10n.t('ui.showRemoteBranches') + `"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>` + vscode.l10n.t('ui.repos') + `</label>
+						<label ${hideSimplify} id="simplifyByDecorationControl" title="` + vscode.l10n.t('ui.simplifyByDecoration') + `"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>` + vscode.l10n.t('ui.simplifyByDecoration') + `</label>
+						<div id="currentBtn" title="` + vscode.l10n.t('ui.head') + `"></div>
+						<div id="findBtn" title="` + vscode.l10n.t('ui.findPlaceholder') + `"></div>
+						<div id="terminalBtn" title="` + vscode.l10n.t('ui.openingTerminal') + `"></div>
+						<div id="settingsBtn" title="` + vscode.l10n.t('ui.repositorySettings') + `"></div>
+						<div id="fetchBtn"></div>
+						<div id="refreshBtn"></div>
+					</div>
+					<div id="content">
+						<div id="commitGraph"></div>
+						<div id="commitTable"></div>
+					</div>
+					<div id="footer"></div>
 				</div>
-				<div id="content">
-					<div id="commitGraph"></div>
-					<div id="commitTable"></div>
-				</div>
-				<div id="footer"></div>
-			</div>
-			<script nonce="${nonce}">var initialState = ${JSON.stringify(initialState)}, globalState = ${JSON.stringify(globalState)}, workspaceState = ${JSON.stringify(workspaceState)};</script>
+				<script nonce="${nonce}">var initialState = ${JSON.stringify(initialState)}, globalState = ${JSON.stringify(globalState)}, workspaceState = ${JSON.stringify(workspaceState)};</script>
 			<script nonce="${nonce}" src="${this.getMediaUri('out.min.js')}"></script>
 			</body>`;
 		} else {

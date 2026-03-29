@@ -1,3 +1,5 @@
+import { setI18nTexts, getText } from './utils';
+
 class GitGraphView {
   private gitRepos: GG.GitRepoSet;
   private gitBranches: ReadonlyArray<string> = [];
@@ -74,6 +76,9 @@ class GitGraphView {
       requestingConfig: false,
     };
 
+    // 初始化翻译文本
+		setI18nTexts(initialState.i18n);
+
     this.controlsElem = document.getElementById("controls")!;
     this.tableElem = document.getElementById("commitTable")!;
     this.tableColHeadersElem = document.getElementById("tableColHeaders")!;
@@ -83,7 +88,7 @@ class GitGraphView {
 
     this.graph = new Graph("commitGraph", viewElem, this.config.graph, this.config.mute);
 
-    this.repoDropdown = new Dropdown("repoDropdown", true, false, "Repos", (values) => {
+    this.repoDropdown = new Dropdown("repoDropdown", true, false, getText('ui.repos'), (values) => {
       this.loadRepo(values[0]);
     });
 
@@ -91,7 +96,7 @@ class GitGraphView {
       "branchDropdown",
       false,
       true,
-      "Branches",
+      getText('ui.branches'),
       (values) => {
         this.currentBranches = values;
         this.maxCommits = this.config.initialLoadCommits;
@@ -105,7 +110,7 @@ class GitGraphView {
       "authorDropdown",
       false,
       true,
-      "Authors",
+      getText('ui.authors'),
       (values) => {
         this.currentAuthors = values;
         this.maxCommits = this.config.initialLoadCommits;
@@ -196,7 +201,7 @@ class GitGraphView {
         this.scrollToCommit(this.commitHead, true, true);
       }
     });
-    fetchBtn.title = "Fetch" + (this.config.fetchAndPrune ? " & Prune" : "") + " from Remote(s)";
+    fetchBtn.title = getText('ui.fetch') + (this.config.fetchAndPrune ? " & " + getText('ui.fetchAndPrune') : "") + " " + getText('ui.fromRemotes');
     fetchBtn.innerHTML = SVG_ICONS.download;
     fetchBtn.addEventListener("click", () => this.fetchFromRemotesAction());
     findBtn.innerHTML = SVG_ICONS.search;
@@ -211,7 +216,7 @@ class GitGraphView {
           repo: this.currentRepo,
           name: this.gitRepos[this.currentRepo].name || getRepoName(this.currentRepo),
         },
-        "Opening Terminal",
+        getText('ui.openingTerminal'),
       );
     });
   }
@@ -562,7 +567,7 @@ class GitGraphView {
         this.loadRepoInfo(msg.branches, msg.head, msg.remotes, msg.stashes, msg.isRepo);
       }
     } else {
-      this.displayLoadDataError("Unable to load Repository Info", msg.error);
+      this.displayLoadDataError(getText('ui.unableToLoadRepoInfo'), msg.error);
     }
   }
 
@@ -574,7 +579,7 @@ class GitGraphView {
       }
     } else {
       const error = this.gitBranches.length === 0 && msg.error.indexOf("bad revision 'HEAD'") > -1 ? "There are no commits in this repository." : msg.error;
-      this.displayLoadDataError("Unable to load Commits", error);
+      this.displayLoadDataError(getText('ui.unableToLoadCommits'), error);
     }
   }
 
@@ -595,7 +600,7 @@ class GitGraphView {
     this.currentRepoRefreshState.inProgress = false;
     this.loadViewTo = null;
     this.renderRefreshButton();
-    dialog.showError(message, reason, "Retry", () => {
+    dialog.showError(message, reason, getText('ui.retry'), () => {
       this.refresh(true);
     });
   }
@@ -621,9 +626,9 @@ class GitGraphView {
   public getBranchOptions(includeShowAll?: boolean): ReadonlyArray<DialogSelectInputOption> {
     const options: DialogSelectInputOption[] = [];
     if (includeShowAll) {
-      options.push({ name: "Show All", value: SHOW_ALL_BRANCHES });
+        options.push({ name: getText('ui.showAllBranches'), value: SHOW_ALL_BRANCHES });
     }
-    options.push({ name: "HEAD", value: "HEAD" });
+    options.push({ name: getText('ui.head'), value: "HEAD" });
     for (let i = 0; i < this.config.customBranchGlobPatterns.length; i++) {
       options.push({ name: "Glob: " + this.config.customBranchGlobPatterns[i].name, value: this.config.customBranchGlobPatterns[i].glob });
     }
@@ -637,7 +642,7 @@ class GitGraphView {
   }
   public getAuthorOptions(): ReadonlyArray<DialogSelectInputOption> {
     const options: DialogSelectInputOption[] = [];
-    options.push({ name: "All", value: SHOW_ALL_BRANCHES });
+    options.push({ name: getText('ui.showAllBranches'), value: SHOW_ALL_BRANCHES });
     if (this.gitConfig && this.gitConfig.authors) {
       for (let i = 0; i < this!.gitConfig!.authors.length; i++) {
         const author = this!.gitConfig!.authors[i];
@@ -761,7 +766,7 @@ class GitGraphView {
 
     this.renderRefreshButton();
     if (this.commits.length === 0) {
-      this.tableElem.innerHTML = '<h2 id="loadingHeader">' + SVG_ICONS.loading + "Loading ...</h2>";
+      this.tableElem.innerHTML = '<h2 id="loadingHeader">' + SVG_ICONS.loading + getText('ui.loading') + '</h2>';
     }
 
     if (skipRepoInfo) {

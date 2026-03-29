@@ -607,6 +607,13 @@ class Config {
 	}
 
 	/**
+	 * Get the value of the `git-graph.language` Extension Setting.
+	 */
+	get language() {
+		return this.config.get<string>('language', '');
+	}
+
+	/**
 	 * Get the Git executable paths configured by the `git.path` Visual Studio Code Setting.
 	 */
 	get gitPaths() {

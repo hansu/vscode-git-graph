@@ -9,7 +9,7 @@ import { ExtensionState } from './extensionState';
 import { ErrorInfo, GitFileStatus, GitRepoSet, PullRequestConfig, PullRequestProvider, RepoDropdownOrder } from './types';
 
 export const UNCOMMITTED = '*';
-export const UNABLE_TO_FIND_GIT_MSG = '无法找到 Git 可执行文件。请：设置 Visual Studio Code 设置 "git.path" 为现有 Git 可执行文件的路径和文件名，或安装 Git 并重启 Visual Studio Code。';
+export const UNABLE_TO_FIND_GIT_MSG = vscode.l10n.t('ui.unableToFindGit');
 
 
 /* Path Manipulation */
@@ -258,8 +258,8 @@ export function getSortedRepositoryPaths(repos: GitRepoSet, order: RepoDropdownO
 export function archive(repo: string, ref: string, dataSource: DataSource): Thenable<ErrorInfo> {
 	return vscode.window.showSaveDialog({
 		defaultUri: vscode.Uri.file(repo),
-		saveLabel: '创建归档',
-		filters: { 'TAR 归档': ['tar'], 'ZIP 归档': ['zip'] }
+		saveLabel: vscode.l10n.t('ui.createArchive'),
+		filters: { [vscode.l10n.t('ui.tarArchive')]: ['tar'], [vscode.l10n.t('ui.zipArchive')]: ['zip'] }
 	}).then(
 		(uri) => {
 			if (uri) {
@@ -267,13 +267,13 @@ export function archive(repo: string, ref: string, dataSource: DataSource): Then
 				if (extension === 'tar' || extension === 'zip') {
 					return dataSource.archive(repo, ref, uri.fsPath, extension);
 				} else {
-					return '无效的文件扩展名 "*.' + extension + '". 归档文件必须有 *.tar 或 *.zip 扩展名。';
+					return vscode.l10n.t('ui.invalidArchiveExtension', { extension });
 				}
 			} else {
-				return '未提供归档文件的文件名。';
+				return vscode.l10n.t('ui.noArchiveFileName');
 			}
 		},
-		() => 'Visual Studio Code 无法显示保存对话框。'
+		() => vscode.l10n.t('ui.cannotShowSaveDialog')
 	);
 }
 
@@ -297,7 +297,7 @@ export function copyFilePathToClipboard(repo: string, filePath: string, absolute
 export function copyToClipboard(text: string): Thenable<ErrorInfo> {
 	return vscode.env.clipboard.writeText(text).then(
 		() => null,
-		() => 'Visual Studio Code 无法写入剪贴板。'
+		() => vscode.l10n.t('ui.cannotWriteToClipboard')
 	);
 }
 
@@ -335,7 +335,7 @@ export function createPullRequest(config: PullRequestConfig, sourceOwner: string
 
 	const url = templateUrl.replace(/\$([1-8])/g, (_, index) => urlFieldValues[parseInt(index) - 1]);
 
-	return openExternalUrl(url, '拉取请求链接');
+	return openExternalUrl(url, vscode.l10n.t('ui.pullRequestLink'));
 }
 
 /**
@@ -345,7 +345,7 @@ export function createPullRequest(config: PullRequestConfig, sourceOwner: string
 export function openExtensionSettings(): Thenable<ErrorInfo> {
 	return vscode.commands.executeCommand('workbench.action.openSettings', '@ext:hansu.git-graph-2').then(
 		() => null,
-		() => 'Visual Studio Code 无法打开 Git Graph 扩展设置。'
+		() => vscode.l10n.t('ui.cannotOpenExtensionSettings')
 	);
 }
 
@@ -355,8 +355,8 @@ export function openExtensionSettings(): Thenable<ErrorInfo> {
  * @param type The type of URL being opened (defaults to "External URL").
  * @returns A promise resolving to the ErrorInfo of the executed command.
  */
-export function openExternalUrl(url: string, type: string = '外部链接'): Thenable<ErrorInfo> {
-	const getErrorMessage = () => 'Visual Studio Code 无法打开 ' + type + '：' + url;
+export function openExternalUrl(url: string, type: string = vscode.l10n.t('ui.externalLink')): Thenable<ErrorInfo> {
+	const getErrorMessage = () => vscode.l10n.t('ui.cannotOpen', { type, url });
 	try {
 		return vscode.env.openExternal(vscode.Uri.parse(url)).then(
 			(success) => success ? null : getErrorMessage(),
@@ -398,10 +398,10 @@ export async function openFile(repo: string, filePath: string, hash: string | nu
 			viewColumn: viewColumn === null ? getConfig().openNewTabEditorGroup : viewColumn
 		}).then(
 			() => null,
-			() => 'Visual Studio Code 无法打开 ' + newFilePath + '。'
+			() => vscode.l10n.t('ui.cannotOpenFile', { filePath: newFilePath })
 		);
 	} else {
-		return '文件 ' + newFilePath + ' 当前在该仓库中不存在。';
+		return vscode.l10n.t('ui.fileDoesNotExist', { filePath: newFilePath });
 	}
 }
 
@@ -417,12 +417,12 @@ export async function openFile(repo: string, filePath: string, hash: string | nu
  */
 export function viewDiff(repo: string, fromHash: string, toHash: string, oldFilePath: string, newFilePath: string, type: GitFileStatus) {
 	if (type !== GitFileStatus.Untracked) {
-		let abbrevFromHash = abbrevCommit(fromHash), abbrevToHash = toHash !== UNCOMMITTED ? abbrevCommit(toHash) : '当前', pathComponents = newFilePath.split('/');
-		let desc = fromHash === toHash
-			? fromHash === UNCOMMITTED
-				? '未提交'
-				: (type === GitFileStatus.Added ? '在 ' + abbrevToHash + ' 新增' : type === GitFileStatus.Deleted ? '在 ' + abbrevToHash + ' 删除' : abbrevFromHash + '^ ↔ ' + abbrevToHash)
-			: (type === GitFileStatus.Added ? '在 ' + abbrevFromHash + ' 与 ' + abbrevToHash + ' 之间新增' : type === GitFileStatus.Deleted ? '在 ' + abbrevFromHash + ' 与 ' + abbrevToHash + ' 之间删除' : abbrevFromHash + ' ↔ ' + abbrevToHash);
+		let abbrevFromHash = abbrevCommit(fromHash), abbrevToHash = toHash !== UNCOMMITTED ? abbrevCommit(toHash) : vscode.l10n.t('ui.current'), pathComponents = newFilePath.split('/');
+			let desc = fromHash === toHash
+				? fromHash === UNCOMMITTED
+					? vscode.l10n.t('ui.uncommitted')
+					: (type === GitFileStatus.Added ? vscode.l10n.t('ui.addedAt', { commit: abbrevToHash }) : type === GitFileStatus.Deleted ? vscode.l10n.t('ui.deletedAt', { commit: abbrevToHash }) : abbrevFromHash + '^ ↔ ' + abbrevToHash)
+				: (type === GitFileStatus.Added ? vscode.l10n.t('ui.addedBetween', { commit1: abbrevFromHash, commit2: abbrevToHash }) : type === GitFileStatus.Deleted ? vscode.l10n.t('ui.deletedBetween', { commit1: abbrevFromHash, commit2: abbrevToHash }) : abbrevFromHash + ' ↔ ' + abbrevToHash);
 		let title = pathComponents[pathComponents.length - 1] + ' (' + desc + ')';
 		if (fromHash === UNCOMMITTED) fromHash = 'HEAD';
 
@@ -431,7 +431,7 @@ export function viewDiff(repo: string, fromHash: string, toHash: string, oldFile
 			viewColumn: getConfig().openNewTabEditorGroup
 		}).then(
 			() => null,
-			() => 'Visual Studio Code 无法为 ' + newFilePath + ' 加载差异编辑器。'
+			() => vscode.l10n.t('ui.cannotLoadDiffEditor', { filePath: newFilePath })
 		);
 	} else {
 		return openFile(repo, newFilePath);
@@ -482,7 +482,7 @@ export function viewFileAtRevision(repo: string, hash: string, filePath: string)
 		viewColumn: getConfig().openNewTabEditorGroup
 	}).then(
 		() => null,
-		() => 'Visual Studio Code 无法在提交 ' + abbrevCommit(hash) + ' 处打开 ' + filePath + '。'
+		() => vscode.l10n.t('ui.cannotOpenFileAtRevision', { commit: abbrevCommit(hash), filePath })
 	);
 }
 
@@ -493,7 +493,7 @@ export function viewFileAtRevision(repo: string, hash: string, filePath: string)
 export function viewScm(): Thenable<ErrorInfo> {
 	return vscode.commands.executeCommand('workbench.view.scm').then(
 		() => null,
-		() => 'Visual Studio Code 无法打开源代码控制视图。'
+		() => vscode.l10n.t('ui.cannotOpenSourceControlView')
 	);
 }
 
@@ -840,5 +840,5 @@ function parseVersion(version: string) {
  * @returns The message for the user.
  */
 export function constructIncompatibleGitVersionMessage(executable: GitExecutable, version: GitVersionRequirement, feature?: string) {
-	return '需要更新版本的 Git (>= ' + version + ') 才能使用 ' + (feature ? feature : '此功能') + '。当前安装的 Git 版本是 ' + executable.version + '。请安装更新版本的 Git 以使用此功能。';
+	return vscode.l10n.t('ui.incompatibleGitVersion', { version, feature: feature || vscode.l10n.t('ui.thisFeature'), currentVersion: executable.version });
 }

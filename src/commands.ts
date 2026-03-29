@@ -188,13 +188,13 @@ export class CommandManager extends Disposable {
 				if (isPathInWorkspace(path)) {
 					this.repoManager.registerRepo(path, false).then(status => {
 						if (status.error === null) {
-							showInformationMessage('仓库 "' + status.root! + '" 已添加到 Git Graph。');
+							showInformationMessage(vscode.l10n.t('ui.repoAdded', { repo: status.root! }));
 						} else {
-							showErrorMessage(status.error + ' 因此无法添加到 Git Graph。');
+							showErrorMessage(vscode.l10n.t('ui.cannotAddRepo', { error: status.error }));
 						}
 					});
 				} else {
-					showErrorMessage('文件夹 "' + path + '" 不在已打开的 Visual Studio Code 工作区中，因此无法添加到 Git Graph。');
+					showErrorMessage(vscode.l10n.t('ui.folderNotInWorkspace', { path }));
 				}
 			}
 		}, () => { });
@@ -216,15 +216,15 @@ export class CommandManager extends Disposable {
 		}));
 
 		vscode.window.showQuickPick(items, {
-			placeHolder: '选择要从 Git Graph 中移除的仓库：',
+			placeHolder: vscode.l10n.t('ui.selectRepoToRemove'),
 			canPickMany: false
 		}).then((item) => {
 			if (item && item.description !== undefined) {
 				if (this.repoManager.ignoreRepo(item.description)) {
-					showInformationMessage('仓库 "' + item.label + '" 已从 Git Graph 中移除。');
-				} else {
-					showErrorMessage('仓库 "' + item.label + '" 对 Git Graph 来说是未知的。');
-				}
+									showInformationMessage(vscode.l10n.t('ui.repoRemoved', { repo: item.label }));
+								} else {
+									showErrorMessage(vscode.l10n.t('ui.repoUnknown', { repo: item.label }));
+								}
 			}
 		}, () => { });
 	}
@@ -235,13 +235,13 @@ export class CommandManager extends Disposable {
 	private clearAvatarCache() {
 		this.avatarManager.clearCache().then((errorInfo) => {
 			if (errorInfo === null) {
-				showInformationMessage('头像缓存已成功清除。');
-			} else {
-				showErrorMessage(errorInfo);
-			}
-		}, () => {
-			showErrorMessage('运行命令 "清除头像缓存" 时发生意外错误。');
-		});
+									showInformationMessage(vscode.l10n.t('ui.avatarCacheCleared'));
+								} else {
+									showErrorMessage(errorInfo);
+								}
+							}, () => {
+								showErrorMessage(vscode.l10n.t('ui.errorClearingAvatarCache'));
+							});
 	}
 
 	/**
@@ -267,7 +267,7 @@ export class CommandManager extends Disposable {
 			}
 
 			vscode.window.showQuickPick(items, {
-				placeHolder: '选择要在 Git Graph 中打开并从远程仓库获取的仓库：',
+				placeHolder: vscode.l10n.t('ui.selectRepoToFetch'),
 				canPickMany: false
 			}).then((item) => {
 				if (item && item.description) {
@@ -277,8 +277,8 @@ export class CommandManager extends Disposable {
 					});
 				}
 			}, () => {
-				showErrorMessage('运行命令 "从远程仓库获取" 时发生意外错误。');
-			});
+					showErrorMessage(vscode.l10n.t('ui.errorRunningFetchCommand'));
+				});
 		} else if (repoPaths.length === 1) {
 			GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, {
 				repo: repoPaths[0],
@@ -294,7 +294,7 @@ export class CommandManager extends Disposable {
 	 */
 	private endAllWorkspaceCodeReviews() {
 		this.extensionState.endAllWorkspaceCodeReviews();
-		showInformationMessage('已结束工作区中的所有代码审查');
+		showInformationMessage(vscode.l10n.t('ui.endedAllCodeReviews'));
 	}
 
 	/**
@@ -303,26 +303,26 @@ export class CommandManager extends Disposable {
 	private endSpecificWorkspaceCodeReview() {
 		const codeReviews = this.extensionState.getCodeReviews();
 		if (Object.keys(codeReviews).length === 0) {
-			showErrorMessage('当前工作区中没有进行中的代码审查。');
-			return;
-		}
+					showErrorMessage(vscode.l10n.t('ui.noActiveCodeReviews'));
+					return;
+				}
 
 		vscode.window.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
-			placeHolder: '选择要结束的代码审查：',
+			placeHolder: vscode.l10n.t('ui.selectCodeReviewToEnd'),
 			canPickMany: false
 		}).then((item) => {
 			if (item) {
 				this.extensionState.endCodeReview(item.codeReviewRepo, item.codeReviewId).then((errorInfo) => {
 					if (errorInfo === null) {
-						showInformationMessage('已成功结束代码审查 "' + item.label + '".');
-					} else {
-						showErrorMessage(errorInfo);
-					}
+									showInformationMessage(vscode.l10n.t('ui.codeReviewEnded', { review: item.label }));
+								} else {
+									showErrorMessage(errorInfo);
+								}
 				}, () => { });
 			}
 		}, () => {
-			showErrorMessage('运行命令 "结束工作区中的特定代码审查..." 时发生意外错误。');
-		});
+					showErrorMessage(vscode.l10n.t('ui.errorEndingCodeReview'));
+				});
 	}
 
 	/**
@@ -331,12 +331,12 @@ export class CommandManager extends Disposable {
 	private resumeWorkspaceCodeReview() {
 		const codeReviews = this.extensionState.getCodeReviews();
 		if (Object.keys(codeReviews).length === 0) {
-			showErrorMessage('当前工作区中没有进行中的代码审查。');
-			return;
-		}
+					showErrorMessage(vscode.l10n.t('ui.noActiveCodeReviews'));
+					return;
+				}
 
 		vscode.window.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
-			placeHolder: '选择要恢复的代码审查：',
+			placeHolder: vscode.l10n.t('ui.selectCodeReviewToResume'),
 			canPickMany: false
 		}).then((item) => {
 			if (item) {
@@ -350,8 +350,8 @@ export class CommandManager extends Disposable {
 				});
 			}
 		}, () => {
-			showErrorMessage('运行命令 "恢复工作区中的特定代码审查..." 时发生意外错误。');
-		});
+					showErrorMessage(vscode.l10n.t('ui.errorResumingCodeReview'));
+				});
 	}
 
 	/**
@@ -361,8 +361,8 @@ export class CommandManager extends Disposable {
 		try {
 			const gitGraphVersion = await getExtensionVersion(this.context);
 			const information = 'Git Graph: ' + gitGraphVersion + '\nVisual Studio Code: ' + vscode.version + '\nOS: ' + os.type() + ' ' + os.arch() + ' ' + os.release() + '\nGit: ' + (this.gitExecutable !== null ? this.gitExecutable.version : '(none)');
-			vscode.window.showInformationMessage(information, { modal: true }, '复制').then((selectedItem) => {
-				if (selectedItem === '复制') {
+			vscode.window.showInformationMessage(information, { modal: true }, vscode.l10n.t('ui.copy')).then((selectedItem) => {
+					if (selectedItem === vscode.l10n.t('ui.copy')) {
 					copyToClipboard(information).then((result) => {
 						if (result !== null) {
 							showErrorMessage(result);
@@ -371,7 +371,7 @@ export class CommandManager extends Disposable {
 				}
 			}, () => { });
 		} catch (_) {
-			showErrorMessage('获取版本信息时发生意外错误。');
+			showErrorMessage(vscode.l10n.t('ui.errorGettingVersionInfo'));
 		}
 	}
 
@@ -387,11 +387,11 @@ export class CommandManager extends Disposable {
 			const request = decodeDiffDocUri(uri);
 			return openFile(request.repo, request.filePath, request.commit, this.dataSource, vscode.ViewColumn.Active).then((errorInfo) => {
 				if (errorInfo !== null) {
-					return showErrorMessage('无法打开文件: ' + errorInfo);
-				}
+									return showErrorMessage(vscode.l10n.t('ui.cannotOpenFile', { filePath: errorInfo }));
+								}
 			});
 		} else {
-			return showErrorMessage('无法打开文件: 命令没有使用必需的参数调用。');
+			return showErrorMessage(vscode.l10n.t('ui.cannotOpenFileMissingArgs'));
 		}
 	}
 

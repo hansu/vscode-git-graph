@@ -49,16 +49,131 @@ const SVG_ICONS = {
 	collapse: '<svg style="transform: rotate(-90deg);" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd"  d="M14.207 1.707L13.5 1L7.49997 7L1.49997 1L0.792969 1.707L7.14597 8.061H7.85397L14.207 1.707ZM14.207 7.70688L13.5 6.99988L7.49997 12.9999L1.49997 6.99988L0.792969 7.70688L7.14597 14.0609H7.85397L14.207 7.70688Z"/></svg>'
 };
 
-const GIT_FILE_CHANGE_TYPES = { 'A': '新增', 'M': '修改', 'D': '删除', 'R': '重命名', 'U': '未跟踪' };
-const GIT_SIGNATURE_STATUS_DESCRIPTIONS = {
-	'G': '有效签名',
-	'U': '有效签名但有效性未知',
-	'X': '有效签名已过期',
-	'Y': '由已过期密钥签署的有效签名',
-	'R': '由已吊销密钥签署的有效签名',
-	'E': '无法验证签名',
-	'B': '无效签名'
+// 翻译文本
+let i18nTexts: any = {
+	GIT_FILE_CHANGE_TYPES: { 'A': 'Added', 'M': 'Modified', 'D': 'Deleted', 'R': 'Renamed', 'U': 'Untracked' },
+	GIT_SIGNATURE_STATUS_DESCRIPTIONS: {
+		'G': 'Valid Signature',
+		'U': 'Good Signature with Unknown Validity',
+		'X': 'Good Signature that has Expired',
+		'Y': 'Good Signature made by an Expired Key',
+		'R': 'Good Signature made by a Revoked Key',
+		'E': 'Signature could not be checked',
+		'B': 'Bad Signature'
+	},
+	UNCOMMITTED_CHANGES: 'Uncommitted Changes',
+	SHOW_ALL_BRANCHES: 'Show All Branches',
+	LOADING: 'Loading...',
+	REFRESHING: 'Refreshing...',
+	NO_COMMITS: 'No commits to display',
+	NO_REPOSITORIES: 'No Git repositories found',
+	RESCAN_FOR_REPOS: 'Re-scan the current workspace for repositories',
+	UNABLE_TO_LOAD: 'Unable to load Git Graph',
+	UNABLE_TO_FIND_GIT: 'Git executable not found',
+	REPOSITORY_SETTINGS: 'Repository Settings',
+	GENERAL: 'General',
+	EDIT_NAME: 'Edit Name',
+	DELETE_NAME: 'Delete Name',
+	EDIT_INITIAL_BRANCHES: 'Edit Initial Branches',
+	CLEAR_INITIAL_BRANCHES: 'Clear Initial Branches',
+	SHOW_STASHES: 'Show Stashes',
+	SHOW_TAGS: 'Show Tags',
+	INCLUDE_COMMITS_MENTIONED_BY_REFLOGS: 'Include Commits Mentioned by Reflogs',
+	ONLY_FOLLOW_FIRST_PARENT: 'Only Follow First Parent',
+	USER_DETAILS: 'User Details',
+	USER_NAME: 'User Name:',
+	USER_EMAIL: 'User Email:',
+	EDIT: 'Edit',
+	REMOVE: 'Remove',
+	ADD_USER_DETAILS: 'Add User Details',
+	REMOTE_CONFIGURATION: 'Remote Configuration',
+	REMOTE: 'Remote',
+	URL: 'URL',
+	TYPE: 'Type',
+	ACTIONS: 'Actions',
+	CLICK_TO_SHOW_BRANCHES: 'Click to show branches for this remote.',
+	CLICK_TO_HIDE_BRANCHES: 'Click to hide branches for this remote.',
+	FETCH_URL: 'Fetch URL: ',
+	FETCH: 'Fetch',
+	FETCH_FROM_REMOTE: 'Fetch from Remote',
+	PRUNE_REMOTE: 'Prune Remote',
+	EDIT_REMOTE: 'Edit Remote',
+	DELETE_REMOTE: 'Delete Remote',
+	PUSH_URL: 'Push URL: ',
+	PUSH: 'Push',
+	NO_REMOTES_CONFIGURED: 'No remotes configured for this repository.',
+	ADD_REMOTE: 'Add Remote',
+	ISSUE_LINKING: 'Issue Linking',
+	ISSUE_REGEX: 'Issue Regex:',
+	ISSUE_URL: 'Issue URL:',
+	ADD_ISSUE_LINKING: 'Add Issue Linking',
+	PULL_REQUEST_CREATION: 'Pull Request Creation',
+	PROVIDER: 'Provider:',
+	SOURCE_REPOSITORY: 'Source Repository:',
+	DESTINATION_REPOSITORY: 'Destination Repository:',
+	DESTINATION_BRANCH: 'Destination Branch:',
+	CONFIGURE_PULL_REQUEST_INTEGRATION: 'Configure \'Pull Request Creation\' Integration',
+	GIT_GRAPH_CONFIGURATION: 'Git Graph Configuration',
+	OPEN_GIT_GRAPH_EXTENSION_SETTINGS: 'Open Git Graph Extension Settings',
+	EXPORT_REPOSITORY_CONFIG: 'Export Repository Configuration',
+	REPOS: 'Repos',
+	BRANCHES: 'Branches',
+	AUTHORS: 'Authors',
+	FETCH_AND_PRUNE: 'Fetch & Prune',
+	FROM_REMOTES: 'from Remote(s)',
+	OPENING_TERMINAL: 'Opening Terminal',
+	UNABLE_TO_LOAD_REPO_INFO: 'Unable to load Repository Info',
+	UNABLE_TO_LOAD_COMMITS: 'Unable to load Commits',
+	RETRY: 'Retry',
+	HEAD: 'HEAD',
+	CONFIGURE_INITIAL_BRANCHES: 'Configure Initial Branches',
+	CONFIGURE_INITIAL_BRANCHES_DESCRIPTION: 'Configure the branches that are initially shown when loading this repository in the Git Graph view.',
+	CONFIGURE_INITIAL_BRANCHES_NOTE: 'Note: When \'Checked Out Branch\' is disabled and no \'Specific Branches\' are selected, all branches will be shown.',
+	USE_GLOBALLY: 'Use Globally',
+	USE_GLOBALLY_DESCRIPTION: 'Use this \'User Name\' and \'User Email\' globally across all Git repositories (can be overridden per repository).',
+	PRUNE_TAGS: 'Prune Tags',
+	PRUNE_TAGS_DESCRIPTION: 'Before fetching, remove local tags that no longer exist on the remote. Requires Git >= 2.17.0, and \'Prune\' must be enabled.',
+	CANNOT_CONFIGURE_PULL_REQUEST_INTEGRATION: 'Cannot Configure \'Pull Request Creation\' Integration',
+	CANNOT_CONFIGURE_PULL_REQUEST_INTEGRATION_DESCRIPTION: 'Configuring \'Pull Request Creation\' integration requires at least one remote repository. There are no remote repositories in the current repository.',
+	CONFIRM_REMOVE_PULL_REQUEST_INTEGRATION: 'Are you sure you want to remove the configured \'Pull Request Creation\' integration?',
+	YES_REMOVE: 'Yes, Remove',
+	ISSUE_URL_DESCRIPTION: 'The URL of an issue in your issue tracking system, with placeholders ($1, $2, etc.) to substitute the groups captured in the \'Issue Regex\'.',
+	USE_GLOBALLY_ISSUE_LINKING: 'Use Globally',
+	USE_GLOBALLY_ISSUE_LINKING_DESCRIPTION: 'Use this \'Issue Regex\' and \'Issue URL\' by default across all repositories (can be overridden per repository). Note: \'Use Globally\' is only appropriate when the same issue linking applies to most repositories (e.g. when using JIRA or Pivotal Tracker).',
+	CONFIGURE_PULL_REQUEST_CREATION_STEP1: 'Configure \'Pull Request Creation\' Integration (Step 1/2)',
+	CONFIGURE_PULL_REQUEST_CREATION_STEP2: 'Configure \'Pull Request Creation\' Integration (Step 2/2)',
+	SAVE_CONFIGURATION: 'Save Configuration',
+	FIND_PLACEHOLDER: 'Find',
+	FIND_CASE_SENSITIVE: 'Match Case',
+	FIND_REGEX: 'Use Regular Expression',
+	FIND_PREVIOUS_MATCH: 'Previous Match (Shift+Enter)',
+	FIND_NEXT_MATCH: 'Next Match (Enter)',
+	FIND_OPEN_COMMIT_DETAILS_VIEW: 'Open Commit Details View for Current Match',
+	FIND_CLOSE: 'Close (Escape)'
 };
+
+// 设置翻译文本
+function setI18nTexts(texts: any) {
+	i18nTexts = texts;
+}
+
+// 获取翻译文本
+function getText(key: string, ...args: any[]) {
+	let text = i18nTexts[key];
+	if (typeof text === 'string' && args.length > 0) {
+		for (let i = 0; i < args.length; i++) {
+			text = text.replace(`{${i}}`, args[i]);
+		}
+	}
+	return text;
+}
+
+// 导出函数
+export { setI18nTexts, getText };
+
+// 为了保持向后兼容，定义默认常量
+const GIT_FILE_CHANGE_TYPES = i18nTexts.GIT_FILE_CHANGE_TYPES;
+const GIT_SIGNATURE_STATUS_DESCRIPTIONS = i18nTexts.GIT_SIGNATURE_STATUS_DESCRIPTIONS;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const REF_INVALID_REGEX = /^[-\/].*|[\\" ><~^:?*[]|\.\.|\/\/|\/\.|@{|[.\/]$|\.lock$|^@$/g;
 
