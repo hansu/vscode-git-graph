@@ -101,7 +101,7 @@ class Dialog {
 	 * @param target The target that the dialog was triggered on.
 	 */
 	public showConfirmation(message: string, actionName: string, actioned: () => void, target: DialogTarget | null) {
-		this.show(DialogType.Form, message, actionName, 'Cancel', () => {
+		this.show(DialogType.Form, message, actionName, '取消', () => {
 			this.close();
 			actioned();
 		}, null, target);
@@ -196,7 +196,7 @@ class Dialog {
 	 * @param secondaryActioned An optional callback to be invoked when the secondary action is selected by the user.
 	 * @param includeLineBreak Should a line break be added between the message and form inputs.
 	 */
-	public showForm(message: string, inputs: ReadonlyArray<DialogInput>, actionName: string, actioned: (values: DialogInputValue[]) => void, target: DialogTarget | null, secondaryActionName: string = 'Cancel', secondaryActioned: ((values: DialogInputValue[]) => void) | null = null, includeLineBreak: boolean = true) {
+	public showForm(message: string, inputs: ReadonlyArray<DialogInput>, actionName: string, actioned: (values: DialogInputValue[]) => void, target: DialogTarget | null, secondaryActionName: string = '取消', secondaryActioned: ((values: DialogInputValue[]) => void) | null = null, includeLineBreak: boolean = true) {
 		const multiElement = inputs.length > 1;
 		const multiCheckbox = multiElement && inputs.every((input) => input.type === DialogInputType.Checkbox);
 		const infoColRequired = inputs.some((input) => input.type !== DialogInputType.Checkbox && input.type !== DialogInputType.Radio && input.info);
@@ -280,7 +280,7 @@ class Dialog {
 				const noInput = dialogInput.value === '', invalidInput = dialogInput.value.match(REF_INVALID_REGEX) !== null;
 				alterClass(this.elem, CLASS_DIALOG_NO_INPUT, noInput);
 				if (alterClass(this.elem, CLASS_DIALOG_INPUT_INVALID, !noInput && invalidInput)) {
-					dialogAction.title = invalidInput ? 'Unable to ' + actionName + ', one or more invalid characters entered.' : '';
+					dialogAction.title = invalidInput ? '无法' + actionName + '，输入了一个或多个无效字符。' : '';
 				}
 			});
 		}
@@ -296,7 +296,7 @@ class Dialog {
 	 * @param html The HTML to display in the dialog.
 	 */
 	public showMessage(html: string) {
-		this.show(DialogType.Message, html, null, 'Close', null, null, null);
+		this.show(DialogType.Message, html, null, '关闭', null, null, null);
 	}
 
 	/**
@@ -307,7 +307,7 @@ class Dialog {
 	 * @param actioned An optional callback to be invoked when the primary action is triggered.
 	 */
 	public showError(message: string, reason: GG.ErrorInfo, actionName: string | null, actioned: (() => void) | null) {
-		this.show(DialogType.Message, '<span class="dialogAlert">' + SVG_ICONS.alert + 'Error: ' + message + '</span>' + (reason !== null ? '<br><span class="messageContent errorContent">' + escapeHtml(reason).split('\n').join('<br>') + '</span>' : ''), actionName, 'Dismiss', () => {
+		this.show(DialogType.Message, '<span class="dialogAlert">' + SVG_ICONS.alert + '错误: ' + message + '</span>' + (reason !== null ? '<br><span class="messageContent errorContent">' + escapeHtml(reason).split('\n').join('<br>') + '</span>' : ''), actionName, '关闭', () => {
 			this.close();
 			if (actioned !== null) actioned();
 		}, null, null);
@@ -318,7 +318,7 @@ class Dialog {
 	 * @param action A short name that identifies the action that is running.
 	 */
 	public showActionRunning(action: string) {
-		this.show(DialogType.ActionRunning, '<span class="actionRunning">' + SVG_ICONS.loading + action + ' ...</span>', null, 'Dismiss', null, null, null);
+		this.show(DialogType.ActionRunning, '<span class="actionRunning">' + SVG_ICONS.loading + action + ' ...</span>', null, '关闭', null, null, null);
 	}
 
 	/**

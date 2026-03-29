@@ -34,7 +34,7 @@ class FindWidget {
 		this.view = view;
 		this.widgetElem = document.createElement('div');
 		this.widgetElem.className = 'findWidget';
-		this.widgetElem.innerHTML = '<input id="findInput" type="text" placeholder="Find" disabled/><span id="findCaseSensitive" class="findModifier" title="Match Case">Aa</span><span id="findRegex" class="findModifier" title="Use Regular Expression">.*</span><span id="findPosition"></span><span id="findPrev" title="Previous match (Shift+Enter)"></span><span id="findNext" title="Next match (Enter)"></span><span id="findOpenCdv" title="Open the Commit Details View for the current match"></span><span id="findClose" title="Close (Escape)"></span>';
+		this.widgetElem.innerHTML = '<input id="findInput" type="text" placeholder="查找" disabled/><span id="findCaseSensitive" class="findModifier" title="匹配大小写">Aa</span><span id="findRegex" class="findModifier" title="使用正则表达式">.*</span><span id="findPosition"></span><span id="findPrev" title="上一个匹配项 (Shift+Enter)"></span><span id="findNext" title="下一个匹配项 (Enter)"></span><span id="findOpenCdv" title="为当前匹配项打开提交详情视图"></span><span id="findClose" title="关闭 (Escape)"></span>';
 		document.body.appendChild(this.widgetElem);
 
 		this.inputElem = <HTMLInputElement>document.getElementById('findInput')!;
@@ -298,7 +298,7 @@ class FindWidget {
 					}
 				}
 				if (zeroLengthMatch) {
-					this.widgetElem.setAttribute(ATTR_ERROR, 'Cannot use a regular expression which has zero length matches');
+					this.widgetElem.setAttribute(ATTR_ERROR, '不能使用会产生零长度匹配的正则表达式');
 					this.clearMatches();
 					this.matches = [];
 				}
@@ -366,7 +366,7 @@ class FindWidget {
 			this.matches[this.position].elem.classList.add(CLASS_FIND_CURRENT_COMMIT);
 			if (scrollToCommit) this.view.scrollToCommit(this.matches[position].hash, false);
 		}
-		this.positionElem.innerHTML = this.matches.length > 0 ? (this.position + 1) + ' of ' + this.matches.length : 'No Results';
+		this.positionElem.innerHTML = this.matches.length > 0 ? (this.position + 1) + ' / ' + this.matches.length : '无结果';
 		this.view.saveState();
 	}
 

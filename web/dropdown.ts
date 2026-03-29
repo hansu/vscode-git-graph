@@ -52,14 +52,14 @@ class Dropdown {
 
 		this.filterInput = filter.appendChild(document.createElement('input'));
 		this.filterInput.className = 'dropdownFilterInput';
-		this.filterInput.placeholder = 'Filter ' + dropdownType + '...';
+		this.filterInput.placeholder = '筛选 ' + dropdownType + '...';
 
 		this.optionsElem = this.menuElem.appendChild(document.createElement('div'));
 		this.optionsElem.className = 'dropdownOptions';
 
 		this.noResultsElem = this.menuElem.appendChild(document.createElement('div'));
 		this.noResultsElem.className = 'dropdownNoResults';
-		this.noResultsElem.innerHTML = 'No results found.';
+		this.noResultsElem.innerHTML = '未找到结果。';
 
 		this.currentValueElem = this.elem.appendChild(document.createElement('div'));
 		this.currentValueElem.className = 'dropdownCurrentValue';
@@ -121,14 +121,14 @@ class Dropdown {
 	}
 
 	/**
-	 * Is a value selected in the dropdown (respecting "Show All")
+	 * 下拉菜单中是否选择了一个值（尊重"显示全部"）
 	 * @param value The value to check.
 	 * @returns TRUE => The value is selected, FALSE => The value is not selected.
 	 */
 	public isSelected(value: string) {
 		if (this.options.length > 0) {
 			if (this.multipleAllowed && this.optionsSelected[0]) {
-				// Multiple options can be selected, and "Show All" is selected.
+				// 可以选择多个选项，并且"显示全部"被选中。
 				return true;
 			}
 			const optionIndex = this.options.findIndex((option) => option.value === value);
@@ -193,7 +193,7 @@ class Dropdown {
 			// Unselect the option with the specified value
 			this.optionsSelected[optionIndex] = false;
 			if (this.optionsSelected.every(selected => !selected)) {
-				// All items have been unselected, select "Show All"
+				// 所有项目都已取消选择，选择"显示全部"
 				this.optionsSelected[0] = true;
 			}
 
@@ -326,14 +326,14 @@ class Dropdown {
 					}
 				} else {
 					if (this.optionsSelected[0]) {
-						// Deselect "Show All" if it is enabled
+						// 如果"显示全部"已启用，则取消选择
 						this.optionsSelected[0] = false;
 					}
 
 					this.optionsSelected[option] = !this.optionsSelected[option];
 
 					if (this.optionsSelected.every(selected => !selected)) {
-						// All items have been unselected, select "Show All"
+						// 所有项目都已取消选择，选择"显示全部"
 						this.optionsSelected[0] = true;
 					}
 					change = true;

@@ -65,7 +65,7 @@ export class DiffDocProvider extends Disposable implements vscode.TextDocumentCo
 				return document.value;
 			},
 			(errorMessage) => {
-				showErrorMessage('Unable to retrieve file: ' + errorMessage);
+				showErrorMessage('无法检索文件：' + errorMessage);
 				return '';
 			}
 		);

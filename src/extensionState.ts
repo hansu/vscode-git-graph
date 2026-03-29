@@ -379,7 +379,7 @@ export class ExtensionState extends Disposable {
 		const reviews = this.getCodeReviews();
 
 		if (typeof reviews[repo] === 'undefined' || typeof reviews[repo][id] === 'undefined') {
-			return Promise.resolve('The Code Review could not be found.');
+			return Promise.resolve('找不到该代码审查。');
 		}
 
 		if (remainingFiles.length > 0) {
@@ -447,7 +447,7 @@ export class ExtensionState extends Disposable {
 	private updateGlobalState(key: string, value: any): Thenable<ErrorInfo> {
 		return this.globalState.update(key, value).then(
 			() => null,
-			() => 'Visual Studio Code was unable to save the Git Graph Global State Memento.'
+			() => 'Visual Studio Code 无法保存 Git Graph 的全局状态。'
 		);
 	}
 
@@ -460,7 +460,7 @@ export class ExtensionState extends Disposable {
 	private updateWorkspaceState(key: string, value: any): Thenable<ErrorInfo> {
 		return this.workspaceState.update(key, value).then(
 			() => null,
-			() => 'Visual Studio Code was unable to save the Git Graph Workspace State Memento.'
+			() => 'Visual Studio Code 无法保存 Git Graph 的工作区状态。'
 		);
 	}
 }

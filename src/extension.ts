@@ -70,12 +70,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 				getGitExecutableFromPaths(paths).then((gitExecutable) => {
 					gitExecutableEmitter.emit(gitExecutable);
-					const msg = 'Git Graph is now using ' + gitExecutable.path + ' (version: ' + gitExecutable.version + ')';
+					const msg = 'Git Graph 现在使用 ' + gitExecutable.path + ' (版本: ' + gitExecutable.version + ')';
 					showInformationMessage(msg);
 					logger.log(msg);
 					repoManager.searchWorkspaceForRepos();
 				}, () => {
-					const msg = 'The new value of "git.path" ("' + paths.join('", "') + '") does not ' + (paths.length > 1 ? 'contain a string that matches' : 'match') + ' the path and filename of a valid Git executable.';
+					const msg = '"git.path" 的新值 ("' + paths.join('", "') + '") ' + (paths.length > 1 ? '不包含匹配' : '不匹配') + '有效 Git 可执行文件的路径和文件名。';
 					showErrorMessage(msg);
 					logger.logError(msg);
 				});

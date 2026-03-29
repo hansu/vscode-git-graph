@@ -188,7 +188,7 @@ export class DataSource extends Disposable {
 					if (refData.head === commits[i].hash) {
 						const numUncommittedChanges = await this.getUncommittedChanges(repo);
 						if (numUncommittedChanges > 0) {
-							commits.unshift({ hash: UNCOMMITTED, parents: [refData.head], author: '*', email: '', date: Math.round((new Date()).getTime() / 1000), message: 'Uncommitted Changes (' + numUncommittedChanges + ')' });
+							commits.unshift({ hash: UNCOMMITTED, parents: [refData.head], author: '*', email: '', date: Math.round((new Date()).getTime() / 1000), message: '未提交的更改 (' + numUncommittedChanges + ')' });
 						}
 						break;
 					}
@@ -376,7 +376,7 @@ export class DataSource extends Disposable {
 					return {};
 				}
 			} else {
-				errorMessage = 'An unexpected error occurred while spawning the Git child process.';
+				errorMessage = '启动 Git 子进程时发生意外错误。';
 			}
 			throw errorMessage;
 		}) as Promise<ActionedUser[]>;
@@ -798,9 +798,9 @@ export class DataSource extends Disposable {
 		}
 		if (pruneTags) {
 			if (!prune) {
-				return Promise.resolve('In order to Prune Tags, pruning must also be enabled when fetching from ' + (remote !== null ? 'a remote' : 'remote(s)') + '.');
+				return Promise.resolve('为了修剪标签，在从' + (remote !== null ? '远程仓库' : '远程仓库') + '获取时必须启用修剪功能。');
 			} else if (this.gitExecutable !== null && !doesVersionMeetRequirement(this.gitExecutable.version, GitVersionRequirement.FetchAndPruneTags)) {
-				return Promise.resolve(constructIncompatibleGitVersionMessage(this.gitExecutable, GitVersionRequirement.FetchAndPruneTags, 'pruning tags when fetching'));
+				return Promise.resolve(constructIncompatibleGitVersionMessage(this.gitExecutable, GitVersionRequirement.FetchAndPruneTags, '获取时修剪标签'));
 			}
 			args.push('--prune-tags');
 		}
@@ -840,7 +840,7 @@ export class DataSource extends Disposable {
 	 */
 	public async pushBranchToMultipleRemotes(repo: string, branchName: string, remotes: string[], setUpstream: boolean, mode: GitPushBranchMode, noVerify: boolean): Promise<ErrorInfo[]> {
 		if (remotes.length === 0) {
-			return ['No remote(s) were specified to push the branch ' + branchName + ' to.'];
+			return ['没有指定推送分支 ' + branchName + ' 到的远程仓库。'];
 		}
 
 		const results: ErrorInfo[] = [];
@@ -863,7 +863,7 @@ export class DataSource extends Disposable {
 	 */
 	public async pushTag(repo: string, tagName: string, remotes: string[], commitHash: string, skipRemoteCheck: boolean): Promise<ErrorInfo[]> {
 		if (remotes.length === 0) {
-			return ['No remote(s) were specified to push the tag ' + tagName + ' to.'];
+			return ['没有指定推送标签 ' + tagName + ' 到的远程仓库。'];
 		}
 
 		if (!skipRemoteCheck) {
@@ -951,7 +951,7 @@ export class DataSource extends Disposable {
 		let remoteStatus = await this.runGitCommand(['push', remote, '--delete', branchName], repo);
 		if (remoteStatus !== null && (new RegExp('remote ref does not exist', 'i')).test(remoteStatus)) {
 			let trackingBranchStatus = await this.runGitCommand(['branch', '-d', '-r', remote + '/' + branchName], repo);
-			return trackingBranchStatus === null ? null : 'Branch does not exist on the remote, deleting the remote tracking branch ' + remote + '/' + branchName + '.\n' + trackingBranchStatus;
+			return trackingBranchStatus === null ? null : '分支在远程不存在，正在删除远程跟踪分支 ' + remote + '/' + branchName + '。\n' + trackingBranchStatus;
 		}
 		return remoteStatus;
 	}
@@ -1080,7 +1080,7 @@ export class DataSource extends Disposable {
 			return this.openGitTerminal(
 				repo,
 				'rebase --interactive ' + (getConfig().signCommits ? '-S ' : '') + (actionOn === RebaseActionOn.Branch ? obj.replace(/'/g, '"\'"') : obj),
-				'Rebase on "' + (actionOn === RebaseActionOn.Branch ? obj : abbrevCommit(obj)) + '"'
+				'在 "' + (actionOn === RebaseActionOn.Branch ? obj : abbrevCommit(obj)) + '" 上变基'
 			);
 		} else {
 			const args = ['rebase', obj];
@@ -1172,7 +1172,7 @@ export class DataSource extends Disposable {
 	 */
 	public async dropCommits(repo: string, commits: ReadonlyArray<string>): Promise<ErrorInfo> {
 		if (commits.length === 0) {
-			return 'No commits selected for dropping.';
+			return '没有选择要删除的提交。';
 		}
 
 		if (commits.length === 1) {
@@ -1203,7 +1203,7 @@ export class DataSource extends Disposable {
 	public async squashCommits(repo: string, commits: ReadonlyArray<string>, commitMessage: string, noVerify: boolean): Promise<ErrorInfo> {
 
 		if (commits.length < 2) {
-			return 'At least 2 commits are required for squashing.';
+			return '至少需要2个提交才能进行压缩。';
 		}
 
 		const oldestCommit = commits[commits.length - 1];
@@ -1504,7 +1504,7 @@ export class DataSource extends Disposable {
 						}
 					});
 				} else {
-					openGitTerminal(repo, this.gitExecutable.path, args.join(' '), 'Open External Directory Diff');
+					openGitTerminal(repo, this.gitExecutable.path, args.join(' '), '打开外部目录对比');
 				}
 				setTimeout(() => resolve(null), 1500);
 			}
@@ -1628,7 +1628,7 @@ export class DataSource extends Disposable {
 					return {};
 				}
 			} else {
-				errorMessage = 'An unexpected error occurred while spawning the Git child process.';
+				errorMessage = '启动 Git 子进程时发生意外错误。';
 			}
 			throw errorMessage;
 		});
@@ -1977,7 +1977,7 @@ export class DataSource extends Disposable {
 					args.push('--no-verify');
 				}
 				if (squashMessageFormat === SquashMessageFormat.Default) {
-					args.push('-m', 'Merge ' + actionOn.toLowerCase() + ' \'' + obj + '\'');
+					args.push('-m', (actionOn === MergeActionOn.Branch ? '合并分支' : '合并提交') + ' \'' + obj + '\'');
 				} else {
 					args.push('--no-edit');
 				}

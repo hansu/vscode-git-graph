@@ -533,7 +533,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				break;
 			case 'rescanForRepos':
 				if (!(await this.repoManager.searchWorkspaceForRepos())) {
-					showErrorMessage('No Git repositories were found in the current workspace.');
+					showErrorMessage('当前工作区中未找到 Git 仓库。');
 				}
 				break;
 			case 'resetFileToRevision':
@@ -733,15 +733,15 @@ export abstract class BaseGitGraphView extends Disposable {
 			body = `<body>
 			<div id="view" tabindex="-1">
 				<div id="controls"${stickyClassAttr}>
-					<span id="repoControl"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
-					<span id="branchControl"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
-					<span id="authorControl"><span class="unselectable">Authors: </span><div id="authorDropdown" class="dropdown"></div></span>
-					<label ${hideRemotes} id="showRemoteBranchesControl" title="Show Remote Branches"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Remotes</label>
-					<label ${hideSimplify} id="simplifyByDecorationControl" title="Simplify By Decoration"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>Simplify</label>
-					<div id="currentBtn" title="Current"></div>
-					<div id="findBtn" title="Find"></div>
-					<div id="terminalBtn" title="Open a Terminal for this Repository"></div>
-					<div id="settingsBtn" title="Repository Settings"></div>
+					<span id="repoControl"><span class="unselectable">存储库: </span><div id="repoDropdown" class="dropdown"></div></span>
+					<span id="branchControl"><span class="unselectable">分支: </span><div id="branchDropdown" class="dropdown"></div></span>
+					<span id="authorControl"><span class="unselectable">作者: </span><div id="authorDropdown" class="dropdown"></div></span>
+					<label ${hideRemotes} id="showRemoteBranchesControl" title="显示远程分支"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>远程仓库</label>
+					<label ${hideSimplify} id="simplifyByDecorationControl" title="按装饰简化"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>简化</label>
+					<div id="currentBtn" title="当前"></div>
+					<div id="findBtn" title="查找"></div>
+					<div id="terminalBtn" title="为此存储库打开终端"></div>
+					<div id="settingsBtn" title="存储库设置"></div>
 					<div id="fetchBtn"></div>
 					<div id="refreshBtn"></div>
 				</div>

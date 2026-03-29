@@ -49,15 +49,15 @@ const SVG_ICONS = {
 	collapse: '<svg style="transform: rotate(-90deg);" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd"  d="M14.207 1.707L13.5 1L7.49997 7L1.49997 1L0.792969 1.707L7.14597 8.061H7.85397L14.207 1.707ZM14.207 7.70688L13.5 6.99988L7.49997 12.9999L1.49997 6.99988L0.792969 7.70688L7.14597 14.0609H7.85397L14.207 7.70688Z"/></svg>'
 };
 
-const GIT_FILE_CHANGE_TYPES = { 'A': 'Added', 'M': 'Modified', 'D': 'Deleted', 'R': 'Renamed', 'U': 'Untracked' };
+const GIT_FILE_CHANGE_TYPES = { 'A': '新增', 'M': '修改', 'D': '删除', 'R': '重命名', 'U': '未跟踪' };
 const GIT_SIGNATURE_STATUS_DESCRIPTIONS = {
-	'G': 'Valid Signature',
-	'U': 'Good Signature with Unknown Validity',
-	'X': 'Good Signature that has Expired',
-	'Y': 'Good Signature made by an Expired Key',
-	'R': 'Good Signature made by a Revoked Key',
-	'E': 'Signature could not be checked',
-	'B': 'Bad Signature'
+	'G': '有效签名',
+	'U': '有效签名但有效性未知',
+	'X': '有效签名已过期',
+	'Y': '由已过期密钥签署的有效签名',
+	'R': '由已吊销密钥签署的有效签名',
+	'E': '无法验证签名',
+	'B': '无效签名'
 };
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const REF_INVALID_REGEX = /^[-\/].*|[\\" ><~^:?*[]|\.\.|\/\/|\/\.|@{|[.\/]$|\.lock$|^@$/g;
