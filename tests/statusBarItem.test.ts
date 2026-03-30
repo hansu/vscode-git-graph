@@ -29,7 +29,12 @@ describe('StatusBarItem', () => {
 		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
 		// Run
-		const statusBarItem = new StatusBarItem(1, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+		const statusBarItem = new StatusBarItem(
+			1,
+			onDidChangeRepos.subscribe,
+			onDidChangeConfiguration.subscribe,
+			logger,
+		);
 
 		// Assert
 		expect(vscodeStatusBarItem.text).toBe('Git Graph');
@@ -52,7 +57,12 @@ describe('StatusBarItem', () => {
 		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
 		// Run
-		const statusBarItem = new StatusBarItem(1, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+		const statusBarItem = new StatusBarItem(
+			1,
+			onDidChangeRepos.subscribe,
+			onDidChangeConfiguration.subscribe,
+			logger,
+		);
 
 		// Assert
 		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
@@ -62,7 +72,7 @@ describe('StatusBarItem', () => {
 		onDidChangeRepos.emit({
 			repos: {},
 			numRepos: 0,
-			loadRepo: null
+			loadRepo: null,
 		});
 
 		// Assert
@@ -78,7 +88,12 @@ describe('StatusBarItem', () => {
 		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
 		// Run
-		const statusBarItem = new StatusBarItem(0, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+		const statusBarItem = new StatusBarItem(
+			0,
+			onDidChangeRepos.subscribe,
+			onDidChangeConfiguration.subscribe,
+			logger,
+		);
 
 		// Assert
 		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(0);
@@ -88,7 +103,7 @@ describe('StatusBarItem', () => {
 		onDidChangeRepos.emit({
 			repos: {},
 			numRepos: 1,
-			loadRepo: null
+			loadRepo: null,
 		});
 
 		// Assert
@@ -104,7 +119,12 @@ describe('StatusBarItem', () => {
 		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
 		// Run
-		const statusBarItem = new StatusBarItem(1, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+		const statusBarItem = new StatusBarItem(
+			1,
+			onDidChangeRepos.subscribe,
+			onDidChangeConfiguration.subscribe,
+			logger,
+		);
 
 		// Assert
 		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
@@ -113,7 +133,7 @@ describe('StatusBarItem', () => {
 		// Run
 		vscode.mockExtensionSettingReturnValue('showStatusBarItem', false);
 		onDidChangeConfiguration.emit({
-			affectsConfiguration: () => true
+			affectsConfiguration: () => true,
 		});
 
 		// Assert
@@ -129,7 +149,12 @@ describe('StatusBarItem', () => {
 		vscode.mockExtensionSettingReturnValue('showStatusBarItem', true);
 
 		// Run
-		const statusBarItem = new StatusBarItem(1, onDidChangeRepos.subscribe, onDidChangeConfiguration.subscribe, logger);
+		const statusBarItem = new StatusBarItem(
+			1,
+			onDidChangeRepos.subscribe,
+			onDidChangeConfiguration.subscribe,
+			logger,
+		);
 
 		// Assert
 		expect(vscodeStatusBarItem.show).toHaveBeenCalledTimes(1);
@@ -137,7 +162,7 @@ describe('StatusBarItem', () => {
 
 		// Run
 		onDidChangeConfiguration.emit({
-			affectsConfiguration: () => false
+			affectsConfiguration: () => false,
 		});
 
 		// Assert

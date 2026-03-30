@@ -12,43 +12,46 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
 
-type LifeCycleEvent = {
-	stage: LifeCycleStage.Install;
-	extension: string;
-	vscode: string;
-	nonce: string;
-} | {
-	stage: LifeCycleStage.Update;
-	from: {
-		extension: string,
-		vscode: string
-	};
-	to: {
-		extension: string,
-		vscode: string
-	};
-	nonce: string;
-} | {
-	stage: LifeCycleStage.Uninstall;
-	extension: string;
-	vscode: string;
-	nonce: string;
-};
+type LifeCycleEvent =
+	| {
+			stage: LifeCycleStage.Install;
+			extension: string;
+			vscode: string;
+			nonce: string;
+	  }
+	| {
+			stage: LifeCycleStage.Update;
+			from: {
+				extension: string;
+				vscode: string;
+			};
+			to: {
+				extension: string;
+				vscode: string;
+			};
+			nonce: string;
+	  }
+	| {
+			stage: LifeCycleStage.Uninstall;
+			extension: string;
+			vscode: string;
+			nonce: string;
+	  };
 
 export enum LifeCycleStage {
 	Install,
 	Update,
-	Uninstall
+	Uninstall,
 }
 
 export interface LifeCycleState {
 	previous: {
-		extension: string,
-		vscode: string,
+		extension: string;
+		vscode: string;
 	} | null;
 	current: {
-		extension: string,
-		vscode: string
+		extension: string;
+		vscode: string;
 	};
 	apiAvailable: boolean;
 	queue: LifeCycleEvent[];
@@ -131,7 +134,7 @@ export function saveLifeCycleStateInDirectory(directory: string, state: LifeCycl
  */
 export async function sendQueue(queue: LifeCycleEvent[]) {
 	for (let i = 0; i < queue.length; i++) {
-		if (!await sendEvent(queue[i])) return false;
+		if (!(await sendEvent(queue[i]))) return false;
 	}
 	return true;
 }
@@ -143,7 +146,9 @@ export async function sendQueue(queue: LifeCycleEvent[]) {
  */
 function sendEvent(event: LifeCycleEvent) {
 	return new Promise<boolean>((resolve, reject) => {
-		let completed = false, receivedResponse = false, apiAvailable = false;
+		let completed = false,
+			receivedResponse = false,
+			apiAvailable = false;
 		const complete = () => {
 			if (!completed) {
 				completed = true;
@@ -155,34 +160,52 @@ function sendEvent(event: LifeCycleEvent) {
 			}
 		};
 
-		const sendEvent: Omit<LifeCycleEvent, 'stage'> & { about: string, stage?: LifeCycleStage } = Object.assign({
-			about: 'Information about this API is available at: https://api.mhutchie.com/vscode-git-graph/about'
-		}, event);
+		const sendEvent: Omit<LifeCycleEvent, 'stage'> & { about: string; stage?: LifeCycleStage } =
+			Object.assign(
+				{
+					about:
+						'Information about this API is available at: https://api.mhutchie.com/vscode-git-graph/about',
+				},
+				event,
+			);
 		delete sendEvent.stage;
 
 		const content = JSON.stringify(sendEvent);
-		https.request({
-			method: 'POST',
-			hostname: 'api.mhutchie.com',
-			path: '/vscode-git-graph/' + (event.stage === LifeCycleStage.Install ? 'install' : event.stage === LifeCycleStage.Update ? 'update' : 'uninstall'),
-			headers: {
-				'Content-Type': 'application/json',
-				'Content-Length': content.length
-			},
-			agent: false,
-			timeout: 15000
-		}, (res) => {
-			res.on('data', () => { });
-			res.on('end', () => {
-				if (res.statusCode === 201) {
-					receivedResponse = true;
-					apiAvailable = true;
-				} else if (res.statusCode === 410) {
-					receivedResponse = true;
-				}
-				complete();
-			});
-			res.on('error', complete);
-		}).on('error', complete).on('close', complete).end(content);
+		https
+			.request(
+				{
+					method: 'POST',
+					hostname: 'api.mhutchie.com',
+					path:
+						'/vscode-git-graph/' +
+						(event.stage === LifeCycleStage.Install
+							? 'install'
+							: event.stage === LifeCycleStage.Update
+								? 'update'
+								: 'uninstall'),
+					headers: {
+						'Content-Type': 'application/json',
+						'Content-Length': content.length,
+					},
+					agent: false,
+					timeout: 15000,
+				},
+				(res) => {
+					res.on('data', () => {});
+					res.on('end', () => {
+						if (res.statusCode === 201) {
+							receivedResponse = true;
+							apiAvailable = true;
+						} else if (res.statusCode === 410) {
+							receivedResponse = true;
+						}
+						complete();
+					});
+					res.on('error', complete);
+				},
+			)
+			.on('error', complete)
+			.on('close', complete)
+			.end(content);
 	});
 }

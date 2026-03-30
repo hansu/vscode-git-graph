@@ -9,7 +9,25 @@ import { GitGraphView } from './gitGraphView';
 import { GitGraphPanelView } from './gitGraphPanelView';
 import { Logger } from './logger';
 import { RepoManager } from './repoManager';
-import { GitExecutable, UNABLE_TO_FIND_GIT_MSG, VsCodeVersionRequirement, abbrevCommit, abbrevText, copyToClipboard, doesVersionMeetRequirement, getExtensionVersion, getPathFromUri, getRelativeTimeDiff, getRepoName, getSortedRepositoryPaths, isPathInWorkspace, openFile, resolveToSymbolicPath, showErrorMessage, showInformationMessage } from './utils';
+import {
+	GitExecutable,
+	UNABLE_TO_FIND_GIT_MSG,
+	VsCodeVersionRequirement,
+	abbrevCommit,
+	abbrevText,
+	copyToClipboard,
+	doesVersionMeetRequirement,
+	getExtensionVersion,
+	getPathFromUri,
+	getRelativeTimeDiff,
+	getRepoName,
+	getSortedRepositoryPaths,
+	isPathInWorkspace,
+	openFile,
+	resolveToSymbolicPath,
+	showErrorMessage,
+	showInformationMessage,
+} from './utils';
 import { Disposable } from './utils/disposable';
 import { Event } from './utils/event';
 
@@ -36,7 +54,16 @@ export class CommandManager extends Disposable {
 	 * @param onDidChangeGitExecutable The Event emitting the Git executable for Git Graph to use.
 	 * @param logger The Git Graph Logger instance.
 	 */
-	constructor(context: vscode.ExtensionContext, avatarManger: AvatarManager, dataSource: DataSource, extensionState: ExtensionState, repoManager: RepoManager, gitExecutable: GitExecutable | null, onDidChangeGitExecutable: Event<GitExecutable>, logger: Logger) {
+	constructor(
+		context: vscode.ExtensionContext,
+		avatarManger: AvatarManager,
+		dataSource: DataSource,
+		extensionState: ExtensionState,
+		repoManager: RepoManager,
+		gitExecutable: GitExecutable | null,
+		onDidChangeGitExecutable: Event<GitExecutable>,
+		logger: Logger,
+	) {
 		super();
 		this.context = context;
 		this.avatarManager = avatarManger;
@@ -54,23 +81,34 @@ export class CommandManager extends Disposable {
 		this.registerCommand('git-graph.removeGitRepository', () => this.removeGitRepository());
 		this.registerCommand('git-graph.clearAvatarCache', () => this.clearAvatarCache());
 		this.registerCommand('git-graph.fetch', () => this.fetch());
-		this.registerCommand('git-graph.endAllWorkspaceCodeReviews', () => this.endAllWorkspaceCodeReviews());
-		this.registerCommand('git-graph.endSpecificWorkspaceCodeReview', () => this.endSpecificWorkspaceCodeReview());
-		this.registerCommand('git-graph.resumeWorkspaceCodeReview', () => this.resumeWorkspaceCodeReview());
+		this.registerCommand('git-graph.endAllWorkspaceCodeReviews', () =>
+			this.endAllWorkspaceCodeReviews(),
+		);
+		this.registerCommand('git-graph.endSpecificWorkspaceCodeReview', () =>
+			this.endSpecificWorkspaceCodeReview(),
+		);
+		this.registerCommand('git-graph.resumeWorkspaceCodeReview', () =>
+			this.resumeWorkspaceCodeReview(),
+		);
 		this.registerCommand('git-graph.version', () => this.version());
 		this.registerCommand('git-graph.openFile', (arg) => this.openFile(arg));
 
 		this.registerDisposable(
 			onDidChangeGitExecutable((gitExecutable) => {
 				this.gitExecutable = gitExecutable;
-			})
+			}),
 		);
 
 		// Register Extension Contexts
 		try {
-			this.registerContext('git-graph:codiconsSupported', doesVersionMeetRequirement(vscode.version, VsCodeVersionRequirement.Codicons));
+			this.registerContext(
+				'git-graph:codiconsSupported',
+				doesVersionMeetRequirement(vscode.version, VsCodeVersionRequirement.Codicons),
+			);
 		} catch (_) {
-			this.logger.logError('Unable to set Visual Studio Code Context "git-graph:codiconsSupported"');
+			this.logger.logError(
+				'Unable to set Visual Studio Code Context "git-graph:codiconsSupported"',
+			);
 		}
 	}
 
@@ -84,7 +122,7 @@ export class CommandManager extends Disposable {
 			vscode.commands.registerCommand(command, (...args: any[]) => {
 				this.logger.log('Command Invoked: ' + command);
 				callback(...args);
-			})
+			}),
 		);
 	}
 
@@ -95,11 +133,24 @@ export class CommandManager extends Disposable {
 	 */
 	private registerContext(key: string, value: any) {
 		return vscode.commands.executeCommand('setContext', key, value).then(
-			() => this.logger.log('Successfully set Visual Studio Code Context "' + key + '" to "' + JSON.stringify(value) + '"'),
-			() => this.logger.logError('Failed to set Visual Studio Code Context "' + key + '" to "' + JSON.stringify(value) + '"')
+			() =>
+				this.logger.log(
+					'Successfully set Visual Studio Code Context "' +
+						key +
+						'" to "' +
+						JSON.stringify(value) +
+						'"',
+				),
+			() =>
+				this.logger.logError(
+					'Failed to set Visual Studio Code Context "' +
+						key +
+						'" to "' +
+						JSON.stringify(value) +
+						'"',
+				),
 		);
 	}
-
 
 	/* Commands */
 
@@ -122,7 +173,15 @@ export class CommandManager extends Disposable {
 	 */
 	private async viewInEditor(arg: any) {
 		const loadRepo = await this.getLoadRepo(arg);
-		GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, loadRepo !== null ? { repo: loadRepo } : null);
+		GitGraphView.createOrShow(
+			this.context.extensionPath,
+			this.dataSource,
+			this.extensionState,
+			this.avatarManager,
+			this.repoManager,
+			this.logger,
+			loadRepo !== null ? { repo: loadRepo } : null,
+		);
 	}
 
 	/**
@@ -142,7 +201,7 @@ export class CommandManager extends Disposable {
 			this.extensionState,
 			this.avatarManager,
 			this.repoManager,
-			this.logger
+			this.logger,
 		);
 
 		// Show the view immediately - VS Code will handle the panel creation
@@ -163,11 +222,18 @@ export class CommandManager extends Disposable {
 			loadRepo = await this.repoManager.getKnownRepo(repoPath);
 			if (loadRepo === null) {
 				// The repo is not currently known, add it
-				loadRepo = (await this.repoManager.registerRepo(await resolveToSymbolicPath(repoPath), true)).root;
+				loadRepo = (
+					await this.repoManager.registerRepo(await resolveToSymbolicPath(repoPath), true)
+				).root;
 			}
-		} else if (getConfig().openToTheRepoOfTheActiveTextEditorDocument && vscode.window.activeTextEditor) {
+		} else if (
+			getConfig().openToTheRepoOfTheActiveTextEditorDocument &&
+			vscode.window.activeTextEditor
+		) {
 			// If the config setting is enabled, load the repo containing the active text editor document
-			loadRepo = this.repoManager.getRepoContainingFile(getPathFromUri(vscode.window.activeTextEditor.document.uri));
+			loadRepo = this.repoManager.getRepoContainingFile(
+				getPathFromUri(vscode.window.activeTextEditor.document.uri),
+			);
 		}
 
 		return loadRepo;
@@ -182,22 +248,27 @@ export class CommandManager extends Disposable {
 			return;
 		}
 
-		vscode.window.showOpenDialog({ canSelectFiles: false, canSelectFolders: true, canSelectMany: false }).then(uris => {
-			if (uris && uris.length > 0) {
-				let path = getPathFromUri(uris[0]);
-				if (isPathInWorkspace(path)) {
-					this.repoManager.registerRepo(path, false).then(status => {
-						if (status.error === null) {
-							showInformationMessage(vscode.l10n.t('ui.repoAdded', { repo: status.root! }));
+		vscode.window
+			.showOpenDialog({ canSelectFiles: false, canSelectFolders: true, canSelectMany: false })
+			.then(
+				(uris) => {
+					if (uris && uris.length > 0) {
+						let path = getPathFromUri(uris[0]);
+						if (isPathInWorkspace(path)) {
+							this.repoManager.registerRepo(path, false).then((status) => {
+								if (status.error === null) {
+									showInformationMessage(vscode.l10n.t('ui.repoAdded', { repo: status.root! }));
+								} else {
+									showErrorMessage(vscode.l10n.t('ui.cannotAddRepo', { error: status.error }));
+								}
+							});
 						} else {
-							showErrorMessage(vscode.l10n.t('ui.cannotAddRepo', { error: status.error }));
+							showErrorMessage(vscode.l10n.t('ui.folderNotInWorkspace', { path }));
 						}
-					});
-				} else {
-					showErrorMessage(vscode.l10n.t('ui.folderNotInWorkspace', { path }));
-				}
-			}
-		}, () => { });
+					}
+				},
+				() => {},
+			);
 	}
 
 	/**
@@ -210,38 +281,49 @@ export class CommandManager extends Disposable {
 		}
 
 		const repos = this.repoManager.getRepos();
-		const items: vscode.QuickPickItem[] = getSortedRepositoryPaths(repos, getConfig().repoDropdownOrder).map((path) => ({
+		const items: vscode.QuickPickItem[] = getSortedRepositoryPaths(
+			repos,
+			getConfig().repoDropdownOrder,
+		).map((path) => ({
 			label: repos[path].name || getRepoName(path),
-			description: path
+			description: path,
 		}));
 
-		vscode.window.showQuickPick(items, {
-			placeHolder: vscode.l10n.t('ui.selectRepoToRemove'),
-			canPickMany: false
-		}).then((item) => {
-			if (item && item.description !== undefined) {
-				if (this.repoManager.ignoreRepo(item.description)) {
-					showInformationMessage(vscode.l10n.t('ui.repoRemoved', { repo: item.label }));
-				} else {
-					showErrorMessage(vscode.l10n.t('ui.repoUnknown', { repo: item.label }));
-				}
-			}
-		}, () => { });
+		vscode.window
+			.showQuickPick(items, {
+				placeHolder: vscode.l10n.t('ui.selectRepoToRemove'),
+				canPickMany: false,
+			})
+			.then(
+				(item) => {
+					if (item && item.description !== undefined) {
+						if (this.repoManager.ignoreRepo(item.description)) {
+							showInformationMessage(vscode.l10n.t('ui.repoRemoved', { repo: item.label }));
+						} else {
+							showErrorMessage(vscode.l10n.t('ui.repoUnknown', { repo: item.label }));
+						}
+					}
+				},
+				() => {},
+			);
 	}
 
 	/**
 	 * The method run when the `git-graph.clearAvatarCache` command is invoked.
 	 */
 	private clearAvatarCache() {
-		this.avatarManager.clearCache().then((errorInfo) => {
-			if (errorInfo === null) {
-				showInformationMessage(vscode.l10n.t('ui.avatarCacheCleared'));
-			} else {
-				showErrorMessage(errorInfo);
-			}
-		}, () => {
-			showErrorMessage(vscode.l10n.t('ui.errorClearingAvatarCache'));
-		});
+		this.avatarManager.clearCache().then(
+			(errorInfo) => {
+				if (errorInfo === null) {
+					showInformationMessage(vscode.l10n.t('ui.avatarCacheCleared'));
+				} else {
+					showErrorMessage(errorInfo);
+				}
+			},
+			() => {
+				showErrorMessage(vscode.l10n.t('ui.errorClearingAvatarCache'));
+			},
+		);
 	}
 
 	/**
@@ -254,7 +336,7 @@ export class CommandManager extends Disposable {
 		if (repoPaths.length > 1) {
 			const items: vscode.QuickPickItem[] = repoPaths.map((path) => ({
 				label: repos[path].name || getRepoName(path),
-				description: path
+				description: path,
 			}));
 
 			const lastActiveRepo = this.extensionState.getLastActiveRepo();
@@ -266,26 +348,55 @@ export class CommandManager extends Disposable {
 				}
 			}
 
-			vscode.window.showQuickPick(items, {
-				placeHolder: vscode.l10n.t('ui.selectRepoToFetch'),
-				canPickMany: false
-			}).then((item) => {
-				if (item && item.description) {
-					GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, {
-						repo: item.description,
-						runCommandOnLoad: 'fetch'
-					});
-				}
-			}, () => {
-				showErrorMessage(vscode.l10n.t('ui.errorRunningFetchCommand'));
-			});
+			vscode.window
+				.showQuickPick(items, {
+					placeHolder: vscode.l10n.t('ui.selectRepoToFetch'),
+					canPickMany: false,
+				})
+				.then(
+					(item) => {
+						if (item && item.description) {
+							GitGraphView.createOrShow(
+								this.context.extensionPath,
+								this.dataSource,
+								this.extensionState,
+								this.avatarManager,
+								this.repoManager,
+								this.logger,
+								{
+									repo: item.description,
+									runCommandOnLoad: 'fetch',
+								},
+							);
+						}
+					},
+					() => {
+						showErrorMessage(vscode.l10n.t('ui.errorRunningFetchCommand'));
+					},
+				);
 		} else if (repoPaths.length === 1) {
-			GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, {
-				repo: repoPaths[0],
-				runCommandOnLoad: 'fetch'
-			});
+			GitGraphView.createOrShow(
+				this.context.extensionPath,
+				this.dataSource,
+				this.extensionState,
+				this.avatarManager,
+				this.repoManager,
+				this.logger,
+				{
+					repo: repoPaths[0],
+					runCommandOnLoad: 'fetch',
+				},
+			);
 		} else {
-			GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, null);
+			GitGraphView.createOrShow(
+				this.context.extensionPath,
+				this.dataSource,
+				this.extensionState,
+				this.avatarManager,
+				this.repoManager,
+				this.logger,
+				null,
+			);
 		}
 	}
 
@@ -307,22 +418,32 @@ export class CommandManager extends Disposable {
 			return;
 		}
 
-		vscode.window.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
-			placeHolder: vscode.l10n.t('ui.selectCodeReviewToEnd'),
-			canPickMany: false
-		}).then((item) => {
-			if (item) {
-				this.extensionState.endCodeReview(item.codeReviewRepo, item.codeReviewId).then((errorInfo) => {
-					if (errorInfo === null) {
-						showInformationMessage(vscode.l10n.t('ui.codeReviewEnded', { review: item.label }));
-					} else {
-						showErrorMessage(errorInfo);
+		vscode.window
+			.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
+				placeHolder: vscode.l10n.t('ui.selectCodeReviewToEnd'),
+				canPickMany: false,
+			})
+			.then(
+				(item) => {
+					if (item) {
+						this.extensionState.endCodeReview(item.codeReviewRepo, item.codeReviewId).then(
+							(errorInfo) => {
+								if (errorInfo === null) {
+									showInformationMessage(
+										vscode.l10n.t('ui.codeReviewEnded', { review: item.label }),
+									);
+								} else {
+									showErrorMessage(errorInfo);
+								}
+							},
+							() => {},
+						);
 					}
-				}, () => { });
-			}
-		}, () => {
-			showErrorMessage(vscode.l10n.t('ui.errorEndingCodeReview'));
-		});
+				},
+				() => {
+					showErrorMessage(vscode.l10n.t('ui.errorEndingCodeReview'));
+				},
+			);
 	}
 
 	/**
@@ -335,23 +456,36 @@ export class CommandManager extends Disposable {
 			return;
 		}
 
-		vscode.window.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
-			placeHolder: vscode.l10n.t('ui.selectCodeReviewToResume'),
-			canPickMany: false
-		}).then((item) => {
-			if (item) {
-				const commitHashes = item.codeReviewId.split('-');
-				GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, {
-					repo: item.codeReviewRepo,
-					commitDetails: {
-						commitHash: commitHashes[commitHashes.length > 1 ? 1 : 0],
-						compareWithHash: commitHashes.length > 1 ? commitHashes[0] : null
+		vscode.window
+			.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
+				placeHolder: vscode.l10n.t('ui.selectCodeReviewToResume'),
+				canPickMany: false,
+			})
+			.then(
+				(item) => {
+					if (item) {
+						const commitHashes = item.codeReviewId.split('-');
+						GitGraphView.createOrShow(
+							this.context.extensionPath,
+							this.dataSource,
+							this.extensionState,
+							this.avatarManager,
+							this.repoManager,
+							this.logger,
+							{
+								repo: item.codeReviewRepo,
+								commitDetails: {
+									commitHash: commitHashes[commitHashes.length > 1 ? 1 : 0],
+									compareWithHash: commitHashes.length > 1 ? commitHashes[0] : null,
+								},
+							},
+						);
 					}
-				});
-			}
-		}, () => {
-			showErrorMessage(vscode.l10n.t('ui.errorResumingCodeReview'));
-		});
+				},
+				() => {
+					showErrorMessage(vscode.l10n.t('ui.errorResumingCodeReview'));
+				},
+			);
 	}
 
 	/**
@@ -360,16 +494,33 @@ export class CommandManager extends Disposable {
 	private async version() {
 		try {
 			const gitGraphVersion = await getExtensionVersion(this.context);
-			const information = 'Git Graph: ' + gitGraphVersion + '\nVisual Studio Code: ' + vscode.version + '\nOS: ' + os.type() + ' ' + os.arch() + ' ' + os.release() + '\nGit: ' + (this.gitExecutable !== null ? this.gitExecutable.version : '(none)');
-			vscode.window.showInformationMessage(information, { modal: true }, vscode.l10n.t('ui.copy')).then((selectedItem) => {
-				if (selectedItem === vscode.l10n.t('ui.copy')) {
-					copyToClipboard(information).then((result) => {
-						if (result !== null) {
-							showErrorMessage(result);
+			const information =
+				'Git Graph: ' +
+				gitGraphVersion +
+				'\nVisual Studio Code: ' +
+				vscode.version +
+				'\nOS: ' +
+				os.type() +
+				' ' +
+				os.arch() +
+				' ' +
+				os.release() +
+				'\nGit: ' +
+				(this.gitExecutable !== null ? this.gitExecutable.version : '(none)');
+			vscode.window
+				.showInformationMessage(information, { modal: true }, vscode.l10n.t('ui.copy'))
+				.then(
+					(selectedItem) => {
+						if (selectedItem === vscode.l10n.t('ui.copy')) {
+							copyToClipboard(information).then((result) => {
+								if (result !== null) {
+									showErrorMessage(result);
+								}
+							});
 						}
-					});
-				}
-			}, () => { });
+					},
+					() => {},
+				);
 		} catch (_) {
 			showErrorMessage(vscode.l10n.t('ui.errorGettingVersionInfo'));
 		}
@@ -385,7 +536,13 @@ export class CommandManager extends Disposable {
 		if (typeof uri === 'object' && uri && uri.scheme === DiffDocProvider.scheme) {
 			// A Git Graph URI has been provided
 			const request = decodeDiffDocUri(uri);
-			return openFile(request.repo, request.filePath, request.commit, this.dataSource, vscode.ViewColumn.Active).then((errorInfo) => {
+			return openFile(
+				request.repo,
+				request.filePath,
+				request.commit,
+				this.dataSource,
+				vscode.ViewColumn.Active,
+			).then((errorInfo) => {
 				if (errorInfo !== null) {
 					return showErrorMessage(vscode.l10n.t('ui.cannotOpenFile', { filePath: errorInfo }));
 				}
@@ -395,7 +552,6 @@ export class CommandManager extends Disposable {
 		}
 	}
 
-
 	/* Helper Methods */
 
 	/**
@@ -403,49 +559,69 @@ export class CommandManager extends Disposable {
 	 * @param codeReviews A set of Code Reviews.
 	 * @returns A list of Quick Pick items.
 	 */
-	private getCodeReviewQuickPickItems(codeReviews: CodeReviews): Promise<CodeReviewQuickPickItem[]> {
+	private getCodeReviewQuickPickItems(
+		codeReviews: CodeReviews,
+	): Promise<CodeReviewQuickPickItem[]> {
 		const repos = this.repoManager.getRepos();
-		const enrichedCodeReviews: { repo: string, id: string, review: CodeReviewData, fromCommitHash: string, toCommitHash: string }[] = [];
-		const fetchCommits: { repo: string, commitHash: string }[] = [];
+		const enrichedCodeReviews: {
+			repo: string;
+			id: string;
+			review: CodeReviewData;
+			fromCommitHash: string;
+			toCommitHash: string;
+		}[] = [];
+		const fetchCommits: { repo: string; commitHash: string }[] = [];
 
 		Object.keys(codeReviews).forEach((repo) => {
 			if (typeof repos[repo] === 'undefined') return;
 			Object.keys(codeReviews[repo]).forEach((id) => {
 				const commitHashes = id.split('-');
-				commitHashes.forEach((commitHash) => fetchCommits.push({ repo: repo, commitHash: commitHash }));
+				commitHashes.forEach((commitHash) =>
+					fetchCommits.push({ repo: repo, commitHash: commitHash }),
+				);
 				enrichedCodeReviews.push({
-					repo: repo, id: id, review: codeReviews[repo][id],
-					fromCommitHash: commitHashes[0], toCommitHash: commitHashes[commitHashes.length > 1 ? 1 : 0]
+					repo: repo,
+					id: id,
+					review: codeReviews[repo][id],
+					fromCommitHash: commitHashes[0],
+					toCommitHash: commitHashes[commitHashes.length > 1 ? 1 : 0],
 				});
 			});
 		});
 
-		return Promise.all(fetchCommits.map((fetch) => this.dataSource.getCommitSubject(fetch.repo, fetch.commitHash))).then(
-			(subjects) => {
-				const commitSubjects: { [repo: string]: { [commitHash: string]: string } } = {};
-				subjects.forEach((subject, i) => {
-					if (typeof commitSubjects[fetchCommits[i].repo] === 'undefined') {
-						commitSubjects[fetchCommits[i].repo] = {};
-					}
-					commitSubjects[fetchCommits[i].repo][fetchCommits[i].commitHash] = subject !== null ? subject : '<Unknown Commit Subject>';
-				});
+		return Promise.all(
+			fetchCommits.map((fetch) => this.dataSource.getCommitSubject(fetch.repo, fetch.commitHash)),
+		).then((subjects) => {
+			const commitSubjects: { [repo: string]: { [commitHash: string]: string } } = {};
+			subjects.forEach((subject, i) => {
+				if (typeof commitSubjects[fetchCommits[i].repo] === 'undefined') {
+					commitSubjects[fetchCommits[i].repo] = {};
+				}
+				commitSubjects[fetchCommits[i].repo][fetchCommits[i].commitHash] =
+					subject !== null ? subject : '<Unknown Commit Subject>';
+			});
 
-				return enrichedCodeReviews.sort((a, b) => b.review.lastActive - a.review.lastActive).map((codeReview) => {
+			return enrichedCodeReviews
+				.sort((a, b) => b.review.lastActive - a.review.lastActive)
+				.map((codeReview) => {
 					const fromSubject = commitSubjects[codeReview.repo][codeReview.fromCommitHash];
 					const toSubject = commitSubjects[codeReview.repo][codeReview.toCommitHash];
 					const isComparison = codeReview.fromCommitHash !== codeReview.toCommitHash;
 					return {
 						codeReviewRepo: codeReview.repo,
 						codeReviewId: codeReview.id,
-						label: (repos[codeReview.repo].name || getRepoName(codeReview.repo)) + ': ' + abbrevCommit(codeReview.fromCommitHash) + (isComparison ? ' ↔ ' + abbrevCommit(codeReview.toCommitHash) : ''),
+						label:
+							(repos[codeReview.repo].name || getRepoName(codeReview.repo)) +
+							': ' +
+							abbrevCommit(codeReview.fromCommitHash) +
+							(isComparison ? ' ↔ ' + abbrevCommit(codeReview.toCommitHash) : ''),
 						description: getRelativeTimeDiff(Math.round(codeReview.review.lastActive / 1000)),
 						detail: isComparison
 							? abbrevText(fromSubject, 50) + ' ↔ ' + abbrevText(toSubject, 50)
-							: fromSubject
+							: fromSubject,
 					};
 				});
-			}
-		);
+		});
 	}
 }
 

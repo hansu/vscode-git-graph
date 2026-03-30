@@ -13,7 +13,7 @@ interface FindWidgetState {
 class FindWidget {
 	private readonly view: GitGraphView;
 	private text: string = '';
-	private matches: { hash: string, elem: HTMLElement }[] = [];
+	private matches: { hash: string; elem: HTMLElement }[] = [];
 	private position: number = -1;
 	private visible: boolean = false;
 
@@ -34,7 +34,22 @@ class FindWidget {
 		this.view = view;
 		this.widgetElem = document.createElement('div');
 		this.widgetElem.className = 'findWidget';
-		this.widgetElem.innerHTML = '<input id="findInput" type="text" placeholder="' + getText('ui.findPlaceholder') + '" disabled/><span id="findCaseSensitive" class="findModifier" title="' + getText('ui.findCaseSensitive') + '">Aa</span><span id="findRegex" class="findModifier" title="' + getText('ui.findRegex') + '">.*</span><span id="findPosition"></span><span id="findPrev" title="' + getText('ui.findPreviousMatch') + '"></span><span id="findNext" title="' + getText('ui.findNextMatch') + '"></span><span id="findOpenCdv" title="' + getText('ui.findOpenCommitDetailsView') + '"></span><span id="findClose" title="' + getText('ui.findClose') + '"></span>';
+		this.widgetElem.innerHTML =
+			'<input id="findInput" type="text" placeholder="' +
+			getText('ui.findPlaceholder') +
+			'" disabled/><span id="findCaseSensitive" class="findModifier" title="' +
+			getText('ui.findCaseSensitive') +
+			'">Aa</span><span id="findRegex" class="findModifier" title="' +
+			getText('ui.findRegex') +
+			'">.*</span><span id="findPosition"></span><span id="findPrev" title="' +
+			getText('ui.findPreviousMatch') +
+			'"></span><span id="findNext" title="' +
+			getText('ui.findNextMatch') +
+			'"></span><span id="findOpenCdv" title="' +
+			getText('ui.findOpenCommitDetailsView') +
+			'"></span><span id="findClose" title="' +
+			getText('ui.findClose') +
+			'"></span>';
 		document.body.appendChild(this.widgetElem);
 
 		this.inputElem = <HTMLInputElement>document.getElementById('findInput')!;
@@ -97,7 +112,10 @@ class FindWidget {
 		openCdvElem.innerHTML = SVG_ICONS.cdv;
 		alterClass(openCdvElem, CLASS_ACTIVE, workspaceState.findOpenCommitDetailsView);
 		openCdvElem.addEventListener('click', () => {
-			updateWorkspaceViewState('findOpenCommitDetailsView', !workspaceState.findOpenCommitDetailsView);
+			updateWorkspaceViewState(
+				'findOpenCommitDetailsView',
+				!workspaceState.findOpenCommitDetailsView,
+			);
 			alterClass(openCdvElem, CLASS_ACTIVE, workspaceState.findOpenCommitDetailsView);
 			this.openCommitDetailsViewForCurrentMatchIfEnabled();
 		});
@@ -158,9 +176,11 @@ class FindWidget {
 	 */
 	public setColour(colour: string) {
 		document.body.style.setProperty('--git-graph-findMatch', colour);
-		document.body.style.setProperty('--git-graph-findMatchCommit', modifyColourOpacity(colour, 0.5));
+		document.body.style.setProperty(
+			'--git-graph-findMatchCommit',
+			modifyColourOpacity(colour, 0.5),
+		);
 	}
-
 
 	/* State */
 
@@ -171,7 +191,7 @@ class FindWidget {
 		return {
 			text: this.text,
 			currentHash: this.getCurrentHash(),
-			visible: this.visible
+			visible: this.visible,
 		};
 	}
 
@@ -202,7 +222,6 @@ class FindWidget {
 		return this.visible;
 	}
 
-
 	/* Matching */
 
 	/**
@@ -215,8 +234,13 @@ class FindWidget {
 		this.position = -1;
 
 		if (this.text !== '') {
-			let colVisibility = this.view.getColumnVisibility(), findPattern: RegExp | null, findGlobalPattern: RegExp | null;
-			const regexText = workspaceState.findIsRegex ? this.text : this.text.replace(/[\\\[\](){}|.*+?^$]/g, '\\$&'), flags = 'u' + (workspaceState.findIsCaseSensitive ? '' : 'i');
+			let colVisibility = this.view.getColumnVisibility(),
+				findPattern: RegExp | null,
+				findGlobalPattern: RegExp | null;
+			const regexText = workspaceState.findIsRegex
+					? this.text
+					: this.text.replace(/[\\\[\](){}|.*+?^$]/g, '\\$&'),
+				flags = 'u' + (workspaceState.findIsCaseSensitive ? '' : 'i');
 			try {
 				findPattern = new RegExp(regexText, flags);
 				findGlobalPattern = new RegExp(regexText, 'g' + flags);
@@ -227,23 +251,33 @@ class FindWidget {
 				this.widgetElem.setAttribute(ATTR_ERROR, (e as Error).message);
 			}
 			if (findPattern !== null && findGlobalPattern !== null) {
-				let commitElems = getCommitElems(), j = 0, commit, zeroLengthMatch = false;
+				let commitElems = getCommitElems(),
+					j = 0,
+					commit,
+					zeroLengthMatch = false;
 
 				// Search the commit data itself to detect commits that match, so that dom tree traversal is performed on matching commit rows (for performance)
 				const commits = this.view.getCommits();
 				for (let i = 0; i < commits.length; i++) {
 					commit = commits[i];
 					let branchLabels = getBranchLabels(commit.heads, commit.remotes);
-					if (commit.hash !== UNCOMMITTED && (
-						(colVisibility.author && findPattern.test(commit.author))
-						|| (colVisibility.commit && (commit.hash.search(findPattern) === 0 || findPattern.test(abbrevCommit(commit.hash))))
-						|| findPattern.test(commit.message)
-						|| branchLabels.heads.some(head => findPattern!.test(head.name) || head.remotes.some(remote => findPattern!.test(remote)))
-						|| branchLabels.remotes.some(remote => findPattern!.test(remote.name))
-						|| commit.tags.some(tag => findPattern!.test(tag.name))
-						|| (colVisibility.date && findPattern.test(formatShortDate(commit.date).formatted))
-						|| (commit.stash !== null && findPattern.test(commit.stash.selector))
-					)) {
+					if (
+						commit.hash !== UNCOMMITTED &&
+						((colVisibility.author && findPattern.test(commit.author)) ||
+							(colVisibility.commit &&
+								(commit.hash.search(findPattern) === 0 ||
+									findPattern.test(abbrevCommit(commit.hash)))) ||
+							findPattern.test(commit.message) ||
+							branchLabels.heads.some(
+								(head) =>
+									findPattern!.test(head.name) ||
+									head.remotes.some((remote) => findPattern!.test(remote)),
+							) ||
+							branchLabels.remotes.some((remote) => findPattern!.test(remote.name)) ||
+							commit.tags.some((tag) => findPattern!.test(tag.name)) ||
+							(colVisibility.date && findPattern.test(formatShortDate(commit.date).formatted)) ||
+							(commit.stash !== null && findPattern.test(commit.stash.selector)))
+					) {
 						let idStr = i.toString();
 						while (j < commitElems.length && commitElems[j].dataset.id !== idStr) j++;
 						if (j === commitElems.length) continue;
@@ -251,12 +285,16 @@ class FindWidget {
 						this.matches.push({ hash: commit.hash, elem: commitElems[j] });
 
 						// Highlight matches
-						let textElems = getChildNodesWithTextContent(commitElems[j]), textElem;
+						let textElems = getChildNodesWithTextContent(commitElems[j]),
+							textElem;
 						for (let k = 0; k < textElems.length; k++) {
 							textElem = textElems[k];
-							let matchStart = 0, matchEnd = 0, text = textElem.textContent!, match: RegExpExecArray | null;
+							let matchStart = 0,
+								matchEnd = 0,
+								text = textElem.textContent!,
+								match: RegExpExecArray | null;
 							findGlobalPattern.lastIndex = 0;
-							while (match = findGlobalPattern.exec(text)) {
+							while ((match = findGlobalPattern.exec(text))) {
 								if (match[0].length === 0) {
 									zeroLengthMatch = true;
 									break;
@@ -265,10 +303,16 @@ class FindWidget {
 									// This match isn't immediately after the previous match, or isn't at the beginning of the text
 									if (matchStart !== matchEnd) {
 										// There was a previous match, insert it in a text node
-										textElem.parentNode!.insertBefore(FindWidget.createMatchElem(text.substring(matchStart, matchEnd)), textElem);
+										textElem.parentNode!.insertBefore(
+											FindWidget.createMatchElem(text.substring(matchStart, matchEnd)),
+											textElem,
+										);
 									}
 									// Insert a text node containing the text between the last match and the current match
-									textElem.parentNode!.insertBefore(document.createTextNode(text.substring(matchEnd, match.index)), textElem);
+									textElem.parentNode!.insertBefore(
+										document.createTextNode(text.substring(matchEnd, match.index)),
+										textElem,
+									);
 									matchStart = match.index;
 								}
 								matchEnd = findGlobalPattern.lastIndex;
@@ -277,7 +321,10 @@ class FindWidget {
 								// There were one or more matches
 								if (matchStart !== matchEnd) {
 									// There was a match, insert it in a text node
-									textElem.parentNode!.insertBefore(FindWidget.createMatchElem(text.substring(matchStart, matchEnd)), textElem);
+									textElem.parentNode!.insertBefore(
+										FindWidget.createMatchElem(text.substring(matchStart, matchEnd)),
+										textElem,
+									);
 								}
 								if (matchEnd !== text.length) {
 									// There was some text after last match, update the textElem (the last node of it's parent) to contain the remaining text.
@@ -289,10 +336,18 @@ class FindWidget {
 							}
 							if (zeroLengthMatch) break;
 						}
-						if (colVisibility.commit && commit.hash.search(findPattern) === 0 && !findPattern.test(abbrevCommit(commit.hash)) && textElems.length > 0) {
+						if (
+							colVisibility.commit &&
+							commit.hash.search(findPattern) === 0 &&
+							!findPattern.test(abbrevCommit(commit.hash)) &&
+							textElems.length > 0
+						) {
 							// The commit matches on more than the abbreviated commit, so the commit should be highlighted
 							let commitNode = textElems[textElems.length - 1]; // Commit is always the last column if it is visible
-							commitNode.parentNode!.replaceChild(FindWidget.createMatchElem(commitNode.textContent!), commitNode);
+							commitNode.parentNode!.replaceChild(
+								FindWidget.createMatchElem(commitNode.textContent!),
+								commitNode,
+							);
 						}
 						if (zeroLengthMatch) break;
 					}
@@ -314,7 +369,7 @@ class FindWidget {
 		if (this.matches.length > 0) {
 			newPos = 0;
 			if (goToCommitHash !== null) {
-				let pos = this.matches.findIndex(match => match.hash === goToCommitHash);
+				let pos = this.matches.findIndex((match) => match.hash === goToCommitHash);
 				if (pos > -1) newPos = pos;
 			}
 		}
@@ -327,13 +382,15 @@ class FindWidget {
 	private clearMatches() {
 		for (let i = 0; i < this.matches.length; i++) {
 			if (i === this.position) this.matches[i].elem.classList.remove(CLASS_FIND_CURRENT_COMMIT);
-			let matchElems = getChildrenWithClassName(this.matches[i].elem, CLASS_FIND_MATCH), matchElem;
+			let matchElems = getChildrenWithClassName(this.matches[i].elem, CLASS_FIND_MATCH),
+				matchElem;
 			for (let j = 0; j < matchElems.length; j++) {
 				matchElem = matchElems[j];
 				let text = matchElem.childNodes[0].textContent!;
 
 				// Combine current text with the text from previous sibling text nodes
-				let node = matchElem.previousSibling, elem = matchElem.previousElementSibling;
+				let node = matchElem.previousSibling,
+					elem = matchElem.previousElementSibling;
 				while (node !== null && node !== elem && node.textContent !== null) {
 					text = node.textContent + text;
 					matchElem.parentNode!.removeChild(node);
@@ -360,13 +417,17 @@ class FindWidget {
 	 * @param scrollToCommit After updating the user's position in the set of find matches, should the current match be scrolled to (so it's visible in the view).
 	 */
 	private updatePosition(position: number, scrollToCommit: boolean) {
-		if (this.position > -1) this.matches[this.position].elem.classList.remove(CLASS_FIND_CURRENT_COMMIT);
+		if (this.position > -1)
+			this.matches[this.position].elem.classList.remove(CLASS_FIND_CURRENT_COMMIT);
 		this.position = position;
 		if (this.position > -1) {
 			this.matches[this.position].elem.classList.add(CLASS_FIND_CURRENT_COMMIT);
 			if (scrollToCommit) this.view.scrollToCommit(this.matches[position].hash, false);
 		}
-		this.positionElem.innerHTML = this.matches.length > 0 ? (this.position + 1) + ' / ' + this.matches.length : getText('ui.noResults');
+		this.positionElem.innerHTML =
+			this.matches.length > 0
+				? this.position + 1 + ' / ' + this.matches.length
+				: getText('ui.noResults');
 		this.view.saveState();
 	}
 
@@ -395,7 +456,10 @@ class FindWidget {
 		if (workspaceState.findOpenCommitDetailsView) {
 			const commitHash = this.getCurrentHash();
 			if (commitHash !== null && !this.view.isCdvOpen(commitHash, null)) {
-				const commitElem = findCommitElemWithId(getCommitElems(), this.view.getCommitId(commitHash));
+				const commitElem = findCommitElemWithId(
+					getCommitElems(),
+					this.view.getCommitId(commitHash),
+				);
 				if (commitElem !== null) {
 					this.view.loadCommitDetails(commitElem);
 				}

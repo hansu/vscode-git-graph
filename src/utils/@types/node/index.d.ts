@@ -8,6 +8,9 @@
  */
 declare module 'fs' {
 	namespace realpath {
-		function native(path: PathLike, callback: (err: NodeJS.ErrnoException | null, resolvedPath: string) => void): void;
+		function native(
+			path: PathLike,
+			callback: (err: NodeJS.ErrnoException | null, resolvedPath: string) => void,
+		): void;
 	}
 }

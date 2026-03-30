@@ -26,21 +26,21 @@ import {
 	SquashMessageFormat,
 	TabIconColourTheme,
 	TagType,
-	ToolbarButtonVisibility
+	ToolbarButtonVisibility,
 } from './types';
 
 const VIEW_COLUMN_MAPPING: { [column: string]: vscode.ViewColumn } = {
-	'Active': vscode.ViewColumn.Active,
-	'Beside': vscode.ViewColumn.Beside,
-	'One': vscode.ViewColumn.One,
-	'Two': vscode.ViewColumn.Two,
-	'Three': vscode.ViewColumn.Three,
-	'Four': vscode.ViewColumn.Four,
-	'Five': vscode.ViewColumn.Five,
-	'Six': vscode.ViewColumn.Six,
-	'Seven': vscode.ViewColumn.Seven,
-	'Eight': vscode.ViewColumn.Eight,
-	'Nine': vscode.ViewColumn.Nine
+	Active: vscode.ViewColumn.Active,
+	Beside: vscode.ViewColumn.Beside,
+	One: vscode.ViewColumn.One,
+	Two: vscode.ViewColumn.Two,
+	Three: vscode.ViewColumn.Three,
+	Four: vscode.ViewColumn.Four,
+	Five: vscode.ViewColumn.Five,
+	Six: vscode.ViewColumn.Six,
+	Seven: vscode.ViewColumn.Seven,
+	Eight: vscode.ViewColumn.Eight,
+	Nine: vscode.ViewColumn.Nine,
 };
 
 /**
@@ -57,7 +57,10 @@ class Config {
 	 * @returns A Config instance.
 	 */
 	constructor(repo?: string) {
-		this.config = vscode.workspace.getConfiguration('git-graph', repo ? vscode.Uri.file(repo) : undefined);
+		this.config = vscode.workspace.getConfiguration(
+			'git-graph',
+			repo ? vscode.Uri.file(repo) : undefined,
+		);
 	}
 
 	/**
@@ -65,15 +68,33 @@ class Config {
 	 */
 	get commitDetailsView(): CommitDetailsViewConfig {
 		return {
-			autoCenter: !!this.getRenamedExtensionSetting('commitDetailsView.autoCenter', 'autoCenterCommitDetailsView', true),
+			autoCenter: !!this.getRenamedExtensionSetting(
+				'commitDetailsView.autoCenter',
+				'autoCenterCommitDetailsView',
+				true,
+			),
 			autoScroll: !!this.config.get<boolean>('commitDetailsView.autoScroll', true),
-			fileTreeCompactFolders: !!this.getRenamedExtensionSetting('commitDetailsView.fileView.fileTree.compactFolders', 'commitDetailsViewFileTreeCompactFolders', true),
-			fileViewType: this.getRenamedExtensionSetting<string>('commitDetailsView.fileView.type', 'defaultFileViewType', 'File Tree') === 'File List'
-				? FileViewType.List
-				: FileViewType.Tree,
-			location: this.getRenamedExtensionSetting<string>('commitDetailsView.location', 'commitDetailsViewLocation', 'Inline') === 'Docked to Bottom'
-				? CommitDetailsViewLocation.DockedToBottom
-				: CommitDetailsViewLocation.Inline
+			fileTreeCompactFolders: !!this.getRenamedExtensionSetting(
+				'commitDetailsView.fileView.fileTree.compactFolders',
+				'commitDetailsViewFileTreeCompactFolders',
+				true,
+			),
+			fileViewType:
+				this.getRenamedExtensionSetting<string>(
+					'commitDetailsView.fileView.type',
+					'defaultFileViewType',
+					'File Tree',
+				) === 'File List'
+					? FileViewType.List
+					: FileViewType.Tree,
+			location:
+				this.getRenamedExtensionSetting<string>(
+					'commitDetailsView.location',
+					'commitDetailsViewLocation',
+					'Inline',
+				) === 'Docked to Bottom'
+					? CommitDetailsViewLocation.DockedToBottom
+					: CommitDetailsViewLocation.Inline,
 		};
 	}
 
@@ -83,13 +104,72 @@ class Config {
 	get contextMenuActionsVisibility(): ContextMenuActionsVisibility {
 		const userConfig = this.config.get('contextMenuActionsVisibility', {});
 		const config: ContextMenuActionsVisibility = {
-			branch: { checkout: true, rename: true, delete: true, merge: true, rebase: true, push: true, pull: true, createBranch: true, viewIssue: true, createPullRequest: true, createArchive: true, selectInBranchesDropdown: true, unselectInBranchesDropdown: true, copyName: true },
-			commit: { addTag: true, createBranch: true, checkout: true, cherrypick: true, revert: true, drop: true, merge: true, rebase: true, reset: true, undo: true, editMessage: true, copyHash: true, copySubject: true },
-			commitDetailsViewFile: { viewDiff: true, viewFileAtThisRevision: true, viewDiffWithWorkingFile: true, openFile: true, markAsReviewed: true, markAsNotReviewed: true, resetFileToThisRevision: true, copyAbsoluteFilePath: true, copyRelativeFilePath: true },
-			remoteBranch: { checkout: true, delete: true, fetch: true, merge: true, pull: true, createBranch: true, viewIssue: true, createPullRequest: true, createArchive: true, selectInBranchesDropdown: true, unselectInBranchesDropdown: true, copyName: true },
-			stash: { apply: true, createBranch: true, pop: true, drop: true, copyName: true, copyHash: true },
+			branch: {
+				checkout: true,
+				rename: true,
+				delete: true,
+				merge: true,
+				rebase: true,
+				push: true,
+				pull: true,
+				createBranch: true,
+				viewIssue: true,
+				createPullRequest: true,
+				createArchive: true,
+				selectInBranchesDropdown: true,
+				unselectInBranchesDropdown: true,
+				copyName: true,
+			},
+			commit: {
+				addTag: true,
+				createBranch: true,
+				checkout: true,
+				cherrypick: true,
+				revert: true,
+				drop: true,
+				merge: true,
+				rebase: true,
+				reset: true,
+				undo: true,
+				editMessage: true,
+				copyHash: true,
+				copySubject: true,
+			},
+			commitDetailsViewFile: {
+				viewDiff: true,
+				viewFileAtThisRevision: true,
+				viewDiffWithWorkingFile: true,
+				openFile: true,
+				markAsReviewed: true,
+				markAsNotReviewed: true,
+				resetFileToThisRevision: true,
+				copyAbsoluteFilePath: true,
+				copyRelativeFilePath: true,
+			},
+			remoteBranch: {
+				checkout: true,
+				delete: true,
+				fetch: true,
+				merge: true,
+				pull: true,
+				createBranch: true,
+				viewIssue: true,
+				createPullRequest: true,
+				createArchive: true,
+				selectInBranchesDropdown: true,
+				unselectInBranchesDropdown: true,
+				copyName: true,
+			},
+			stash: {
+				apply: true,
+				createBranch: true,
+				pop: true,
+				drop: true,
+				copyName: true,
+				copyHash: true,
+			},
 			tag: { viewDetails: true, delete: true, push: true, createArchive: true, copyName: true },
-			uncommittedChanges: { stash: true, reset: true, clean: true, openSourceControlView: true }
+			uncommittedChanges: { stash: true, reset: true, clean: true, openSourceControlView: true },
 		};
 		mergeConfigObjects(config, userConfig);
 		return config;
@@ -130,8 +210,11 @@ class Config {
 		let providers = this.config.get('customPullRequestProviders', <any[]>[]);
 		return Array.isArray(providers)
 			? providers
-				.filter((provider) => typeof provider.name === 'string' && typeof provider.templateUrl === 'string')
-				.map((provider) => ({ name: provider.name, templateUrl: provider.templateUrl }))
+					.filter(
+						(provider) =>
+							typeof provider.name === 'string' && typeof provider.templateUrl === 'string',
+					)
+					.map((provider) => ({ name: provider.name, templateUrl: provider.templateUrl }))
 			: [];
 	}
 
@@ -139,7 +222,13 @@ class Config {
 	 * Get the value of the `git-graph.date.format` Extension Setting.
 	 */
 	get dateFormat(): DateFormat {
-		let configValue = this.getRenamedExtensionSetting<string>('date.format', 'dateFormat', 'Date & Time'), type = DateFormatType.DateAndTime, iso = false;
+		let configValue = this.getRenamedExtensionSetting<string>(
+				'date.format',
+				'dateFormat',
+				'Date & Time',
+			),
+			type = DateFormatType.DateAndTime,
+			iso = false;
 		if (configValue === 'Relative') {
 			type = DateFormatType.Relative;
 		} else {
@@ -153,7 +242,8 @@ class Config {
 	 * Get the value of the `git-graph.date.type` Extension Setting.
 	 */
 	get dateType() {
-		return this.getRenamedExtensionSetting<string>('date.type', 'dateType', 'Author Date') === 'Commit Date'
+		return this.getRenamedExtensionSetting<string>('date.type', 'dateType', 'Author Date') ===
+			'Commit Date'
 			? DateType.Commit
 			: DateType.Author;
 	}
@@ -163,7 +253,13 @@ class Config {
 	 */
 	get defaultColumnVisibility(): DefaultColumnVisibility {
 		let obj: any = this.config.get('defaultColumnVisibility', {});
-		if (typeof obj === 'object' && obj !== null && typeof obj['Date'] === 'boolean' && typeof obj['Author'] === 'boolean' && typeof obj['Commit'] === 'boolean') {
+		if (
+			typeof obj === 'object' &&
+			obj !== null &&
+			typeof obj['Date'] === 'boolean' &&
+			typeof obj['Author'] === 'boolean' &&
+			typeof obj['Commit'] === 'boolean'
+		) {
 			return { author: obj['Author'], commit: obj['Commit'], date: obj['Date'] };
 		} else {
 			return { author: true, commit: true, date: true };
@@ -175,7 +271,12 @@ class Config {
 	 */
 	get toolbarButtonVisibility(): ToolbarButtonVisibility {
 		let obj: any = this.config.get('toolbarButtonVisibility', {});
-		if (typeof obj === 'object' && obj !== null && typeof obj['Remotes'] === 'boolean' && typeof obj['Simplify'] === 'boolean') {
+		if (
+			typeof obj === 'object' &&
+			obj !== null &&
+			typeof obj['Remotes'] === 'boolean' &&
+			typeof obj['Simplify'] === 'boolean'
+		) {
 			return { remotes: obj['Remotes'], simplify: obj['Simplify'] };
 		} else {
 			return { remotes: true, simplify: true };
@@ -186,64 +287,89 @@ class Config {
 	 * Get the value of the `git-graph.dialog.*` Extension Settings.
 	 */
 	get dialogDefaults(): DialogDefaults {
-		let resetCommitMode = this.config.get<string>('dialog.resetCurrentBranchToCommit.mode', 'Mixed');
-		let resetUncommittedMode = this.config.get<string>('dialog.resetUncommittedChanges.mode', 'Mixed');
-		let refInputSpaceSubstitution = this.config.get<string>('dialog.general.referenceInputSpaceSubstitution', 'None');
+		let resetCommitMode = this.config.get<string>(
+			'dialog.resetCurrentBranchToCommit.mode',
+			'Mixed',
+		);
+		let resetUncommittedMode = this.config.get<string>(
+			'dialog.resetUncommittedChanges.mode',
+			'Mixed',
+		);
+		let refInputSpaceSubstitution = this.config.get<string>(
+			'dialog.general.referenceInputSpaceSubstitution',
+			'None',
+		);
 
 		return {
 			addTag: {
 				pushToRemote: !!this.config.get('dialog.addTag.pushToRemote', false),
-				type: this.config.get<string>('dialog.addTag.type', 'Annotated') === 'Lightweight' ? TagType.Lightweight : TagType.Annotated
+				type:
+					this.config.get<string>('dialog.addTag.type', 'Annotated') === 'Lightweight'
+						? TagType.Lightweight
+						: TagType.Annotated,
 			},
 			applyStash: {
-				reinstateIndex: !!this.config.get('dialog.applyStash.reinstateIndex', false)
+				reinstateIndex: !!this.config.get('dialog.applyStash.reinstateIndex', false),
 			},
 			cherryPick: {
 				noCommit: !!this.config.get('dialog.cherryPick.noCommit', false),
-				recordOrigin: !!this.config.get('dialog.cherryPick.recordOrigin', false)
+				recordOrigin: !!this.config.get('dialog.cherryPick.recordOrigin', false),
 			},
 			createBranch: {
-				checkout: !!this.config.get('dialog.createBranch.checkOut', false)
+				checkout: !!this.config.get('dialog.createBranch.checkOut', false),
 			},
 			deleteBranch: {
-				forceDelete: !!this.config.get('dialog.deleteBranch.forceDelete', false)
+				forceDelete: !!this.config.get('dialog.deleteBranch.forceDelete', false),
 			},
 			fetchIntoLocalBranch: {
-				forceFetch: !!this.config.get('dialog.fetchIntoLocalBranch.forceFetch', false)
+				forceFetch: !!this.config.get('dialog.fetchIntoLocalBranch.forceFetch', false),
 			},
 			fetchRemote: {
 				prune: !!this.config.get('dialog.fetchRemote.prune', false),
-				pruneTags: !!this.config.get('dialog.fetchRemote.pruneTags', false)
+				pruneTags: !!this.config.get('dialog.fetchRemote.pruneTags', false),
 			},
 			general: {
-				referenceInputSpaceSubstitution: refInputSpaceSubstitution === 'Hyphen' ? '-' : refInputSpaceSubstitution === 'Underscore' ? '_' : null
+				referenceInputSpaceSubstitution:
+					refInputSpaceSubstitution === 'Hyphen'
+						? '-'
+						: refInputSpaceSubstitution === 'Underscore'
+							? '_'
+							: null,
 			},
 			merge: {
 				noCommit: !!this.config.get('dialog.merge.noCommit', false),
 				noFastForward: !!this.config.get('dialog.merge.noFastForward', true),
 				allowUnrelatedHistories: !!this.config.get('dialog.merge.allowUnrelatedHistories', false),
-				squash: !!this.config.get('dialog.merge.squashCommits', false)
+				squash: !!this.config.get('dialog.merge.squashCommits', false),
 			},
 			popStash: {
-				reinstateIndex: !!this.config.get('dialog.popStash.reinstateIndex', false)
+				reinstateIndex: !!this.config.get('dialog.popStash.reinstateIndex', false),
 			},
 			pullBranch: {
 				noFastForward: !!this.config.get('dialog.pullBranch.noFastForward', false),
-				squash: !!this.config.get('dialog.pullBranch.squashCommits', false)
+				squash: !!this.config.get('dialog.pullBranch.squashCommits', false),
 			},
 			rebase: {
 				ignoreDate: !!this.config.get('dialog.rebase.ignoreDate', true),
-				interactive: !!this.config.get('dialog.rebase.launchInteractiveRebase', false)
+				interactive: !!this.config.get('dialog.rebase.launchInteractiveRebase', false),
 			},
 			resetCommit: {
-				mode: resetCommitMode === 'Soft' ? GitResetMode.Soft : (resetCommitMode === 'Hard' ? GitResetMode.Hard : GitResetMode.Mixed)
+				mode:
+					resetCommitMode === 'Soft'
+						? GitResetMode.Soft
+						: resetCommitMode === 'Hard'
+							? GitResetMode.Hard
+							: GitResetMode.Mixed,
 			},
 			resetUncommitted: {
-				mode: resetUncommittedMode === 'Hard' ? GitResetMode.Hard : GitResetMode.Mixed
+				mode: resetUncommittedMode === 'Hard' ? GitResetMode.Hard : GitResetMode.Mixed,
 			},
 			stashUncommittedChanges: {
-				includeUntracked: !!this.config.get('dialog.stashUncommittedChanges.includeUntracked', true)
-			}
+				includeUntracked: !!this.config.get(
+					'dialog.stashUncommittedChanges.includeUntracked',
+					true,
+				),
+			},
 		};
 	}
 
@@ -251,7 +377,8 @@ class Config {
 	 * Get the value of the `git-graph.dialog.merge.squashMessageFormat` Extension Setting.
 	 */
 	get squashMergeMessageFormat() {
-		return this.config.get<string>('dialog.merge.squashMessageFormat', 'Default') === 'Git SQUASH_MSG'
+		return this.config.get<string>('dialog.merge.squashMessageFormat', 'Default') ===
+			'Git SQUASH_MSG'
 			? SquashMessageFormat.GitSquashMsg
 			: SquashMessageFormat.Default;
 	}
@@ -260,7 +387,8 @@ class Config {
 	 * Get the value of the `git-graph.dialog.pullBranch.squashMessageFormat` Extension Setting.
 	 */
 	get squashPullMessageFormat() {
-		return this.config.get<string>('dialog.pullBranch.squashMessageFormat', 'Default') === 'Git SQUASH_MSG'
+		return this.config.get<string>('dialog.pullBranch.squashMessageFormat', 'Default') ===
+			'Git SQUASH_MSG'
 			? SquashMessageFormat.GitSquashMsg
 			: SquashMessageFormat.Default;
 	}
@@ -285,16 +413,41 @@ class Config {
 	get graph(): GraphConfig {
 		const colours = this.getRenamedExtensionSetting<string[]>('graph.colours', 'graphColours', []);
 		return {
-			colours: Array.isArray(colours) && colours.length > 0
-				? colours.filter((v) => v.match(/^\s*(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|rgb[a]?\s*\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\))\s*$/) !== null)
-				: ['#0085d9', '#d9008f', '#00d90a', '#d98500', '#a300d9', '#ff0000', '#00d9cc', '#e138e8', '#85d900', '#dc5b23', '#6f24d6', '#ffcc00'],
-			style: this.getRenamedExtensionSetting<string>('graph.style', 'graphStyle', 'rounded') === 'angular'
-				? GraphStyle.Angular
-				: GraphStyle.Rounded,
+			colours:
+				Array.isArray(colours) && colours.length > 0
+					? colours.filter(
+							(v) =>
+								v.match(
+									/^\s*(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|rgb[a]?\s*\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\))\s*$/,
+								) !== null,
+						)
+					: [
+							'#0085d9',
+							'#d9008f',
+							'#00d90a',
+							'#d98500',
+							'#a300d9',
+							'#ff0000',
+							'#00d9cc',
+							'#e138e8',
+							'#85d900',
+							'#dc5b23',
+							'#6f24d6',
+							'#ffcc00',
+						],
+			style:
+				this.getRenamedExtensionSetting<string>('graph.style', 'graphStyle', 'rounded') ===
+				'angular'
+					? GraphStyle.Angular
+					: GraphStyle.Rounded,
 			grid: { x: 16, y: 24, offsetX: 16, offsetY: 12, expandY: 250 },
-			uncommittedChanges: this.config.get<string>('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes') === 'Open Circle at the Checked Out Commit'
-				? GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit
-				: GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges
+			uncommittedChanges:
+				this.config.get<string>(
+					'graph.uncommittedChanges',
+					'Open Circle at the Uncommitted Changes',
+				) === 'Open Circle at the Checked Out Commit'
+					? GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit
+					: GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges,
 		};
 	}
 
@@ -313,7 +466,7 @@ class Config {
 			find: this.getKeybinding('keyboardShortcut.find', 'f'),
 			refresh: this.getKeybinding('keyboardShortcut.refresh', 'r'),
 			scrollToHead: this.getKeybinding('keyboardShortcut.scrollToHead', 'h'),
-			scrollToStash: this.getKeybinding('keyboardShortcut.scrollToStash', 's')
+			scrollToStash: this.getKeybinding('keyboardShortcut.scrollToStash', 's'),
 		};
 	}
 
@@ -335,7 +488,11 @@ class Config {
 	 * Get the value of the `git-graph.openNewTabEditorGroup` Extension Setting.
 	 */
 	get openNewTabEditorGroup(): vscode.ViewColumn {
-		const location = this.getRenamedExtensionSetting<string>('openNewTabEditorGroup', 'openDiffTabLocation', 'Active');
+		const location = this.getRenamedExtensionSetting<string>(
+			'openNewTabEditorGroup',
+			'openDiffTabLocation',
+			'Active',
+		);
 		return typeof location === 'string' && typeof VIEW_COLUMN_MAPPING[location] !== 'undefined'
 			? VIEW_COLUMN_MAPPING[location]
 			: vscode.ViewColumn.Active;
@@ -352,16 +509,26 @@ class Config {
 	 * Get the reference label configuration from the Extension Settings.
 	 */
 	get referenceLabels(): ReferenceLabelsConfig {
-		const alignmentConfigValue = this.getRenamedExtensionSetting<string>('referenceLabels.alignment', 'referenceLabelAlignment', 'Normal');
-		const alignment = alignmentConfigValue === 'Branches (on the left) & Tags (on the right)'
-			? RefLabelAlignment.BranchesOnLeftAndTagsOnRight
-			: alignmentConfigValue === 'Branches (aligned to the graph) & Tags (on the right)'
-				? RefLabelAlignment.BranchesAlignedToGraphAndTagsOnRight
-				: RefLabelAlignment.Normal;
+		const alignmentConfigValue = this.getRenamedExtensionSetting<string>(
+			'referenceLabels.alignment',
+			'referenceLabelAlignment',
+			'Normal',
+		);
+		const alignment =
+			alignmentConfigValue === 'Branches (on the left) & Tags (on the right)'
+				? RefLabelAlignment.BranchesOnLeftAndTagsOnRight
+				: alignmentConfigValue === 'Branches (aligned to the graph) & Tags (on the right)'
+					? RefLabelAlignment.BranchesAlignedToGraphAndTagsOnRight
+					: RefLabelAlignment.Normal;
 		return {
-			branchLabelsAlignedToGraph: alignment === RefLabelAlignment.BranchesAlignedToGraphAndTagsOnRight,
-			combineLocalAndRemoteBranchLabels: !!this.getRenamedExtensionSetting('referenceLabels.combineLocalAndRemoteBranchLabels', 'combineLocalAndRemoteBranchLabels', true),
-			tagLabelsOnRight: alignment !== RefLabelAlignment.Normal
+			branchLabelsAlignedToGraph:
+				alignment === RefLabelAlignment.BranchesAlignedToGraphAndTagsOnRight,
+			combineLocalAndRemoteBranchLabels: !!this.getRenamedExtensionSetting(
+				'referenceLabels.combineLocalAndRemoteBranchLabels',
+				'combineLocalAndRemoteBranchLabels',
+				true,
+			),
+			tagLabelsOnRight: alignment !== RefLabelAlignment.Normal,
 		};
 	}
 
@@ -369,16 +536,23 @@ class Config {
 	 * Get the value of the `git-graph.repository.commits.fetchAvatars` Extension Setting.
 	 */
 	get fetchAvatars() {
-		return !!this.getRenamedExtensionSetting('repository.commits.fetchAvatars', 'fetchAvatars', false);
+		return !!this.getRenamedExtensionSetting(
+			'repository.commits.fetchAvatars',
+			'fetchAvatars',
+			false,
+		);
 	}
 
 	/**
 	 * Get the value of the `git-graph.repository.commits.initialLoad` Extension Setting.
 	 */
 	get initialLoadCommits() {
-		return this.getRenamedExtensionSetting('repository.commits.initialLoad', 'initialLoadCommits', 300);
+		return this.getRenamedExtensionSetting(
+			'repository.commits.initialLoad',
+			'initialLoadCommits',
+			300,
+		);
 	}
-
 
 	/**
 	 * Get the value of the `git-graph.repository.commits.loadMore` Extension Setting.
@@ -391,7 +565,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.commits.loadMoreAutomatically` Extension Setting.
 	 */
 	get loadMoreCommitsAutomatically() {
-		return !!this.getRenamedExtensionSetting('repository.commits.loadMoreAutomatically', 'loadMoreCommitsAutomatically', true);
+		return !!this.getRenamedExtensionSetting(
+			'repository.commits.loadMoreAutomatically',
+			'loadMoreCommitsAutomatically',
+			true,
+		);
 	}
 
 	/**
@@ -399,8 +577,16 @@ class Config {
 	 */
 	get muteCommits(): MuteCommitsConfig {
 		return {
-			commitsNotAncestorsOfHead: !!this.getRenamedExtensionSetting('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 'muteCommitsThatAreNotAncestorsOfHead', false),
-			mergeCommits: !!this.getRenamedExtensionSetting('repository.commits.mute.mergeCommits', 'muteMergeCommits', true)
+			commitsNotAncestorsOfHead: !!this.getRenamedExtensionSetting(
+				'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+				'muteCommitsThatAreNotAncestorsOfHead',
+				false,
+			),
+			mergeCommits: !!this.getRenamedExtensionSetting(
+				'repository.commits.mute.mergeCommits',
+				'muteMergeCommits',
+				true,
+			),
 		};
 	}
 
@@ -408,7 +594,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.commits.order` Extension Setting.
 	 */
 	get commitOrder() {
-		const ordering = this.getRenamedExtensionSetting<string>('repository.commits.order', 'commitOrdering', 'date');
+		const ordering = this.getRenamedExtensionSetting<string>(
+			'repository.commits.order',
+			'commitOrdering',
+			'date',
+		);
 		return ordering === 'author-date'
 			? CommitOrdering.AuthorDate
 			: ordering === 'topo'
@@ -420,7 +610,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.commits.showSignatureStatus` Extension Setting.
 	 */
 	get showSignatureStatus() {
-		return !!this.getRenamedExtensionSetting('repository.commits.showSignatureStatus', 'showSignatureStatus', false);
+		return !!this.getRenamedExtensionSetting(
+			'repository.commits.showSignatureStatus',
+			'showSignatureStatus',
+			false,
+		);
 	}
 
 	/**
@@ -441,7 +635,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.includeCommitsMentionedByReflogs` Extension Setting.
 	 */
 	get includeCommitsMentionedByReflogs() {
-		return !!this.getRenamedExtensionSetting('repository.includeCommitsMentionedByReflogs', 'includeCommitsMentionedByReflogs', false);
+		return !!this.getRenamedExtensionSetting(
+			'repository.includeCommitsMentionedByReflogs',
+			'includeCommitsMentionedByReflogs',
+			false,
+		);
 	}
 
 	/**
@@ -450,11 +648,19 @@ class Config {
 	get onRepoLoad(): OnRepoLoadConfig {
 		const branches = this.config.get('repository.onLoad.showSpecificBranches', []);
 		return {
-			scrollToHead: !!this.getRenamedExtensionSetting('repository.onLoad.scrollToHead', 'openRepoToHead', false),
-			showCheckedOutBranch: !!this.getRenamedExtensionSetting('repository.onLoad.showCheckedOutBranch', 'showCurrentBranchByDefault', false),
+			scrollToHead: !!this.getRenamedExtensionSetting(
+				'repository.onLoad.scrollToHead',
+				'openRepoToHead',
+				false,
+			),
+			showCheckedOutBranch: !!this.getRenamedExtensionSetting(
+				'repository.onLoad.showCheckedOutBranch',
+				'showCurrentBranchByDefault',
+				false,
+			),
 			showSpecificBranches: Array.isArray(branches)
 				? branches.filter((branch) => typeof branch === 'string')
-				: []
+				: [],
 		};
 	}
 
@@ -462,7 +668,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.onlyFollowFirstParent` Extension Setting.
 	 */
 	get onlyFollowFirstParent() {
-		return !!this.getRenamedExtensionSetting('repository.onlyFollowFirstParent', 'onlyFollowFirstParent', false);
+		return !!this.getRenamedExtensionSetting(
+			'repository.onlyFollowFirstParent',
+			'onlyFollowFirstParent',
+			false,
+		);
 	}
 
 	/**
@@ -483,7 +693,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.showCommitsOnlyReferencedByTags` Extension Setting.
 	 */
 	get showCommitsOnlyReferencedByTags() {
-		return !!this.getRenamedExtensionSetting('repository.showCommitsOnlyReferencedByTags', 'showCommitsOnlyReferencedByTags', true);
+		return !!this.getRenamedExtensionSetting(
+			'repository.showCommitsOnlyReferencedByTags',
+			'showCommitsOnlyReferencedByTags',
+			true,
+		);
 	}
 
 	/**
@@ -525,14 +739,22 @@ class Config {
 	 * Get the value of the `git-graph.repository.showUncommittedChanges` Extension Setting.
 	 */
 	get showUncommittedChanges() {
-		return !!this.getRenamedExtensionSetting('repository.showUncommittedChanges', 'showUncommittedChanges', true);
+		return !!this.getRenamedExtensionSetting(
+			'repository.showUncommittedChanges',
+			'showUncommittedChanges',
+			true,
+		);
 	}
 
 	/**
 	 * Get the value of the `git-graph.repository.showUntrackedFiles` Extension Setting.
 	 */
 	get showUntrackedFiles() {
-		return !!this.getRenamedExtensionSetting('repository.showUntrackedFiles', 'showUntrackedFiles', true);
+		return !!this.getRenamedExtensionSetting(
+			'repository.showUntrackedFiles',
+			'showUntrackedFiles',
+			true,
+		);
 	}
 
 	/**
@@ -617,7 +839,9 @@ class Config {
 	 * Get the Git executable paths configured by the `git.path` Visual Studio Code Setting.
 	 */
 	get gitPaths() {
-		const configValue = vscode.workspace.getConfiguration('git').get<string | string[] | null>('path', null);
+		const configValue = vscode.workspace
+			.getConfiguration('git')
+			.get<string | string[] | null>('path', null);
 		if (configValue === null) {
 			return [];
 		} else if (typeof configValue === 'string') {
@@ -655,11 +879,16 @@ class Config {
 	 * @returns The value of the extension setting.
 	 */
 	private getRenamedExtensionSetting<T>(newSection: string, oldSection: string, defaultValue: T) {
-		const newValues = this.config.inspect<T>(newSection), oldValues = this.config.inspect<T>(oldSection);
-		if (typeof newValues !== 'undefined' && typeof newValues.workspaceValue !== 'undefined') return newValues.workspaceValue;
-		if (typeof oldValues !== 'undefined' && typeof oldValues.workspaceValue !== 'undefined') return oldValues.workspaceValue;
-		if (typeof newValues !== 'undefined' && typeof newValues.globalValue !== 'undefined') return newValues.globalValue;
-		if (typeof oldValues !== 'undefined' && typeof oldValues.globalValue !== 'undefined') return oldValues.globalValue;
+		const newValues = this.config.inspect<T>(newSection),
+			oldValues = this.config.inspect<T>(oldSection);
+		if (typeof newValues !== 'undefined' && typeof newValues.workspaceValue !== 'undefined')
+			return newValues.workspaceValue;
+		if (typeof oldValues !== 'undefined' && typeof oldValues.workspaceValue !== 'undefined')
+			return oldValues.workspaceValue;
+		if (typeof newValues !== 'undefined' && typeof newValues.globalValue !== 'undefined')
+			return newValues.globalValue;
+		if (typeof oldValues !== 'undefined' && typeof oldValues.globalValue !== 'undefined')
+			return oldValues.globalValue;
 		return defaultValue;
 	}
 }

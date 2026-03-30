@@ -67,7 +67,7 @@ export const WEBVIEW_EXTRA_NLS_KEYS: readonly string[] = [
 	'configuration.contextMenuActionsVisibility.uncommittedChanges.stash',
 	'configuration.contextMenuActionsVisibility.uncommittedChanges.reset',
 	'configuration.contextMenuActionsVisibility.uncommittedChanges.clean',
-	'configuration.contextMenuActionsVisibility.uncommittedChanges.openSourceControlView'
+	'configuration.contextMenuActionsVisibility.uncommittedChanges.openSourceControlView',
 ];
 
 export function mergeWebviewExtraNls(wt: (key: string) => string): Record<string, string> {

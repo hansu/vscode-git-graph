@@ -44,7 +44,6 @@
 		"l10n": {
 			"folder": ""
 		},
-
 		"commands": [
 			{
 				"category": "Git Graph",
@@ -1642,15 +1641,18 @@
 		"vscode:prepublish": "npm run compile",
 		"vscode:uninstall": "node ./out/life-cycle/uninstall.js",
 		"clean": "node ./.vscode/clean.js",
-		"compile": "npm run lint && npm run clean && npm run compile-src && npm run compile-web",
+		"compile": "npm run format:check && npm run lint && npm run clean && npm run compile-src && npm run compile-web",
 		"compile-src": "tsc -p ./src && node ./.vscode/package-src.js",
 		"compile-web": "tsc -p ./web && node ./.vscode/package-web.js",
 		"compile-web-debug": "tsc -p ./web && node ./.vscode/package-web.js debug",
+		"format": "oxfmt ./src ./tests ./web",
+		"format:check": "oxfmt --check ./src ./tests ./web",
 		"lint": "eslint --max-warnings 0 ./src ./tests ./web",
 		"package": "vsce package",
 		"package-and-install": "npm run package && node ./.vscode/install-package.js",
 		"test": "jest --verbose",
-		"test-and-report-coverage": "jest --verbose --coverage"
+		"test-and-report-coverage": "jest --verbose --coverage",
+		"prepare": "husky"
 	},
 	"dependencies": {
 		"iconv-lite": "0.5.0"
@@ -1666,9 +1668,15 @@
 		"@typescript-eslint/parser": "^8.20.0",
 		"@vscode/vsce": "^3.6.0",
 		"eslint": "^9.17.0",
+		"husky": "^9.1.7",
 		"jest": "^29.7.0",
+		"lint-staged": "^16.4.0",
+		"oxfmt": "^0.42.0",
 		"ts-jest": "^29.2.0",
 		"typescript": "^5.7.0",
 		"uglify-js": "^3.19.0"
+	},
+	"lint-staged": {
+		"{src,tests,web}/**/*.{ts,tsx,css,json}": "oxfmt"
 	}
 }

@@ -10,7 +10,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { LifeCycleStage, LifeCycleState, generateNonce, getDataDirectory, getLifeCycleStateInDirectory, saveLifeCycleStateInDirectory, sendQueue } from './utils';
+import {
+	LifeCycleStage,
+	LifeCycleState,
+	generateNonce,
+	getDataDirectory,
+	getLifeCycleStateInDirectory,
+	saveLifeCycleStateInDirectory,
+	sendQueue,
+} from './utils';
 import { getExtensionVersion } from '../utils';
 
 /**
@@ -32,7 +40,7 @@ export async function onStartUp(extensionContext: vscode.ExtensionContext) {
 
 	const versions = {
 		extension: await getExtensionVersion(extensionContext),
-		vscode: vscode.version
+		vscode: vscode.version,
 	};
 
 	if (state === null || state.current.extension !== versions.extension) {
@@ -45,13 +53,15 @@ export async function onStartUp(extensionContext: vscode.ExtensionContext) {
 				previous: null,
 				current: versions,
 				apiAvailable: true,
-				queue: [{
-					stage: LifeCycleStage.Install,
-					extension: versions.extension,
-					vscode: versions.vscode,
-					nonce: nonce
-				}],
-				attempts: 1
+				queue: [
+					{
+						stage: LifeCycleStage.Install,
+						extension: versions.extension,
+						vscode: versions.vscode,
+						nonce: nonce,
+					},
+				],
+				attempts: 1,
 			};
 		} else {
 			// Update
@@ -61,7 +71,7 @@ export async function onStartUp(extensionContext: vscode.ExtensionContext) {
 				stage: LifeCycleStage.Update,
 				from: state.previous,
 				to: state.current,
-				nonce: nonce
+				nonce: nonce,
 			});
 			state.attempts = 1;
 		}
@@ -70,7 +80,6 @@ export async function onStartUp(extensionContext: vscode.ExtensionContext) {
 		state.apiAvailable = await sendQueue(state.queue);
 		state.queue = [];
 		await saveLifeCycleState(extensionContext, state);
-
 	} else if (state.queue.length > 0 && state.attempts < 2) {
 		// There are one or more events in the queue that previously failed to send, send them
 		state.attempts++;
@@ -90,7 +99,7 @@ export async function onStartUp(extensionContext: vscode.ExtensionContext) {
 function saveLifeCycleState(extensionContext: vscode.ExtensionContext, state: LifeCycleState) {
 	return Promise.all([
 		saveLifeCycleStateInDirectory(extensionContext.globalStoragePath, state),
-		saveLifeCycleStateInDirectory(getDataDirectory(), state)
+		saveLifeCycleStateInDirectory(getDataDirectory(), state),
 	]);
 }
 

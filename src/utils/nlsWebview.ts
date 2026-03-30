@@ -29,7 +29,10 @@ function getFileBundleMap(extensionPath: string, useZh: boolean): Record<string,
  * - `git-graph.language` **zh** / **en**: read `package.nls*.json` from disk (explicit override).
  * - **empty** (default): use `vscode.l10n.t`, same as the rest of the extension and the active VS Code / Language Pack locale.
  */
-export function createWebviewNlsTranslator(extensionPath: string, gitGraphLanguageSetting: string): (key: string) => string {
+export function createWebviewNlsTranslator(
+	extensionPath: string,
+	gitGraphLanguageSetting: string,
+): (key: string) => string {
 	const norm = gitGraphLanguageSetting.trim().toLowerCase();
 	if (norm === 'zh') {
 		const map = getFileBundleMap(extensionPath, true);

@@ -37,7 +37,14 @@ class Dropdown {
 	 * @returns The Dropdown instance.
 	 * @param selectMultipleWithCtrl Select multiple items using Ctrl
 	 */
-	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void, selectMultipleWithCtrl: boolean = false) {
+	constructor(
+		id: string,
+		showInfo: boolean,
+		multipleAllowed: boolean,
+		dropdownType: string,
+		changeCallback: (values: string[]) => void,
+		selectMultipleWithCtrl: boolean = false,
+	) {
 		this.showInfo = showInfo;
 		this.multipleAllowed = multipleAllowed;
 		this.selectMultipleWithCtrl = selectMultipleWithCtrl;
@@ -64,30 +71,38 @@ class Dropdown {
 		this.currentValueElem = this.elem.appendChild(document.createElement('div'));
 		this.currentValueElem.className = 'dropdownCurrentValue';
 
-		alterClass(this.elem, 'multi', (multipleAllowed && !selectMultipleWithCtrl));
+		alterClass(this.elem, 'multi', multipleAllowed && !selectMultipleWithCtrl);
 		this.elem.appendChild(this.menuElem);
 
-		document.addEventListener('click', (e) => {
-			if (!e.target) return;
-			if (e.target === this.currentValueElem) {
-				this.dropdownVisible = !this.dropdownVisible;
-				if (this.dropdownVisible) {
-					this.filterInput.value = '';
-					this.filter();
-				}
-				this.elem.classList.toggle('dropdownOpen');
-				if (this.dropdownVisible) this.filterInput.focus();
-			} else if (this.dropdownVisible) {
-				if ((<HTMLElement>e.target).closest('.dropdown') !== this.elem) {
-					this.close();
-				} else {
-					const option = <HTMLElement | null>(<HTMLElement>e.target).closest('.dropdownOption');
-					if (option !== null && option.parentNode === this.optionsElem && typeof option.dataset.id !== 'undefined') {
-						this.onOptionClick(parseInt(option.dataset.id!), e);
+		document.addEventListener(
+			'click',
+			(e) => {
+				if (!e.target) return;
+				if (e.target === this.currentValueElem) {
+					this.dropdownVisible = !this.dropdownVisible;
+					if (this.dropdownVisible) {
+						this.filterInput.value = '';
+						this.filter();
+					}
+					this.elem.classList.toggle('dropdownOpen');
+					if (this.dropdownVisible) this.filterInput.focus();
+				} else if (this.dropdownVisible) {
+					if ((<HTMLElement>e.target).closest('.dropdown') !== this.elem) {
+						this.close();
+					} else {
+						const option = <HTMLElement | null>(<HTMLElement>e.target).closest('.dropdownOption');
+						if (
+							option !== null &&
+							option.parentNode === this.optionsElem &&
+							typeof option.dataset.id !== 'undefined'
+						) {
+							this.onOptionClick(parseInt(option.dataset.id!), e);
+						}
 					}
 				}
-			}
-		}, true);
+			},
+			true,
+		);
 		document.addEventListener('contextmenu', () => this.close(), true);
 		this.filterInput.addEventListener('keyup', () => this.filter());
 	}
@@ -100,7 +115,8 @@ class Dropdown {
 	public setOptions(options: ReadonlyArray<DropdownOption>, optionsSelected: string[] | null) {
 		this.options = options;
 		this.optionsSelected = [];
-		let selectedOption = -1, isSelected;
+		let selectedOption = -1,
+			isSelected;
 		if (optionsSelected) {
 			for (let i = 0; i < options.length; i++) {
 				isSelected = optionsSelected.includes(options[i].value);
@@ -155,7 +171,11 @@ class Dropdown {
 	public selectOption(value: string, event: MouseEvent | undefined) {
 		const optionIndex = this.options.findIndex((option) => value === option.value);
 		if (optionIndex < 0 && (this.optionsSelected[0] || this.optionsSelected[optionIndex])) return;
-		if (this.multipleAllowed && !this.optionsSelected[0] && (!this.selectMultipleWithCtrl || (event && (event.ctrlKey || event.metaKey)))) {
+		if (
+			this.multipleAllowed &&
+			!this.optionsSelected[0] &&
+			(!this.selectMultipleWithCtrl || (event && (event.ctrlKey || event.metaKey)))
+		) {
 			// Select the option with the specified value
 			this.optionsSelected[optionIndex] = true;
 		} else {
@@ -171,7 +191,6 @@ class Dropdown {
 			this.menuElem.scroll(0, menuScroll);
 		}
 		this.changeCallback(this.getSelectedOptions(false));
-
 	}
 
 	/**
@@ -192,7 +211,7 @@ class Dropdown {
 
 			// Unselect the option with the specified value
 			this.optionsSelected[optionIndex] = false;
-			if (this.optionsSelected.every(selected => !selected)) {
+			if (this.optionsSelected.every((selected) => !selected)) {
 				// 所有项目都已取消选择，选择"显示全部"
 				this.optionsSelected[0] = true;
 			}
@@ -244,10 +263,28 @@ class Dropdown {
 		let html = '';
 		for (let i = 0; i < this.options.length; i++) {
 			const escapedName = escapeHtml(this.options[i].name);
-			html += '<div class="dropdownOption' + (this.optionsSelected[i] ? ' ' + CLASS_SELECTED : '') + '" data-id="' + i + '" title="' + escapedName + '">' +
-				(this.multipleAllowed && !this.selectMultipleWithCtrl && this.optionsSelected[i] ? '<div class="dropdownOptionMultiSelected">' + SVG_ICONS.check + '</div>' : '') +
-				escapedName + (typeof this.options[i].hint === 'string' && this.options[i].hint !== '' ? '<span class="dropdownOptionHint">' + escapeHtml(this.options[i].hint!) + '</span>' : '') +
-				(this.showInfo ? '<div class="dropdownOptionInfo" title="' + escapeHtml(this.options[i].value) + '">' + SVG_ICONS.info + '</div>' : '') +
+			html +=
+				'<div class="dropdownOption' +
+				(this.optionsSelected[i] ? ' ' + CLASS_SELECTED : '') +
+				'" data-id="' +
+				i +
+				'" title="' +
+				escapedName +
+				'">' +
+				(this.multipleAllowed && !this.selectMultipleWithCtrl && this.optionsSelected[i]
+					? '<div class="dropdownOptionMultiSelected">' + SVG_ICONS.check + '</div>'
+					: '') +
+				escapedName +
+				(typeof this.options[i].hint === 'string' && this.options[i].hint !== ''
+					? '<span class="dropdownOptionHint">' + escapeHtml(this.options[i].hint!) + '</span>'
+					: '') +
+				(this.showInfo
+					? '<div class="dropdownOptionInfo" title="' +
+						escapeHtml(this.options[i].value) +
+						'">' +
+						SVG_ICONS.info +
+						'</div>'
+					: '') +
 				'</div>';
 		}
 		this.optionsElem.className = 'dropdownOptions' + (this.showInfo ? ' showInfo' : '');
@@ -258,7 +295,15 @@ class Dropdown {
 		// Width must be at least 138px for the filter element.
 		// Don't need to add 12px if showing (info icons or multi checkboxes) and the scrollbar isn't needed. The scrollbar isn't needed if: menuElem height + filter input (25px) < 297px
 		const menuElemRect = this.menuElem.getBoundingClientRect();
-		this.currentValueElem.style.width = Math.max(Math.ceil(menuElemRect.width) + ((this.showInfo || (this.multipleAllowed && !this.selectMultipleWithCtrl)) && menuElemRect.height < 272 ? 0 : 12), 138) + 'px';
+		this.currentValueElem.style.width =
+			Math.max(
+				Math.ceil(menuElemRect.width) +
+					((this.showInfo || (this.multipleAllowed && !this.selectMultipleWithCtrl)) &&
+					menuElemRect.height < 272
+						? 0
+						: 12),
+				138,
+			) + 'px';
 		this.menuElem.style.cssText = 'right:0; overflow-y:auto; max-height:297px;'; // Max height for the dropdown is [filter (31px) + 9.5 * dropdown item (28px) = 297px]
 		if (this.dropdownVisible) this.filter();
 	}
@@ -267,7 +312,9 @@ class Dropdown {
 	 * Filter the options displayed in the dropdown list, based on the filter criteria specified by the user.
 	 */
 	private filter() {
-		let val = this.filterInput.value.toLowerCase(), match, matches = false;
+		let val = this.filterInput.value.toLowerCase(),
+			match,
+			matches = false;
 		for (let i = 0; i < this.options.length; i++) {
 			match = this.options[i].name.toLowerCase().indexOf(val) > -1;
 			(<HTMLElement>this.optionsElem.children[i]).style.display = match ? 'block' : 'none';
@@ -289,7 +336,8 @@ class Dropdown {
 			return [names ? this.options[0].name : this.options[0].value];
 		}
 		for (let i = 0; i < this.options.length; i++) {
-			if (this.optionsSelected[i]) selected.push(names ? this.options[i].name : this.options[i].value);
+			if (this.optionsSelected[i])
+				selected.push(names ? this.options[i].name : this.options[i].value);
 		}
 		return selected;
 	}
@@ -313,7 +361,10 @@ class Dropdown {
 			}
 		} else {
 			// Single Click
-			if (this.multipleAllowed && (!this.selectMultipleWithCtrl || (event && (event.ctrlKey || event.metaKey)))) {
+			if (
+				this.multipleAllowed &&
+				(!this.selectMultipleWithCtrl || (event && (event.ctrlKey || event.metaKey)))
+			) {
 				// Multiple dropdown options can be selected
 				if (option === 0) {
 					// Show All was selected
@@ -332,7 +383,7 @@ class Dropdown {
 
 					this.optionsSelected[option] = !this.optionsSelected[option];
 
-					if (this.optionsSelected.every(selected => !selected)) {
+					if (this.optionsSelected.every((selected) => !selected)) {
 						// 所有项目都已取消选择，选择"显示全部"
 						this.optionsSelected[0] = true;
 					}

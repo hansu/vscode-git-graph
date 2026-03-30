@@ -1,0 +1,14 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"useTabs": true,
+	"singleQuote": true,
+	"endOfLine": "lf",
+	"sortPackageJson": false,
+	"ignorePatterns": [
+		"out/**",
+		"dist/**",
+		"node_modules/**",
+		"coverage/**",
+		"*.vsix"
+	]
+}

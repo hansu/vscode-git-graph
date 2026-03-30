@@ -5,8 +5,27 @@ import { getConfig } from './config';
 import { DataSource } from './dataSource';
 import { DEFAULT_REPO_STATE, ExtensionState } from './extensionState';
 import { Logger } from './logger';
-import { BooleanOverride, ErrorInfo, FileViewType, GitRepoSet, GitRepoState, PullRequestConfig, PullRequestConfigBase, PullRequestProvider, RepoCommitOrdering } from './types';
-import { evalPromises, getPathFromStr, getPathFromUri, getRepoName, pathWithTrailingSlash, realpath, showErrorMessage, showInformationMessage } from './utils';
+import {
+	BooleanOverride,
+	ErrorInfo,
+	FileViewType,
+	GitRepoSet,
+	GitRepoState,
+	PullRequestConfig,
+	PullRequestConfigBase,
+	PullRequestProvider,
+	RepoCommitOrdering,
+} from './types';
+import {
+	evalPromises,
+	getPathFromStr,
+	getPathFromUri,
+	getRepoName,
+	pathWithTrailingSlash,
+	realpath,
+	showErrorMessage,
+	showInformationMessage,
+} from './utils';
 import { BufferedQueue } from './utils/bufferedQueue';
 import { Disposable, toDisposable } from './utils/disposable';
 import { Event, EventEmitter } from './utils/event';
@@ -44,7 +63,12 @@ export class RepoManager extends Disposable {
 	 * @param extensionState The Git Graph ExtensionState instance.
 	 * @param logger The Git Graph Logger instance.
 	 */
-	constructor(dataSource: DataSource, extensionState: ExtensionState, onDidChangeConfiguration: Event<vscode.ConfigurationChangeEvent>, logger: Logger) {
+	constructor(
+		dataSource: DataSource,
+		extensionState: ExtensionState,
+		onDidChangeConfiguration: Event<vscode.ConfigurationChangeEvent>,
+		logger: Logger,
+	) {
 		super();
 		this.dataSource = dataSource;
 		this.extensionState = extensionState;
@@ -53,15 +77,26 @@ export class RepoManager extends Disposable {
 		this.ignoredRepos = extensionState.getIgnoredRepos();
 		this.maxDepthOfRepoSearch = getConfig().maxDepthOfRepoSearch;
 
-		this.configWatcher = vscode.workspace.createFileSystemWatcher('**/.vscode/vscode-git-graph.json');
+		this.configWatcher = vscode.workspace.createFileSystemWatcher(
+			'**/.vscode/vscode-git-graph.json',
+		);
 		this.configWatcher.onDidCreate(this.onConfigWatcherCreateOrChange.bind(this));
 		this.configWatcher.onDidChange(this.onConfigWatcherCreateOrChange.bind(this));
 
 		this.repoEventEmitter = new EventEmitter<RepoChangeEvent>();
 
-		this.onWatcherCreateQueue = new BufferedQueue<string>(this.processOnWatcherCreateEvent.bind(this), this.sendRepos.bind(this));
-		this.onWatcherChangeQueue = new BufferedQueue<string>(this.processOnWatcherChangeEvent.bind(this), this.sendRepos.bind(this));
-		this.checkRepoConfigQueue = new BufferedQueue<string>(this.checkRepoForNewConfig.bind(this), this.sendRepos.bind(this));
+		this.onWatcherCreateQueue = new BufferedQueue<string>(
+			this.processOnWatcherCreateEvent.bind(this),
+			this.sendRepos.bind(this),
+		);
+		this.onWatcherChangeQueue = new BufferedQueue<string>(
+			this.processOnWatcherChangeEvent.bind(this),
+			this.sendRepos.bind(this),
+		);
+		this.checkRepoConfigQueue = new BufferedQueue<string>(
+			this.checkRepoForNewConfig.bind(this),
+			this.sendRepos.bind(this),
+		);
 
 		this.startupTasks();
 
@@ -71,7 +106,8 @@ export class RepoManager extends Disposable {
 			// - remove repositories within deleted folders
 			// - apply changes to the order of workspace folders
 			vscode.workspace.onDidChangeWorkspaceFolders(async (e) => {
-				let changes = false, path;
+				let changes = false,
+					path;
 				if (e.added.length > 0) {
 					for (let i = 0; i < e.added.length; i++) {
 						path = getPathFromUri(e.added[i].uri);
@@ -124,7 +160,7 @@ export class RepoManager extends Disposable {
 				for (let i = 0; i < folders.length; i++) {
 					this.stopWatchingFolder(folders[i]);
 				}
-			})
+			}),
 		);
 	}
 
@@ -156,7 +192,7 @@ export class RepoManager extends Disposable {
 		if (this.updateReposWorkspaceFolderIndex()) {
 			this.extensionState.saveRepos(this.repos);
 		}
-		if (!await this.checkReposExist()) {
+		if (!(await this.checkReposExist())) {
 			// On startup, ensure that sendRepo is called (even if no changes were made)
 			this.sendRepos();
 		}
@@ -171,10 +207,16 @@ export class RepoManager extends Disposable {
 	 */
 	private removeReposNotInWorkspace() {
 		const workspaceFolderInfo = getWorkspaceFolderInfoForRepoInclusionMapping();
-		const rootsExact = workspaceFolderInfo.rootsExact, rootsFolder = workspaceFolderInfo.rootsFolder, repoPaths = Object.keys(this.repos);
+		const rootsExact = workspaceFolderInfo.rootsExact,
+			rootsFolder = workspaceFolderInfo.rootsFolder,
+			repoPaths = Object.keys(this.repos);
 		for (let i = 0; i < repoPaths.length; i++) {
 			const repoPathFolder = pathWithTrailingSlash(repoPaths[i]);
-			if (rootsExact.indexOf(repoPaths[i]) === -1 && !rootsFolder.find(root => repoPaths[i].startsWith(root)) && !rootsExact.find(root => root.startsWith(repoPathFolder))) {
+			if (
+				rootsExact.indexOf(repoPaths[i]) === -1 &&
+				!rootsFolder.find((root) => repoPaths[i].startsWith(root)) &&
+				!rootsExact.find((root) => root.startsWith(repoPathFolder))
+			) {
 				this.removeRepo(repoPaths[i]);
 			}
 		}
@@ -186,7 +228,7 @@ export class RepoManager extends Disposable {
 	 * @param loadRepo If TRUE and the Git Graph View is visible, load the Git Graph View with the repository being registered.
 	 */
 	public registerRepo(path: string, loadRepo: boolean) {
-		return new Promise<{ root: string | null, error: string | null }>(async resolve => {
+		return new Promise<{ root: string | null; error: string | null }>(async (resolve) => {
 			let root = await this.dataSource.repoRoot(path);
 			if (root === null) {
 				resolve({ root: null, error: vscode.l10n.t('ui.folderNotGitRepo', { path }) });
@@ -221,7 +263,6 @@ export class RepoManager extends Disposable {
 		}
 	}
 
-
 	/* Repo Management */
 
 	/**
@@ -246,9 +287,14 @@ export class RepoManager extends Disposable {
 	 * @returns The path of the repository containing the file, or NULL if no known repository contains the file.
 	 */
 	public getRepoContainingFile(path: string) {
-		let repoPaths = Object.keys(this.repos), repo = null;
+		let repoPaths = Object.keys(this.repos),
+			repo = null;
 		for (let i = 0; i < repoPaths.length; i++) {
-			if (path.startsWith(pathWithTrailingSlash(repoPaths[i])) && (repo === null || repo.length < repoPaths[i].length)) repo = repoPaths[i];
+			if (
+				path.startsWith(pathWithTrailingSlash(repoPaths[i])) &&
+				(repo === null || repo.length < repoPaths[i].length)
+			)
+				repo = repoPaths[i];
 		}
 		return repo;
 	}
@@ -259,9 +305,12 @@ export class RepoManager extends Disposable {
 	 * @returns An array of the paths of all known repositories contained in the specified folder.
 	 */
 	private getReposInFolder(path: string) {
-		let pathFolder = pathWithTrailingSlash(path), repoPaths = Object.keys(this.repos), reposInFolder: string[] = [];
+		let pathFolder = pathWithTrailingSlash(path),
+			repoPaths = Object.keys(this.repos),
+			reposInFolder: string[] = [];
 		for (let i = 0; i < repoPaths.length; i++) {
-			if (repoPaths[i] === path || repoPaths[i].startsWith(pathFolder)) reposInFolder.push(repoPaths[i]);
+			if (repoPaths[i] === path || repoPaths[i].startsWith(pathFolder))
+				reposInFolder.push(repoPaths[i]);
 		}
 		return reposInFolder;
 	}
@@ -349,7 +398,8 @@ export class RepoManager extends Disposable {
 	private isDirectoryWithinRepos(path: string) {
 		let repoPaths = Object.keys(this.repos);
 		for (let i = 0; i < repoPaths.length; i++) {
-			if (path === repoPaths[i] || path.startsWith(pathWithTrailingSlash(repoPaths[i]))) return true;
+			if (path === repoPaths[i] || path.startsWith(pathWithTrailingSlash(repoPaths[i])))
+				return true;
 		}
 		return false;
 	}
@@ -362,7 +412,7 @@ export class RepoManager extends Disposable {
 		this.repoEventEmitter.emit({
 			repos: this.getRepos(),
 			numRepos: this.getNumRepos(),
-			loadRepo: loadRepo
+			loadRepo: loadRepo,
 		});
 	}
 
@@ -371,23 +421,27 @@ export class RepoManager extends Disposable {
 	 * @returns TRUE => At least one repository was removed or transferred, FALSE => No repositories were removed.
 	 */
 	public checkReposExist() {
-		let repoPaths = Object.keys(this.repos), changes = false;
-		return evalPromises(repoPaths, 3, (path) => this.dataSource.repoRoot(path)).then((results) => {
-			for (let i = 0; i < repoPaths.length; i++) {
-				if (results[i] === null) {
-					this.removeRepo(repoPaths[i]);
-					changes = true;
-				} else if (repoPaths[i] !== results[i]) {
-					this.transferRepoState(repoPaths[i], results[i]!);
-					changes = true;
+		let repoPaths = Object.keys(this.repos),
+			changes = false;
+		return evalPromises(repoPaths, 3, (path) => this.dataSource.repoRoot(path))
+			.then((results) => {
+				for (let i = 0; i < repoPaths.length; i++) {
+					if (results[i] === null) {
+						this.removeRepo(repoPaths[i]);
+						changes = true;
+					} else if (repoPaths[i] !== results[i]) {
+						this.transferRepoState(repoPaths[i], results[i]!);
+						changes = true;
+					}
 				}
-			}
-		}).catch(() => { }).then(() => {
-			if (changes) {
-				this.sendRepos();
-			}
-			return changes;
-		});
+			})
+			.catch(() => {})
+			.then(() => {
+				if (changes) {
+					this.sendRepos();
+				}
+				return changes;
+			});
 	}
 
 	/**
@@ -397,9 +451,13 @@ export class RepoManager extends Disposable {
 	 */
 	private updateReposWorkspaceFolderIndex(repo: string | null = null) {
 		const workspaceFolderInfo = getWorkspaceFolderInfoForRepoInclusionMapping();
-		const rootsExact = workspaceFolderInfo.rootsExact, rootsFolder = workspaceFolderInfo.rootsFolder, workspaceFolders = workspaceFolderInfo.workspaceFolders;
+		const rootsExact = workspaceFolderInfo.rootsExact,
+			rootsFolder = workspaceFolderInfo.rootsFolder,
+			workspaceFolders = workspaceFolderInfo.workspaceFolders;
 		const repoPaths = repo !== null && this.isKnownRepo(repo) ? [repo] : Object.keys(this.repos);
-		let changes = false, rootIndex: number, workspaceFolderIndex: number | null;
+		let changes = false,
+			rootIndex: number,
+			workspaceFolderIndex: number | null;
 		for (let i = 0; i < repoPaths.length; i++) {
 			rootIndex = rootsExact.indexOf(repoPaths[i]);
 			if (rootIndex === -1) {
@@ -445,7 +503,6 @@ export class RepoManager extends Disposable {
 		this.logger.log('Transferred repo state: ' + oldRepo + ' -> ' + newRepo);
 	}
 
-
 	/* Repo Searching */
 
 	/**
@@ -454,10 +511,17 @@ export class RepoManager extends Disposable {
 	 */
 	public async searchWorkspaceForRepos() {
 		this.logger.log('Searching workspace for new repos ...');
-		let rootFolders = vscode.workspace.workspaceFolders, changes = false;
+		let rootFolders = vscode.workspace.workspaceFolders,
+			changes = false;
 		if (typeof rootFolders !== 'undefined') {
 			for (let i = 0; i < rootFolders.length; i++) {
-				if (await this.searchDirectoryForRepos(getPathFromUri(rootFolders[i].uri), this.maxDepthOfRepoSearch)) changes = true;
+				if (
+					await this.searchDirectoryForRepos(
+						getPathFromUri(rootFolders[i].uri),
+						this.maxDepthOfRepoSearch,
+					)
+				)
+					changes = true;
 			}
 		}
 		this.logger.log('Completed searching workspace for new repos');
@@ -472,33 +536,45 @@ export class RepoManager extends Disposable {
 	 * @returns TRUE => At least one repository was added, FALSE => No repositories were added.
 	 */
 	private searchDirectoryForRepos(directory: string, maxDepth: number) {
-		return new Promise<boolean>(resolve => {
+		return new Promise<boolean>((resolve) => {
 			if (this.isDirectoryWithinRepos(directory)) {
 				resolve(false);
 				return;
 			}
 
-			this.dataSource.repoRoot(directory).then(async (root) => {
-				if (root !== null) {
-					resolve(await this.addRepo(root));
-				} else if (maxDepth > 0) {
-					fs.readdir(directory, async (err, dirContents) => {
-						if (err) {
-							resolve(false);
-						} else {
-							let dirs = [];
-							for (let i = 0; i < dirContents.length; i++) {
-								if (dirContents[i] !== '.git' && await isDirectory(directory + '/' + dirContents[i])) {
-									dirs.push(directory + '/' + dirContents[i]);
+			this.dataSource
+				.repoRoot(directory)
+				.then(async (root) => {
+					if (root !== null) {
+						resolve(await this.addRepo(root));
+					} else if (maxDepth > 0) {
+						fs.readdir(directory, async (err, dirContents) => {
+							if (err) {
+								resolve(false);
+							} else {
+								let dirs = [];
+								for (let i = 0; i < dirContents.length; i++) {
+									if (
+										dirContents[i] !== '.git' &&
+										(await isDirectory(directory + '/' + dirContents[i]))
+									) {
+										dirs.push(directory + '/' + dirContents[i]);
+									}
 								}
+								resolve(
+									(
+										await evalPromises(dirs, 2, (dir) =>
+											this.searchDirectoryForRepos(dir, maxDepth - 1),
+										)
+									).indexOf(true) > -1,
+								);
 							}
-							resolve((await evalPromises(dirs, 2, dir => this.searchDirectoryForRepos(dir, maxDepth - 1))).indexOf(true) > -1);
-						}
-					});
-				} else {
-					resolve(false);
-				}
-			}).catch(() => resolve(false));
+						});
+					} else {
+						resolve(false);
+					}
+				})
+				.catch(() => resolve(false));
 		});
 	}
 
@@ -506,7 +582,8 @@ export class RepoManager extends Disposable {
 	 * Check the know repositories for any new submodules (and add them).
 	 */
 	private async checkReposForNewSubmodules() {
-		let repoPaths = Object.keys(this.repos), changes = false;
+		let repoPaths = Object.keys(this.repos),
+			changes = false;
 		for (let i = 0; i < repoPaths.length; i++) {
 			if (await this.searchRepoForSubmodules(repoPaths[i])) changes = true;
 		}
@@ -519,7 +596,8 @@ export class RepoManager extends Disposable {
 	 * @returns TRUE => At least one submodule was added, FALSE => No submodules were added.
 	 */
 	private async searchRepoForSubmodules(repo: string) {
-		let submodules = await this.dataSource.getSubmodules(repo), changes = false;
+		let submodules = await this.dataSource.getSubmodules(repo),
+			changes = false;
 		for (let i = 0; i < submodules.length; i++) {
 			if (!this.isKnownRepo(submodules[i])) {
 				if (await this.addRepo(submodules[i])) changes = true;
@@ -527,7 +605,6 @@ export class RepoManager extends Disposable {
 		}
 		return changes;
 	}
-
 
 	/* Workspace Folder Watching */
 
@@ -617,14 +694,13 @@ export class RepoManager extends Disposable {
 	 * @returns TRUE => Change was made. FALSE => No change was made.
 	 */
 	private async processOnWatcherChangeEvent(path: string) {
-		if (!await doesPathExist(path)) {
+		if (!(await doesPathExist(path))) {
 			if (this.removeReposWithinFolder(path)) {
 				return true;
 			}
 		}
 		return false;
 	}
-
 
 	/* Repository Configuration Management */
 
@@ -644,10 +720,21 @@ export class RepoManager extends Disposable {
 		try {
 			const file = await readExternalConfigFile(repo);
 			const state = this.repos[repo];
-			if (state && file !== null && typeof file.exportedAt === 'number' && file.exportedAt > state.lastImportAt) {
+			if (
+				state &&
+				file !== null &&
+				typeof file.exportedAt === 'number' &&
+				file.exportedAt > state.lastImportAt
+			) {
 				const validationError = validateExternalConfigFile(file);
 				if (validationError === null) {
-					const action = isRepoNew ? vscode.l10n.t('ui.yes') : await vscode.window.showInformationMessage(vscode.l10n.t('ui.configFileUpdated', { repo: state.name || getRepoName(repo) }), vscode.l10n.t('ui.yes'), vscode.l10n.t('ui.no'));
+					const action = isRepoNew
+						? vscode.l10n.t('ui.yes')
+						: await vscode.window.showInformationMessage(
+								vscode.l10n.t('ui.configFileUpdated', { repo: state.name || getRepoName(repo) }),
+								vscode.l10n.t('ui.yes'),
+								vscode.l10n.t('ui.no'),
+							);
 					if (this.isKnownRepo(repo) && action) {
 						const state = this.repos[repo];
 						if (action === vscode.l10n.t('ui.yes')) {
@@ -656,15 +743,22 @@ export class RepoManager extends Disposable {
 						state.lastImportAt = file.exportedAt;
 						this.extensionState.saveRepos(this.repos);
 						if (!isRepoNew && action === vscode.l10n.t('ui.yes')) {
-							showInformationMessage(vscode.l10n.t('ui.configFileImported', { repo: state.name || getRepoName(repo) }));
+							showInformationMessage(
+								vscode.l10n.t('ui.configFileImported', { repo: state.name || getRepoName(repo) }),
+							);
 						}
 						return true;
 					}
 				} else {
-					showErrorMessage(vscode.l10n.t('ui.invalidConfigValue', { file: getPathFromStr(path.join(repo, '.vscode', 'vscode-git-graph.json')), value: validationError }));
+					showErrorMessage(
+						vscode.l10n.t('ui.invalidConfigValue', {
+							file: getPathFromStr(path.join(repo, '.vscode', 'vscode-git-graph.json')),
+							value: validationError,
+						}),
+					);
 				}
 			}
-		} catch (_) { }
+		} catch (_) {}
 		return false;
 	}
 
@@ -687,14 +781,17 @@ export class RepoManager extends Disposable {
 	 */
 	public exportRepoConfig(repo: string): Promise<ErrorInfo> {
 		const file = generateExternalConfigFile(this.repos[repo]);
-		return writeExternalConfigFile(repo, file).then((message) => {
-			showInformationMessage(message);
-			if (this.isKnownRepo(repo)) {
-				this.repos[repo].lastImportAt = file.exportedAt!;
-				this.extensionState.saveRepos(this.repos);
-			}
-			return null;
-		}, (error) => error);
+		return writeExternalConfigFile(repo, file).then(
+			(message) => {
+				showInformationMessage(message);
+				if (this.isKnownRepo(repo)) {
+					this.repos[repo].lastImportAt = file.exportedAt!;
+					this.extensionState.saveRepos(this.repos);
+				}
+				return null;
+			},
+			(error) => error,
+		);
 	}
 }
 
@@ -703,7 +800,10 @@ export class RepoManager extends Disposable {
  * @returns The Workspace Folder Information.
  */
 function getWorkspaceFolderInfoForRepoInclusionMapping() {
-	let rootsExact = [], rootsFolder = [], workspaceFolders = vscode.workspace.workspaceFolders || [], path;
+	let rootsExact = [],
+		rootsFolder = [],
+		workspaceFolders = vscode.workspace.workspaceFolders || [],
+		path;
 	for (let i = 0; i < workspaceFolders.length; i++) {
 		path = getPathFromUri(workspaceFolders[i].uri);
 		rootsExact.push(path);
@@ -712,7 +812,7 @@ function getWorkspaceFolderInfoForRepoInclusionMapping() {
 	return {
 		workspaceFolders: workspaceFolders,
 		rootsExact: rootsExact,
-		rootsFolder: rootsFolder
+		rootsFolder: rootsFolder,
 	};
 }
 
@@ -722,7 +822,7 @@ function getWorkspaceFolderInfoForRepoInclusionMapping() {
  * @returns TRUE => Directory, FALSE => Not a directory.
  */
 function isDirectory(path: string) {
-	return new Promise<boolean>(resolve => {
+	return new Promise<boolean>((resolve) => {
 		fs.stat(path, (err, stats) => {
 			resolve(err ? false : stats.isDirectory());
 		});
@@ -735,19 +835,17 @@ function isDirectory(path: string) {
  * @returns TRUE => Path exists, FALSE => Path doesn't exist.
  */
 function doesPathExist(path: string) {
-	return new Promise<boolean>(resolve => {
-		fs.stat(path, err => resolve(!err));
+	return new Promise<boolean>((resolve) => {
+		fs.stat(path, (err) => resolve(!err));
 	});
 }
-
 
 /** External Repo Config File */
 
 export namespace ExternalRepoConfig {
-
 	export const enum FileViewType {
 		Tree = 'tree',
-		List = 'list'
+		List = 'list',
 	}
 
 	export interface IssueLinkingConfig {
@@ -759,7 +857,7 @@ export namespace ExternalRepoConfig {
 		Bitbucket = 'bitbucket',
 		Custom = 'custom',
 		GitHub = 'github',
-		GitLab = 'gitlab'
+		GitLab = 'gitlab',
 	}
 
 	interface PullRequestConfigBuiltIn extends PullRequestConfigBase {
@@ -770,8 +868,8 @@ export namespace ExternalRepoConfig {
 	interface PullRequestConfigCustom extends PullRequestConfigBase {
 		readonly provider: PullRequestProvider.Custom;
 		readonly custom: {
-			readonly name: string,
-			readonly templateUrl: string
+			readonly name: string;
+			readonly templateUrl: string;
 		};
 	}
 
@@ -793,7 +891,6 @@ export namespace ExternalRepoConfig {
 		showTags?: boolean;
 		exportedAt?: number;
 	}
-
 }
 
 /**
@@ -869,7 +966,8 @@ function generateExternalConfigFile(state: GitRepoState): Readonly<ExternalRepoC
 		file.hideRemotes = state.hideRemotes;
 	}
 	if (state.includeCommitsMentionedByReflogs !== BooleanOverride.Default) {
-		file.includeCommitsMentionedByReflogs = state.includeCommitsMentionedByReflogs === BooleanOverride.Enabled;
+		file.includeCommitsMentionedByReflogs =
+			state.includeCommitsMentionedByReflogs === BooleanOverride.Enabled;
 	}
 	if (state.issueLinkingConfig !== null) {
 		file.issueLinkingConfig = state.issueLinkingConfig;
@@ -881,7 +979,8 @@ function generateExternalConfigFile(state: GitRepoState): Readonly<ExternalRepoC
 		file.onlyFollowFirstParent = state.onlyFollowFirstParent === BooleanOverride.Enabled;
 	}
 	if (state.onRepoLoadShowCheckedOutBranch !== BooleanOverride.Default) {
-		file.onRepoLoadShowCheckedOutBranch = state.onRepoLoadShowCheckedOutBranch === BooleanOverride.Enabled;
+		file.onRepoLoadShowCheckedOutBranch =
+			state.onRepoLoadShowCheckedOutBranch === BooleanOverride.Enabled;
 	}
 	if (state.onRepoLoadShowSpecificBranches !== null) {
 		file.onRepoLoadShowSpecificBranches = state.onRepoLoadShowSpecificBranches;
@@ -913,7 +1012,7 @@ function generateExternalConfigFile(state: GitRepoState): Readonly<ExternalRepoC
 	if (state.showTags !== BooleanOverride.Default) {
 		file.showTags = state.showTags === BooleanOverride.Enabled;
 	}
-	file.exportedAt = (new Date()).getTime();
+	file.exportedAt = new Date().getTime();
 	return file;
 }
 
@@ -923,55 +1022,94 @@ function generateExternalConfigFile(state: GitRepoState): Readonly<ExternalRepoC
  * @returns NULL => Value, String => The first field that is invalid.
  */
 function validateExternalConfigFile(file: Readonly<ExternalRepoConfig.File>) {
-	if (typeof file.commitOrdering !== 'undefined' && file.commitOrdering !== RepoCommitOrdering.Date && file.commitOrdering !== RepoCommitOrdering.AuthorDate && file.commitOrdering !== RepoCommitOrdering.Topological) {
+	if (
+		typeof file.commitOrdering !== 'undefined' &&
+		file.commitOrdering !== RepoCommitOrdering.Date &&
+		file.commitOrdering !== RepoCommitOrdering.AuthorDate &&
+		file.commitOrdering !== RepoCommitOrdering.Topological
+	) {
 		return 'commitOrdering';
 	}
-	if (typeof file.fileViewType !== 'undefined' && file.fileViewType !== ExternalRepoConfig.FileViewType.Tree && file.fileViewType !== ExternalRepoConfig.FileViewType.List) {
+	if (
+		typeof file.fileViewType !== 'undefined' &&
+		file.fileViewType !== ExternalRepoConfig.FileViewType.Tree &&
+		file.fileViewType !== ExternalRepoConfig.FileViewType.List
+	) {
 		return 'fileViewType';
 	}
-	if (typeof file.hideRemotes !== 'undefined' && (!Array.isArray(file.hideRemotes) || file.hideRemotes.some((remote) => typeof remote !== 'string'))) {
+	if (
+		typeof file.hideRemotes !== 'undefined' &&
+		(!Array.isArray(file.hideRemotes) ||
+			file.hideRemotes.some((remote) => typeof remote !== 'string'))
+	) {
 		return 'hideRemotes';
 	}
-	if (typeof file.includeCommitsMentionedByReflogs !== 'undefined' && typeof file.includeCommitsMentionedByReflogs !== 'boolean') {
+	if (
+		typeof file.includeCommitsMentionedByReflogs !== 'undefined' &&
+		typeof file.includeCommitsMentionedByReflogs !== 'boolean'
+	) {
 		return 'includeCommitsMentionedByReflogs';
 	}
-	if (typeof file.issueLinkingConfig !== 'undefined' && (typeof file.issueLinkingConfig !== 'object' || file.issueLinkingConfig === null || typeof file.issueLinkingConfig.issue !== 'string' || typeof file.issueLinkingConfig.url !== 'string')) {
+	if (
+		typeof file.issueLinkingConfig !== 'undefined' &&
+		(typeof file.issueLinkingConfig !== 'object' ||
+			file.issueLinkingConfig === null ||
+			typeof file.issueLinkingConfig.issue !== 'string' ||
+			typeof file.issueLinkingConfig.url !== 'string')
+	) {
 		return 'issueLinkingConfig';
 	}
 	if (typeof file.name !== 'undefined' && typeof file.name !== 'string') {
 		return 'name';
 	}
-	if (typeof file.onlyFollowFirstParent !== 'undefined' && typeof file.onlyFollowFirstParent !== 'boolean') {
+	if (
+		typeof file.onlyFollowFirstParent !== 'undefined' &&
+		typeof file.onlyFollowFirstParent !== 'boolean'
+	) {
 		return 'onlyFollowFirstParent';
 	}
-	if (typeof file.onRepoLoadShowCheckedOutBranch !== 'undefined' && typeof file.onRepoLoadShowCheckedOutBranch !== 'boolean') {
+	if (
+		typeof file.onRepoLoadShowCheckedOutBranch !== 'undefined' &&
+		typeof file.onRepoLoadShowCheckedOutBranch !== 'boolean'
+	) {
 		return 'onRepoLoadShowCheckedOutBranch';
 	}
-	if (typeof file.onRepoLoadShowSpecificBranches !== 'undefined' && (!Array.isArray(file.onRepoLoadShowSpecificBranches) || file.onRepoLoadShowSpecificBranches.some((branch) => typeof branch !== 'string'))) {
+	if (
+		typeof file.onRepoLoadShowSpecificBranches !== 'undefined' &&
+		(!Array.isArray(file.onRepoLoadShowSpecificBranches) ||
+			file.onRepoLoadShowSpecificBranches.some((branch) => typeof branch !== 'string'))
+	) {
 		return 'onRepoLoadShowSpecificBranches';
 	}
-	if (typeof file.pullRequestConfig !== 'undefined' && (
-		typeof file.pullRequestConfig !== 'object' ||
-		file.pullRequestConfig === null ||
-		(
-			file.pullRequestConfig.provider !== ExternalRepoConfig.PullRequestProvider.Bitbucket &&
-			(file.pullRequestConfig.provider !== ExternalRepoConfig.PullRequestProvider.Custom || typeof file.pullRequestConfig.custom !== 'object' || file.pullRequestConfig.custom === null || typeof file.pullRequestConfig.custom.name !== 'string' || typeof file.pullRequestConfig.custom.templateUrl !== 'string') &&
-			file.pullRequestConfig.provider !== ExternalRepoConfig.PullRequestProvider.GitHub &&
-			file.pullRequestConfig.provider !== ExternalRepoConfig.PullRequestProvider.GitLab
-		) ||
-		typeof file.pullRequestConfig.hostRootUrl !== 'string' ||
-		typeof file.pullRequestConfig.sourceRemote !== 'string' ||
-		typeof file.pullRequestConfig.sourceOwner !== 'string' ||
-		typeof file.pullRequestConfig.sourceRepo !== 'string' ||
-		(typeof file.pullRequestConfig.destRemote !== 'string' && file.pullRequestConfig.destRemote !== null) ||
-		typeof file.pullRequestConfig.destOwner !== 'string' ||
-		typeof file.pullRequestConfig.destRepo !== 'string' ||
-		typeof file.pullRequestConfig.destProjectId !== 'string' ||
-		typeof file.pullRequestConfig.destBranch !== 'string'
-	)) {
+	if (
+		typeof file.pullRequestConfig !== 'undefined' &&
+		(typeof file.pullRequestConfig !== 'object' ||
+			file.pullRequestConfig === null ||
+			(file.pullRequestConfig.provider !== ExternalRepoConfig.PullRequestProvider.Bitbucket &&
+				(file.pullRequestConfig.provider !== ExternalRepoConfig.PullRequestProvider.Custom ||
+					typeof file.pullRequestConfig.custom !== 'object' ||
+					file.pullRequestConfig.custom === null ||
+					typeof file.pullRequestConfig.custom.name !== 'string' ||
+					typeof file.pullRequestConfig.custom.templateUrl !== 'string') &&
+				file.pullRequestConfig.provider !== ExternalRepoConfig.PullRequestProvider.GitHub &&
+				file.pullRequestConfig.provider !== ExternalRepoConfig.PullRequestProvider.GitLab) ||
+			typeof file.pullRequestConfig.hostRootUrl !== 'string' ||
+			typeof file.pullRequestConfig.sourceRemote !== 'string' ||
+			typeof file.pullRequestConfig.sourceOwner !== 'string' ||
+			typeof file.pullRequestConfig.sourceRepo !== 'string' ||
+			(typeof file.pullRequestConfig.destRemote !== 'string' &&
+				file.pullRequestConfig.destRemote !== null) ||
+			typeof file.pullRequestConfig.destOwner !== 'string' ||
+			typeof file.pullRequestConfig.destRepo !== 'string' ||
+			typeof file.pullRequestConfig.destProjectId !== 'string' ||
+			typeof file.pullRequestConfig.destBranch !== 'string')
+	) {
 		return 'pullRequestConfig';
 	}
-	if (typeof file.showRemoteBranches !== 'undefined' && typeof file.showRemoteBranches !== 'boolean') {
+	if (
+		typeof file.showRemoteBranches !== 'undefined' &&
+		typeof file.showRemoteBranches !== 'boolean'
+	) {
 		return 'showRemoteBranches';
 	}
 	if (typeof file.showStashes !== 'undefined' && typeof file.showStashes !== 'boolean') {
@@ -1006,22 +1144,28 @@ function applyExternalConfigFile(file: Readonly<ExternalRepoConfig.File>, state:
 		state.hideRemotes = file.hideRemotes;
 	}
 	if (typeof file.includeCommitsMentionedByReflogs !== 'undefined') {
-		state.includeCommitsMentionedByReflogs = file.includeCommitsMentionedByReflogs ? BooleanOverride.Enabled : BooleanOverride.Disabled;
+		state.includeCommitsMentionedByReflogs = file.includeCommitsMentionedByReflogs
+			? BooleanOverride.Enabled
+			: BooleanOverride.Disabled;
 	}
 	if (typeof file.issueLinkingConfig !== 'undefined') {
 		state.issueLinkingConfig = {
 			issue: file.issueLinkingConfig.issue,
-			url: file.issueLinkingConfig.url
+			url: file.issueLinkingConfig.url,
 		};
 	}
 	if (typeof file.name !== 'undefined') {
 		state.name = file.name;
 	}
 	if (typeof file.onlyFollowFirstParent !== 'undefined') {
-		state.onlyFollowFirstParent = file.onlyFollowFirstParent ? BooleanOverride.Enabled : BooleanOverride.Disabled;
+		state.onlyFollowFirstParent = file.onlyFollowFirstParent
+			? BooleanOverride.Enabled
+			: BooleanOverride.Disabled;
 	}
 	if (typeof file.onRepoLoadShowCheckedOutBranch !== 'undefined') {
-		state.onRepoLoadShowCheckedOutBranch = file.onRepoLoadShowCheckedOutBranch ? BooleanOverride.Enabled : BooleanOverride.Disabled;
+		state.onRepoLoadShowCheckedOutBranch = file.onRepoLoadShowCheckedOutBranch
+			? BooleanOverride.Enabled
+			: BooleanOverride.Disabled;
 	}
 	if (typeof file.onRepoLoadShowSpecificBranches !== 'undefined') {
 		state.onRepoLoadShowSpecificBranches = file.onRepoLoadShowSpecificBranches;
@@ -1044,12 +1188,13 @@ function applyExternalConfigFile(file: Readonly<ExternalRepoConfig.File>, state:
 		}
 		state.pullRequestConfig = <PullRequestConfig>{
 			provider: provider,
-			custom: provider === PullRequestProvider.Custom
-				? {
-					name: file.pullRequestConfig.custom!.name,
-					templateUrl: file.pullRequestConfig.custom!.templateUrl
-				}
-				: null,
+			custom:
+				provider === PullRequestProvider.Custom
+					? {
+							name: file.pullRequestConfig.custom!.name,
+							templateUrl: file.pullRequestConfig.custom!.templateUrl,
+						}
+					: null,
 			hostRootUrl: file.pullRequestConfig.hostRootUrl,
 			sourceRemote: file.pullRequestConfig.sourceRemote,
 			sourceOwner: file.pullRequestConfig.sourceOwner,
@@ -1058,11 +1203,13 @@ function applyExternalConfigFile(file: Readonly<ExternalRepoConfig.File>, state:
 			destOwner: file.pullRequestConfig.destOwner,
 			destRepo: file.pullRequestConfig.destRepo,
 			destProjectId: file.pullRequestConfig.destProjectId,
-			destBranch: file.pullRequestConfig.destBranch
+			destBranch: file.pullRequestConfig.destBranch,
 		};
 	}
 	if (typeof file.showRemoteBranches !== 'undefined') {
-		state.showRemoteBranchesV2 = file.showRemoteBranches ? BooleanOverride.Enabled : BooleanOverride.Disabled;
+		state.showRemoteBranchesV2 = file.showRemoteBranches
+			? BooleanOverride.Enabled
+			: BooleanOverride.Disabled;
 	}
 	if (typeof file.showStashes !== 'undefined') {
 		state.showStashes = file.showStashes ? BooleanOverride.Enabled : BooleanOverride.Disabled;

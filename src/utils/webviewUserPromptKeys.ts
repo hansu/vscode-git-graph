@@ -219,5 +219,5 @@ export const WEBVIEW_USER_PROMPT_KEYS: readonly string[] = [
 	'ui.tagMostRecentVerbSingular',
 	'ui.tagTypeAnnotated',
 	'ui.tagTypeLightweight',
-	'ui.viewIssueDialogAction'
+	'ui.viewIssueDialogAction',
 ];

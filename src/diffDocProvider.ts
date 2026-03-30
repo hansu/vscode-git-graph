@@ -7,7 +7,7 @@ import { Disposable, toDisposable } from './utils/disposable';
 
 export const enum DiffSide {
 	Old,
-	New
+	New,
 }
 
 /**
@@ -30,7 +30,7 @@ export class DiffDocProvider extends Disposable implements vscode.TextDocumentCo
 		this.registerDisposables(
 			vscode.workspace.onDidCloseTextDocument((doc) => this.docs.delete(doc.uri.toString())),
 			this.onDidChangeEventEmitter,
-			toDisposable(() => this.docs.clear())
+			toDisposable(() => this.docs.clear()),
 		);
 	}
 
@@ -67,7 +67,7 @@ export class DiffDocProvider extends Disposable implements vscode.TextDocumentCo
 			(errorMessage) => {
 				showErrorMessage(vscode.l10n.t('ui.cannotRetrieveFile', { error: errorMessage }));
 				return '';
-			}
+			},
 		);
 	}
 }
@@ -94,7 +94,6 @@ class DiffDocument {
 	}
 }
 
-
 /* Encoding and decoding URI's */
 
 /**
@@ -116,17 +115,25 @@ type DiffDocUriData = {
  * @param diffSide The side of the Diff View that this URI will be displayed on.
  * @returns A URI of the form `git-graph://file.ext?encoded-data` or `file://path/file.ext`
  */
-export function encodeDiffDocUri(repo: string, filePath: string, commit: string, type: GitFileStatus, diffSide: DiffSide): vscode.Uri {
+export function encodeDiffDocUri(
+	repo: string,
+	filePath: string,
+	commit: string,
+	type: GitFileStatus,
+	diffSide: DiffSide,
+): vscode.Uri {
 	if (commit === UNCOMMITTED && type !== GitFileStatus.Deleted) {
 		return vscode.Uri.file(path.join(repo, filePath));
 	}
 
-	const fileDoesNotExist = (diffSide === DiffSide.Old && type === GitFileStatus.Added) || (diffSide === DiffSide.New && type === GitFileStatus.Deleted);
+	const fileDoesNotExist =
+		(diffSide === DiffSide.Old && type === GitFileStatus.Added) ||
+		(diffSide === DiffSide.New && type === GitFileStatus.Deleted);
 	const data: DiffDocUriData = {
 		filePath: getPathFromStr(filePath),
 		commit: commit,
 		repo: repo,
-		exists: !fileDoesNotExist
+		exists: !fileDoesNotExist,
 	};
 
 	let extension: string;
@@ -139,7 +146,7 @@ export function encodeDiffDocUri(repo: string, filePath: string, commit: string,
 
 	return vscode.Uri.file('file' + extension).with({
 		scheme: DiffDocProvider.scheme,
-		query: Buffer.from(JSON.stringify(data)).toString('base64')
+		query: Buffer.from(JSON.stringify(data)).toString('base64'),
 	});
 }
 

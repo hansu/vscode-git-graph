@@ -2,7 +2,20 @@ import * as vscode from './mocks/vscode';
 jest.mock('vscode', () => vscode, { virtual: true });
 
 import { getConfig } from '../src/config';
-import { CommitDetailsViewLocation, CommitOrdering, DateFormatType, DateType, FileViewType, GitResetMode, GraphStyle, GraphUncommittedChangesStyle, RepoDropdownOrder, SquashMessageFormat, TabIconColourTheme, TagType } from '../src/types';
+import {
+	CommitDetailsViewLocation,
+	CommitOrdering,
+	DateFormatType,
+	DateType,
+	FileViewType,
+	GitResetMode,
+	GraphStyle,
+	GraphUncommittedChangesStyle,
+	RepoDropdownOrder,
+	SquashMessageFormat,
+	TabIconColourTheme,
+	TagType,
+} from '../src/types';
 
 import { expectRenamedExtensionSettingToHaveBeenCalled } from './helpers/expectations';
 
@@ -34,7 +47,7 @@ describe('Config', () => {
 			authority: '',
 			path: '/path/to/repo',
 			query: '',
-			fragment: ''
+			fragment: '',
 		});
 	});
 
@@ -48,7 +61,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.autoCenter;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.autoCenter', 'autoCenterCommitDetailsView');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.autoCenter',
+					'autoCenterCommitDetailsView',
+				);
 				expect(value).toBe(true);
 			});
 
@@ -60,7 +76,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.autoCenter;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.autoCenter', 'autoCenterCommitDetailsView');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.autoCenter',
+					'autoCenterCommitDetailsView',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -72,7 +91,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.autoCenter;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.autoCenter', 'autoCenterCommitDetailsView');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.autoCenter',
+					'autoCenterCommitDetailsView',
+				);
 				expect(value).toBe(true);
 			});
 
@@ -84,7 +106,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.autoCenter;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.autoCenter', 'autoCenterCommitDetailsView');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.autoCenter',
+					'autoCenterCommitDetailsView',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -93,7 +118,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.autoCenter;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.autoCenter', 'autoCenterCommitDetailsView');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.autoCenter',
+					'autoCenterCommitDetailsView',
+				);
 				expect(value).toBe(true);
 			});
 		});
@@ -101,49 +129,73 @@ describe('Config', () => {
 		describe('fileTreeCompactFolders', () => {
 			it('Should return TRUE when the configuration value is TRUE', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('commitDetailsView.fileView.fileTree.compactFolders', true);
+				vscode.mockExtensionSettingReturnValue(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					true,
+				);
 
 				// Run
 				const value = config.commitDetailsView.fileTreeCompactFolders;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.fileTree.compactFolders', 'commitDetailsViewFileTreeCompactFolders');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					'commitDetailsViewFileTreeCompactFolders',
+				);
 				expect(value).toBe(true);
 			});
 
 			it('Should return FALSE when the configuration value is FALSE', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('commitDetailsView.fileView.fileTree.compactFolders', false);
+				vscode.mockExtensionSettingReturnValue(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					false,
+				);
 
 				// Run
 				const value = config.commitDetailsView.fileTreeCompactFolders;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.fileTree.compactFolders', 'commitDetailsViewFileTreeCompactFolders');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					'commitDetailsViewFileTreeCompactFolders',
+				);
 				expect(value).toBe(false);
 			});
 
 			it('Should return TRUE when the configuration value is truthy', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('commitDetailsView.fileView.fileTree.compactFolders', 5);
+				vscode.mockExtensionSettingReturnValue(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					5,
+				);
 
 				// Run
 				const value = config.commitDetailsView.fileTreeCompactFolders;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.fileTree.compactFolders', 'commitDetailsViewFileTreeCompactFolders');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					'commitDetailsViewFileTreeCompactFolders',
+				);
 				expect(value).toBe(true);
 			});
 
 			it('Should return FALSE when the configuration value is falsy', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('commitDetailsView.fileView.fileTree.compactFolders', 0);
+				vscode.mockExtensionSettingReturnValue(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					0,
+				);
 
 				// Run
 				const value = config.commitDetailsView.fileTreeCompactFolders;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.fileTree.compactFolders', 'commitDetailsViewFileTreeCompactFolders');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					'commitDetailsViewFileTreeCompactFolders',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -152,7 +204,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.fileTreeCompactFolders;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.fileTree.compactFolders', 'commitDetailsViewFileTreeCompactFolders');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.fileTree.compactFolders',
+					'commitDetailsViewFileTreeCompactFolders',
+				);
 				expect(value).toBe(true);
 			});
 		});
@@ -166,7 +221,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.fileViewType;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.type', 'defaultFileViewType');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.type',
+					'defaultFileViewType',
+				);
 				expect(value).toBe(FileViewType.Tree);
 			});
 
@@ -178,7 +236,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.fileViewType;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.type', 'defaultFileViewType');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.type',
+					'defaultFileViewType',
+				);
 				expect(value).toBe(FileViewType.List);
 			});
 
@@ -190,7 +251,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.fileViewType;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.type', 'defaultFileViewType');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.type',
+					'defaultFileViewType',
+				);
 				expect(value).toBe(FileViewType.Tree);
 			});
 
@@ -199,7 +263,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.fileViewType;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.fileView.type', 'defaultFileViewType');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.fileView.type',
+					'defaultFileViewType',
+				);
 				expect(value).toBe(FileViewType.Tree);
 			});
 		});
@@ -213,7 +280,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.location;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.location', 'commitDetailsViewLocation');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.location',
+					'commitDetailsViewLocation',
+				);
 				expect(value).toBe(CommitDetailsViewLocation.Inline);
 			});
 
@@ -225,7 +295,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.location;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.location', 'commitDetailsViewLocation');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.location',
+					'commitDetailsViewLocation',
+				);
 				expect(value).toBe(CommitDetailsViewLocation.DockedToBottom);
 			});
 
@@ -237,7 +310,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.location;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.location', 'commitDetailsViewLocation');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.location',
+					'commitDetailsViewLocation',
+				);
 				expect(value).toBe(CommitDetailsViewLocation.Inline);
 			});
 
@@ -246,7 +322,10 @@ describe('Config', () => {
 				const value = config.commitDetailsView.location;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('commitDetailsView.location', 'commitDetailsViewLocation');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'commitDetailsView.location',
+					'commitDetailsViewLocation',
+				);
 				expect(value).toBe(CommitDetailsViewLocation.Inline);
 			});
 		});
@@ -294,7 +373,7 @@ describe('Config', () => {
 					createArchive: true,
 					selectInBranchesDropdown: true,
 					unselectInBranchesDropdown: true,
-					copyName: true
+					copyName: true,
 				},
 				commit: {
 					addTag: true,
@@ -309,7 +388,7 @@ describe('Config', () => {
 					undo: true,
 					editMessage: true,
 					copyHash: true,
-					copySubject: true
+					copySubject: true,
 				},
 				commitDetailsViewFile: {
 					viewDiff: true,
@@ -320,7 +399,7 @@ describe('Config', () => {
 					markAsNotReviewed: true,
 					resetFileToThisRevision: true,
 					copyAbsoluteFilePath: true,
-					copyRelativeFilePath: true
+					copyRelativeFilePath: true,
 				},
 				remoteBranch: {
 					checkout: true,
@@ -333,7 +412,7 @@ describe('Config', () => {
 					createArchive: true,
 					selectInBranchesDropdown: true,
 					unselectInBranchesDropdown: true,
-					copyName: true
+					copyName: true,
 				},
 				stash: {
 					apply: true,
@@ -341,21 +420,21 @@ describe('Config', () => {
 					pop: true,
 					drop: true,
 					copyName: true,
-					copyHash: true
+					copyHash: true,
 				},
 				tag: {
 					viewDetails: true,
 					delete: true,
 					push: true,
 					createArchive: true,
-					copyName: true
+					copyName: true,
 				},
 				uncommittedChanges: {
 					stash: true,
 					reset: true,
 					clean: true,
-					openSourceControlView: true
-				}
+					openSourceControlView: true,
+				},
 			});
 		});
 
@@ -378,7 +457,7 @@ describe('Config', () => {
 					createArchive: true,
 					selectInBranchesDropdown: true,
 					unselectInBranchesDropdown: true,
-					copyName: true
+					copyName: true,
 				},
 				commit: {
 					addTag: true,
@@ -393,7 +472,7 @@ describe('Config', () => {
 					undo: true,
 					editMessage: true,
 					copyHash: true,
-					copySubject: true
+					copySubject: true,
 				},
 				commitDetailsViewFile: {
 					viewDiff: true,
@@ -404,7 +483,7 @@ describe('Config', () => {
 					markAsNotReviewed: true,
 					resetFileToThisRevision: true,
 					copyAbsoluteFilePath: true,
-					copyRelativeFilePath: true
+					copyRelativeFilePath: true,
 				},
 				remoteBranch: {
 					checkout: true,
@@ -417,7 +496,7 @@ describe('Config', () => {
 					createArchive: true,
 					selectInBranchesDropdown: true,
 					unselectInBranchesDropdown: true,
-					copyName: true
+					copyName: true,
 				},
 				stash: {
 					apply: true,
@@ -425,21 +504,21 @@ describe('Config', () => {
 					pop: true,
 					drop: true,
 					copyName: true,
-					copyHash: true
+					copyHash: true,
 				},
 				tag: {
 					viewDetails: true,
 					delete: true,
 					push: true,
 					createArchive: true,
-					copyName: true
+					copyName: true,
 				},
 				uncommittedChanges: {
 					stash: true,
 					reset: true,
 					clean: true,
-					openSourceControlView: true
-				}
+					openSourceControlView: true,
+				},
 			});
 		});
 
@@ -447,19 +526,19 @@ describe('Config', () => {
 			// Setup
 			vscode.mockExtensionSettingReturnValue('contextMenuActionsVisibility', {
 				branch: {
-					rename: false
+					rename: false,
 				},
 				commit: {
-					checkout: false
+					checkout: false,
 				},
 				commitDetailsViewFile: {
-					resetFileToThisRevision: false
+					resetFileToThisRevision: false,
 				},
 				remoteBranch: {
 					delete: true,
 					fetch: false,
-					pull: true
-				}
+					pull: true,
+				},
 			});
 
 			// Run
@@ -480,7 +559,7 @@ describe('Config', () => {
 					createArchive: true,
 					selectInBranchesDropdown: true,
 					unselectInBranchesDropdown: true,
-					copyName: true
+					copyName: true,
 				},
 				commit: {
 					addTag: true,
@@ -495,7 +574,7 @@ describe('Config', () => {
 					undo: true,
 					editMessage: true,
 					copyHash: true,
-					copySubject: true
+					copySubject: true,
 				},
 				commitDetailsViewFile: {
 					viewDiff: true,
@@ -506,7 +585,7 @@ describe('Config', () => {
 					markAsNotReviewed: true,
 					resetFileToThisRevision: false,
 					copyAbsoluteFilePath: true,
-					copyRelativeFilePath: true
+					copyRelativeFilePath: true,
 				},
 				remoteBranch: {
 					checkout: true,
@@ -519,7 +598,7 @@ describe('Config', () => {
 					createArchive: true,
 					selectInBranchesDropdown: true,
 					unselectInBranchesDropdown: true,
-					copyName: true
+					copyName: true,
 				},
 				stash: {
 					apply: true,
@@ -527,21 +606,21 @@ describe('Config', () => {
 					pop: true,
 					drop: true,
 					copyName: true,
-					copyHash: true
+					copyHash: true,
 				},
 				tag: {
 					viewDetails: true,
 					delete: true,
 					push: true,
 					createArchive: true,
-					copyName: true
+					copyName: true,
 				},
 				uncommittedChanges: {
 					stash: true,
 					reset: true,
 					clean: true,
-					openSourceControlView: true
-				}
+					openSourceControlView: true,
+				},
 			});
 		});
 	});
@@ -553,7 +632,7 @@ describe('Config', () => {
 				{ name: 'Name 1', glob: 'glob1' },
 				{ name: 'Name 2', glob: 'glob2' },
 				{ name: 'Name 3' },
-				{ name: 'Name 4', glob: 'glob4' }
+				{ name: 'Name 4', glob: 'glob4' },
 			]);
 
 			// Run
@@ -584,7 +663,7 @@ describe('Config', () => {
 				{ shortcode: 'dog', emoji: '🍎' },
 				{ shortcode: 'cat', emoji: '🎨' },
 				{ shortcode: 'bird' },
-				{ shortcode: 'fish', emoji: '🐛' }
+				{ shortcode: 'fish', emoji: '🐛' },
 			]);
 
 			// Run
@@ -595,7 +674,7 @@ describe('Config', () => {
 			expect(value).toStrictEqual([
 				{ shortcode: 'dog', emoji: '🍎' },
 				{ shortcode: 'cat', emoji: '🎨' },
-				{ shortcode: 'fish', emoji: '🐛' }
+				{ shortcode: 'fish', emoji: '🐛' },
 			]);
 		});
 
@@ -617,7 +696,7 @@ describe('Config', () => {
 				{ name: 'cat', templateUrl: '$1/$3' },
 				{ name: 'bird' },
 				{ name: 'fish', templateUrl: '$1/$4' },
-				{ templateUrl: '$1/$5' }
+				{ templateUrl: '$1/$5' },
 			]);
 
 			// Run
@@ -628,7 +707,7 @@ describe('Config', () => {
 			expect(value).toStrictEqual([
 				{ name: 'dog', templateUrl: '$1/$2' },
 				{ name: 'cat', templateUrl: '$1/$3' },
-				{ name: 'fish', templateUrl: '$1/$4' }
+				{ name: 'fish', templateUrl: '$1/$4' },
 			]);
 		});
 
@@ -787,7 +866,11 @@ describe('Config', () => {
 	describe('defaultColumnVisibility', () => {
 		it('Should successfully parse the configuration value (Date column disabled)', () => {
 			// Setup
-			vscode.mockExtensionSettingReturnValue('defaultColumnVisibility', { Date: false, Author: true, Commit: true });
+			vscode.mockExtensionSettingReturnValue('defaultColumnVisibility', {
+				Date: false,
+				Author: true,
+				Commit: true,
+			});
 
 			// Run
 			const value = config.defaultColumnVisibility;
@@ -799,7 +882,11 @@ describe('Config', () => {
 
 		it('Should successfully parse the configuration value (Author column disabled)', () => {
 			// Setup
-			vscode.mockExtensionSettingReturnValue('defaultColumnVisibility', { Date: true, Author: false, Commit: true });
+			vscode.mockExtensionSettingReturnValue('defaultColumnVisibility', {
+				Date: true,
+				Author: false,
+				Commit: true,
+			});
 
 			// Run
 			const value = config.defaultColumnVisibility;
@@ -811,7 +898,11 @@ describe('Config', () => {
 
 		it('Should successfully parse the configuration value (Commit  column disabled)', () => {
 			// Setup
-			vscode.mockExtensionSettingReturnValue('defaultColumnVisibility', { Date: true, Author: true, Commit: false });
+			vscode.mockExtensionSettingReturnValue('defaultColumnVisibility', {
+				Date: true,
+				Author: true,
+				Commit: false,
+			});
 
 			// Run
 			const value = config.defaultColumnVisibility;
@@ -847,7 +938,11 @@ describe('Config', () => {
 
 		it('Should return the default value when the configuration value is invalid (column value is not a boolean)', () => {
 			// Setup
-			vscode.mockExtensionSettingReturnValue('defaultColumnVisibility', { Date: true, Author: true, Commit: 5 });
+			vscode.mockExtensionSettingReturnValue('defaultColumnVisibility', {
+				Date: true,
+				Author: true,
+				Commit: 5,
+			});
 
 			// Run
 			const value = config.defaultColumnVisibility;
@@ -889,7 +984,7 @@ describe('Config', () => {
 				'dialog.pullBranch.squashCommits',
 				'dialog.rebase.ignoreDate',
 				'dialog.rebase.launchInteractiveRebase',
-				'dialog.stashUncommittedChanges.includeUntracked'
+				'dialog.stashUncommittedChanges.includeUntracked',
 			].forEach((section) => vscode.mockExtensionSettingReturnValue(section, true));
 
 			// Run
@@ -903,76 +998,97 @@ describe('Config', () => {
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.cherryPick.recordOrigin', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.createBranch.checkOut', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.deleteBranch.forceDelete', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchIntoLocalBranch.forceFetch', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.fetchIntoLocalBranch.forceFetch',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.prune', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.pruneTags', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.general.referenceInputSpaceSubstitution', 'None');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.general.referenceInputSpaceSubstitution',
+				'None',
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noCommit', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noFastForward', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.allowUnrelatedHistories', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.allowUnrelatedHistories',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.popStash.reinstateIndex', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.noFastForward', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.ignoreDate', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.launchInteractiveRebase', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetCurrentBranchToCommit.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetUncommittedChanges.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.stashUncommittedChanges.includeUntracked', true);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.rebase.launchInteractiveRebase',
+				false,
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetCurrentBranchToCommit.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetUncommittedChanges.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.stashUncommittedChanges.includeUntracked',
+				true,
+			);
 			expect(value).toStrictEqual({
 				addTag: {
 					pushToRemote: true,
-					type: TagType.Annotated
+					type: TagType.Annotated,
 				},
 				applyStash: {
-					reinstateIndex: true
+					reinstateIndex: true,
 				},
 				cherryPick: {
 					noCommit: true,
-					recordOrigin: true
+					recordOrigin: true,
 				},
 				createBranch: {
-					checkout: true
+					checkout: true,
 				},
 				deleteBranch: {
-					forceDelete: true
+					forceDelete: true,
 				},
 				fetchIntoLocalBranch: {
-					forceFetch: true
+					forceFetch: true,
 				},
 				fetchRemote: {
 					prune: true,
-					pruneTags: true
+					pruneTags: true,
 				},
 				general: {
-					referenceInputSpaceSubstitution: null
+					referenceInputSpaceSubstitution: null,
 				},
 				merge: {
 					noCommit: true,
 					noFastForward: true,
 					allowUnrelatedHistories: true,
-					squash: true
+					squash: true,
 				},
 				popStash: {
-					reinstateIndex: true
+					reinstateIndex: true,
 				},
 				pullBranch: {
 					noFastForward: true,
-					squash: true
+					squash: true,
 				},
 				rebase: {
 					ignoreDate: true,
-					interactive: true
+					interactive: true,
 				},
 				resetCommit: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				resetUncommitted: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				stashUncommittedChanges: {
-					includeUntracked: true
-				}
+					includeUntracked: true,
+				},
 			});
 		});
 
@@ -997,7 +1113,7 @@ describe('Config', () => {
 				'dialog.pullBranch.squashCommits',
 				'dialog.rebase.ignoreDate',
 				'dialog.rebase.launchInteractiveRebase',
-				'dialog.stashUncommittedChanges.includeUntracked'
+				'dialog.stashUncommittedChanges.includeUntracked',
 			].forEach((section) => vscode.mockExtensionSettingReturnValue(section, false));
 
 			// Run
@@ -1011,76 +1127,97 @@ describe('Config', () => {
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.cherryPick.recordOrigin', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.createBranch.checkOut', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.deleteBranch.forceDelete', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchIntoLocalBranch.forceFetch', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.fetchIntoLocalBranch.forceFetch',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.prune', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.pruneTags', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.general.referenceInputSpaceSubstitution', 'None');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.general.referenceInputSpaceSubstitution',
+				'None',
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noCommit', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noFastForward', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.allowUnrelatedHistories', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.allowUnrelatedHistories',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.popStash.reinstateIndex', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.noFastForward', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.ignoreDate', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.launchInteractiveRebase', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetCurrentBranchToCommit.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetUncommittedChanges.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.stashUncommittedChanges.includeUntracked', true);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.rebase.launchInteractiveRebase',
+				false,
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetCurrentBranchToCommit.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetUncommittedChanges.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.stashUncommittedChanges.includeUntracked',
+				true,
+			);
 			expect(value).toStrictEqual({
 				addTag: {
 					pushToRemote: false,
-					type: TagType.Annotated
+					type: TagType.Annotated,
 				},
 				applyStash: {
-					reinstateIndex: false
+					reinstateIndex: false,
 				},
 				cherryPick: {
 					noCommit: false,
-					recordOrigin: false
+					recordOrigin: false,
 				},
 				createBranch: {
-					checkout: false
+					checkout: false,
 				},
 				deleteBranch: {
-					forceDelete: false
+					forceDelete: false,
 				},
 				fetchIntoLocalBranch: {
-					forceFetch: false
+					forceFetch: false,
 				},
 				fetchRemote: {
 					prune: false,
-					pruneTags: false
+					pruneTags: false,
 				},
 				general: {
-					referenceInputSpaceSubstitution: null
+					referenceInputSpaceSubstitution: null,
 				},
 				merge: {
 					noCommit: false,
 					noFastForward: false,
 					allowUnrelatedHistories: false,
-					squash: false
+					squash: false,
 				},
 				popStash: {
-					reinstateIndex: false
+					reinstateIndex: false,
 				},
 				pullBranch: {
 					noFastForward: false,
-					squash: false
+					squash: false,
 				},
 				rebase: {
 					ignoreDate: false,
-					interactive: false
+					interactive: false,
 				},
 				resetCommit: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				resetUncommitted: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				stashUncommittedChanges: {
-					includeUntracked: false
-				}
+					includeUntracked: false,
+				},
 			});
 		});
 
@@ -1105,7 +1242,7 @@ describe('Config', () => {
 				'dialog.pullBranch.squashCommits',
 				'dialog.rebase.ignoreDate',
 				'dialog.rebase.launchInteractiveRebase',
-				'dialog.stashUncommittedChanges.includeUntracked'
+				'dialog.stashUncommittedChanges.includeUntracked',
 			].forEach((section) => vscode.mockExtensionSettingReturnValue(section, 1));
 
 			// Run
@@ -1119,76 +1256,97 @@ describe('Config', () => {
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.cherryPick.recordOrigin', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.createBranch.checkOut', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.deleteBranch.forceDelete', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchIntoLocalBranch.forceFetch', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.fetchIntoLocalBranch.forceFetch',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.prune', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.pruneTags', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.general.referenceInputSpaceSubstitution', 'None');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.general.referenceInputSpaceSubstitution',
+				'None',
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noCommit', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noFastForward', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.allowUnrelatedHistories', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.allowUnrelatedHistories',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.popStash.reinstateIndex', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.noFastForward', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.ignoreDate', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.launchInteractiveRebase', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetCurrentBranchToCommit.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetUncommittedChanges.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.stashUncommittedChanges.includeUntracked', true);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.rebase.launchInteractiveRebase',
+				false,
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetCurrentBranchToCommit.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetUncommittedChanges.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.stashUncommittedChanges.includeUntracked',
+				true,
+			);
 			expect(value).toStrictEqual({
 				addTag: {
 					pushToRemote: true,
-					type: TagType.Annotated
+					type: TagType.Annotated,
 				},
 				applyStash: {
-					reinstateIndex: true
+					reinstateIndex: true,
 				},
 				cherryPick: {
 					noCommit: true,
-					recordOrigin: true
+					recordOrigin: true,
 				},
 				createBranch: {
-					checkout: true
+					checkout: true,
 				},
 				deleteBranch: {
-					forceDelete: true
+					forceDelete: true,
 				},
 				fetchIntoLocalBranch: {
-					forceFetch: true
+					forceFetch: true,
 				},
 				fetchRemote: {
 					prune: true,
-					pruneTags: true
+					pruneTags: true,
 				},
 				general: {
-					referenceInputSpaceSubstitution: null
+					referenceInputSpaceSubstitution: null,
 				},
 				merge: {
 					noCommit: true,
 					noFastForward: true,
 					allowUnrelatedHistories: true,
-					squash: true
+					squash: true,
 				},
 				popStash: {
-					reinstateIndex: true
+					reinstateIndex: true,
 				},
 				pullBranch: {
 					noFastForward: true,
-					squash: true
+					squash: true,
 				},
 				rebase: {
 					ignoreDate: true,
-					interactive: true
+					interactive: true,
 				},
 				resetCommit: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				resetUncommitted: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				stashUncommittedChanges: {
-					includeUntracked: true
-				}
+					includeUntracked: true,
+				},
 			});
 		});
 
@@ -1213,7 +1371,7 @@ describe('Config', () => {
 				'dialog.pullBranch.squashCommits',
 				'dialog.rebase.ignoreDate',
 				'dialog.rebase.launchInteractiveRebase',
-				'dialog.stashUncommittedChanges.includeUntracked'
+				'dialog.stashUncommittedChanges.includeUntracked',
 			].forEach((section) => vscode.mockExtensionSettingReturnValue(section, 0));
 
 			// Run
@@ -1227,76 +1385,97 @@ describe('Config', () => {
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.cherryPick.recordOrigin', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.createBranch.checkOut', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.deleteBranch.forceDelete', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchIntoLocalBranch.forceFetch', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.fetchIntoLocalBranch.forceFetch',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.prune', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.pruneTags', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.general.referenceInputSpaceSubstitution', 'None');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.general.referenceInputSpaceSubstitution',
+				'None',
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noCommit', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noFastForward', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.allowUnrelatedHistories', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.allowUnrelatedHistories',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.popStash.reinstateIndex', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.noFastForward', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.ignoreDate', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.launchInteractiveRebase', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetCurrentBranchToCommit.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetUncommittedChanges.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.stashUncommittedChanges.includeUntracked', true);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.rebase.launchInteractiveRebase',
+				false,
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetCurrentBranchToCommit.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetUncommittedChanges.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.stashUncommittedChanges.includeUntracked',
+				true,
+			);
 			expect(value).toStrictEqual({
 				addTag: {
 					pushToRemote: false,
-					type: TagType.Annotated
+					type: TagType.Annotated,
 				},
 				applyStash: {
-					reinstateIndex: false
+					reinstateIndex: false,
 				},
 				cherryPick: {
 					noCommit: false,
-					recordOrigin: false
+					recordOrigin: false,
 				},
 				createBranch: {
-					checkout: false
+					checkout: false,
 				},
 				deleteBranch: {
-					forceDelete: false
+					forceDelete: false,
 				},
 				fetchIntoLocalBranch: {
-					forceFetch: false
+					forceFetch: false,
 				},
 				fetchRemote: {
 					prune: false,
-					pruneTags: false
+					pruneTags: false,
 				},
 				general: {
-					referenceInputSpaceSubstitution: null
+					referenceInputSpaceSubstitution: null,
 				},
 				merge: {
 					noCommit: false,
 					noFastForward: false,
 					allowUnrelatedHistories: false,
-					squash: false
+					squash: false,
 				},
 				popStash: {
-					reinstateIndex: false
+					reinstateIndex: false,
 				},
 				pullBranch: {
 					noFastForward: false,
-					squash: false
+					squash: false,
 				},
 				rebase: {
 					ignoreDate: false,
-					interactive: false
+					interactive: false,
 				},
 				resetCommit: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				resetUncommitted: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				stashUncommittedChanges: {
-					includeUntracked: false
-				}
+					includeUntracked: false,
+				},
 			});
 		});
 
@@ -1305,7 +1484,7 @@ describe('Config', () => {
 			[
 				'dialog.addTag.type',
 				'dialog.resetCurrentBranchToCommit.mode',
-				'dialog.resetUncommittedChanges.mode'
+				'dialog.resetUncommittedChanges.mode',
 			].forEach((section) => vscode.mockExtensionSettingReturnValue(section, 'invalid'));
 
 			// Run
@@ -1319,76 +1498,97 @@ describe('Config', () => {
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.cherryPick.recordOrigin', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.createBranch.checkOut', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.deleteBranch.forceDelete', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchIntoLocalBranch.forceFetch', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.fetchIntoLocalBranch.forceFetch',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.prune', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.pruneTags', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.general.referenceInputSpaceSubstitution', 'None');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.general.referenceInputSpaceSubstitution',
+				'None',
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noCommit', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noFastForward', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.allowUnrelatedHistories', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.allowUnrelatedHistories',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.popStash.reinstateIndex', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.noFastForward', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.ignoreDate', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.launchInteractiveRebase', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetCurrentBranchToCommit.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetUncommittedChanges.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.stashUncommittedChanges.includeUntracked', true);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.rebase.launchInteractiveRebase',
+				false,
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetCurrentBranchToCommit.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetUncommittedChanges.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.stashUncommittedChanges.includeUntracked',
+				true,
+			);
 			expect(value).toStrictEqual({
 				addTag: {
 					pushToRemote: false,
-					type: TagType.Annotated
+					type: TagType.Annotated,
 				},
 				applyStash: {
-					reinstateIndex: false
+					reinstateIndex: false,
 				},
 				cherryPick: {
 					noCommit: false,
-					recordOrigin: false
+					recordOrigin: false,
 				},
 				createBranch: {
-					checkout: false
+					checkout: false,
 				},
 				deleteBranch: {
-					forceDelete: false
+					forceDelete: false,
 				},
 				fetchIntoLocalBranch: {
-					forceFetch: false
+					forceFetch: false,
 				},
 				fetchRemote: {
 					prune: false,
-					pruneTags: false
+					pruneTags: false,
 				},
 				general: {
-					referenceInputSpaceSubstitution: null
+					referenceInputSpaceSubstitution: null,
 				},
 				merge: {
 					noCommit: false,
 					noFastForward: true,
 					allowUnrelatedHistories: false,
-					squash: false
+					squash: false,
 				},
 				popStash: {
-					reinstateIndex: false
+					reinstateIndex: false,
 				},
 				pullBranch: {
 					noFastForward: false,
-					squash: false
+					squash: false,
 				},
 				rebase: {
 					ignoreDate: true,
-					interactive: false
+					interactive: false,
 				},
 				resetCommit: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				resetUncommitted: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				stashUncommittedChanges: {
-					includeUntracked: true
-				}
+					includeUntracked: true,
+				},
 			});
 		});
 
@@ -1404,76 +1604,97 @@ describe('Config', () => {
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.cherryPick.recordOrigin', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.createBranch.checkOut', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.deleteBranch.forceDelete', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchIntoLocalBranch.forceFetch', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.fetchIntoLocalBranch.forceFetch',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.prune', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.fetchRemote.pruneTags', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.general.referenceInputSpaceSubstitution', 'None');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.general.referenceInputSpaceSubstitution',
+				'None',
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noCommit', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.noFastForward', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.allowUnrelatedHistories', false);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.allowUnrelatedHistories',
+				false,
+			);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.popStash.reinstateIndex', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.noFastForward', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashCommits', false);
 			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.ignoreDate', true);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.rebase.launchInteractiveRebase', false);
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetCurrentBranchToCommit.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.resetUncommittedChanges.mode', 'Mixed');
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.stashUncommittedChanges.includeUntracked', true);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.rebase.launchInteractiveRebase',
+				false,
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetCurrentBranchToCommit.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.resetUncommittedChanges.mode',
+				'Mixed',
+			);
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.stashUncommittedChanges.includeUntracked',
+				true,
+			);
 			expect(value).toStrictEqual({
 				addTag: {
 					pushToRemote: false,
-					type: TagType.Annotated
+					type: TagType.Annotated,
 				},
 				applyStash: {
-					reinstateIndex: false
+					reinstateIndex: false,
 				},
 				cherryPick: {
 					noCommit: false,
-					recordOrigin: false
+					recordOrigin: false,
 				},
 				createBranch: {
-					checkout: false
+					checkout: false,
 				},
 				deleteBranch: {
-					forceDelete: false
+					forceDelete: false,
 				},
 				fetchIntoLocalBranch: {
-					forceFetch: false
+					forceFetch: false,
 				},
 				fetchRemote: {
 					prune: false,
-					pruneTags: false
+					pruneTags: false,
 				},
 				general: {
-					referenceInputSpaceSubstitution: null
+					referenceInputSpaceSubstitution: null,
 				},
 				merge: {
 					noCommit: false,
 					noFastForward: true,
 					allowUnrelatedHistories: false,
-					squash: false
+					squash: false,
 				},
 				popStash: {
-					reinstateIndex: false
+					reinstateIndex: false,
 				},
 				pullBranch: {
 					noFastForward: false,
-					squash: false
+					squash: false,
 				},
 				rebase: {
 					ignoreDate: true,
-					interactive: false
+					interactive: false,
 				},
 				resetCommit: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				resetUncommitted: {
-					mode: GitResetMode.Mixed
+					mode: GitResetMode.Mixed,
 				},
 				stashUncommittedChanges: {
-					includeUntracked: true
-				}
+					includeUntracked: true,
+				},
 			});
 		});
 
@@ -1504,7 +1725,10 @@ describe('Config', () => {
 		describe('dialogDefaults.general.referenceInputSpaceSubstitution', () => {
 			it('Should return NULL when the configuration value is "None"', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('dialog.general.referenceInputSpaceSubstitution', 'None');
+				vscode.mockExtensionSettingReturnValue(
+					'dialog.general.referenceInputSpaceSubstitution',
+					'None',
+				);
 
 				// Run
 				const value = config.dialogDefaults;
@@ -1515,7 +1739,10 @@ describe('Config', () => {
 
 			it('Should return "-" when the configuration value is "Hyphen"', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('dialog.general.referenceInputSpaceSubstitution', 'Hyphen');
+				vscode.mockExtensionSettingReturnValue(
+					'dialog.general.referenceInputSpaceSubstitution',
+					'Hyphen',
+				);
 
 				// Run
 				const value = config.dialogDefaults;
@@ -1526,7 +1753,10 @@ describe('Config', () => {
 
 			it('Should return "_" when the configuration value is "Underscore"', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('dialog.general.referenceInputSpaceSubstitution', 'Underscore');
+				vscode.mockExtensionSettingReturnValue(
+					'dialog.general.referenceInputSpaceSubstitution',
+					'Underscore',
+				);
 
 				// Run
 				const value = config.dialogDefaults;
@@ -1537,7 +1767,10 @@ describe('Config', () => {
 
 			it('Should return the default value (NULL) when the configuration value is invalid', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('dialog.general.referenceInputSpaceSubstitution', 'invalid');
+				vscode.mockExtensionSettingReturnValue(
+					'dialog.general.referenceInputSpaceSubstitution',
+					'invalid',
+				);
 
 				// Run
 				const value = config.dialogDefaults;
@@ -1616,7 +1849,10 @@ describe('Config', () => {
 			const value = config.squashMergeMessageFormat;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashMessageFormat', 'Default');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.squashMessageFormat',
+				'Default',
+			);
 			expect(value).toBe(SquashMessageFormat.Default);
 		});
 
@@ -1628,7 +1864,10 @@ describe('Config', () => {
 			const value = config.squashMergeMessageFormat;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashMessageFormat', 'Default');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.squashMessageFormat',
+				'Default',
+			);
 			expect(value).toBe(SquashMessageFormat.GitSquashMsg);
 		});
 
@@ -1640,7 +1879,10 @@ describe('Config', () => {
 			const value = config.squashMergeMessageFormat;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashMessageFormat', 'Default');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.squashMessageFormat',
+				'Default',
+			);
 			expect(value).toBe(SquashMessageFormat.Default);
 		});
 
@@ -1649,7 +1891,10 @@ describe('Config', () => {
 			const value = config.squashMergeMessageFormat;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.merge.squashMessageFormat', 'Default');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.merge.squashMessageFormat',
+				'Default',
+			);
 			expect(value).toBe(SquashMessageFormat.Default);
 		});
 	});
@@ -1663,19 +1908,28 @@ describe('Config', () => {
 			const value = config.squashPullMessageFormat;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashMessageFormat', 'Default');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.pullBranch.squashMessageFormat',
+				'Default',
+			);
 			expect(value).toBe(SquashMessageFormat.Default);
 		});
 
 		it('Should return SquashMessageFormat.GitSquashMsg when the configuration value is "Git SQUASH_MSG"', () => {
 			// Setup
-			vscode.mockExtensionSettingReturnValue('dialog.pullBranch.squashMessageFormat', 'Git SQUASH_MSG');
+			vscode.mockExtensionSettingReturnValue(
+				'dialog.pullBranch.squashMessageFormat',
+				'Git SQUASH_MSG',
+			);
 
 			// Run
 			const value = config.squashPullMessageFormat;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashMessageFormat', 'Default');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.pullBranch.squashMessageFormat',
+				'Default',
+			);
 			expect(value).toBe(SquashMessageFormat.GitSquashMsg);
 		});
 
@@ -1687,7 +1941,10 @@ describe('Config', () => {
 			const value = config.squashPullMessageFormat;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashMessageFormat', 'Default');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.pullBranch.squashMessageFormat',
+				'Default',
+			);
 			expect(value).toBe(SquashMessageFormat.Default);
 		});
 
@@ -1696,12 +1953,18 @@ describe('Config', () => {
 			const value = config.squashPullMessageFormat;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('dialog.pullBranch.squashMessageFormat', 'Default');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'dialog.pullBranch.squashMessageFormat',
+				'Default',
+			);
 			expect(value).toBe(SquashMessageFormat.Default);
 		});
 	});
 
-	describe('enhancedAccessibility', testBooleanExtensionSetting('enhancedAccessibility', 'enhancedAccessibility', false));
+	describe(
+		'enhancedAccessibility',
+		testBooleanExtensionSetting('enhancedAccessibility', 'enhancedAccessibility', false),
+	);
 
 	describe('fileEncoding', () => {
 		it('Should return the configured value', () => {
@@ -1729,7 +1992,13 @@ describe('Config', () => {
 		describe('colours', () => {
 			it('Should return a filtered array of colours based on the configuration value', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('graph.colours', ['#ff0000', '#0000000', '#00ff0088', 'rgb(1,2,3)', 'rgb(1,2,x)']);
+				vscode.mockExtensionSettingReturnValue('graph.colours', [
+					'#ff0000',
+					'#0000000',
+					'#00ff0088',
+					'rgb(1,2,3)',
+					'rgb(1,2,x)',
+				]);
 
 				// Run
 				const value = config.graph.colours;
@@ -1751,7 +2020,20 @@ describe('Config', () => {
 
 				// Assert
 				expectRenamedExtensionSettingToHaveBeenCalled('graph.colours', 'graphColours');
-				expect(value).toStrictEqual(['#0085d9', '#d9008f', '#00d90a', '#d98500', '#a300d9', '#ff0000', '#00d9cc', '#e138e8', '#85d900', '#dc5b23', '#6f24d6', '#ffcc00']);
+				expect(value).toStrictEqual([
+					'#0085d9',
+					'#d9008f',
+					'#00d90a',
+					'#d98500',
+					'#a300d9',
+					'#ff0000',
+					'#00d9cc',
+					'#e138e8',
+					'#85d900',
+					'#dc5b23',
+					'#6f24d6',
+					'#ffcc00',
+				]);
 			});
 
 			it('Should return the default value when the configuration value is invalid (an empty array)', () => {
@@ -1763,7 +2045,20 @@ describe('Config', () => {
 
 				// Assert
 				expectRenamedExtensionSettingToHaveBeenCalled('graph.colours', 'graphColours');
-				expect(value).toStrictEqual(['#0085d9', '#d9008f', '#00d90a', '#d98500', '#a300d9', '#ff0000', '#00d9cc', '#e138e8', '#85d900', '#dc5b23', '#6f24d6', '#ffcc00']);
+				expect(value).toStrictEqual([
+					'#0085d9',
+					'#d9008f',
+					'#00d90a',
+					'#d98500',
+					'#a300d9',
+					'#ff0000',
+					'#00d9cc',
+					'#e138e8',
+					'#85d900',
+					'#dc5b23',
+					'#6f24d6',
+					'#ffcc00',
+				]);
 			});
 
 			it('Should return the default value when the configuration value is unknown', () => {
@@ -1772,7 +2067,20 @@ describe('Config', () => {
 
 				// Assert
 				expectRenamedExtensionSettingToHaveBeenCalled('graph.colours', 'graphColours');
-				expect(value).toStrictEqual(['#0085d9', '#d9008f', '#00d90a', '#d98500', '#a300d9', '#ff0000', '#00d9cc', '#e138e8', '#85d900', '#dc5b23', '#6f24d6', '#ffcc00']);
+				expect(value).toStrictEqual([
+					'#0085d9',
+					'#d9008f',
+					'#00d90a',
+					'#d98500',
+					'#a300d9',
+					'#ff0000',
+					'#00d9cc',
+					'#e138e8',
+					'#85d900',
+					'#dc5b23',
+					'#6f24d6',
+					'#ffcc00',
+				]);
 			});
 		});
 
@@ -1826,25 +2134,37 @@ describe('Config', () => {
 		describe('uncommittedChanges', () => {
 			it('Should return GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges when the configuration value is "Open Circle at the Uncommitted Changes"', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes');
+				vscode.mockExtensionSettingReturnValue(
+					'graph.uncommittedChanges',
+					'Open Circle at the Uncommitted Changes',
+				);
 
 				// Run
 				const value = config.graph.uncommittedChanges;
 
 				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes');
+				expect(workspaceConfiguration.get).toBeCalledWith(
+					'graph.uncommittedChanges',
+					'Open Circle at the Uncommitted Changes',
+				);
 				expect(value).toBe(GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges);
 			});
 
 			it('Should return GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit when the configuration value is "Open Circle at the Checked Out Commit"', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('graph.uncommittedChanges', 'Open Circle at the Checked Out Commit');
+				vscode.mockExtensionSettingReturnValue(
+					'graph.uncommittedChanges',
+					'Open Circle at the Checked Out Commit',
+				);
 
 				// Run
 				const value = config.graph.uncommittedChanges;
 
 				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes');
+				expect(workspaceConfiguration.get).toBeCalledWith(
+					'graph.uncommittedChanges',
+					'Open Circle at the Uncommitted Changes',
+				);
 				expect(value).toBe(GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit);
 			});
 
@@ -1856,7 +2176,10 @@ describe('Config', () => {
 				const value = config.graph.uncommittedChanges;
 
 				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes');
+				expect(workspaceConfiguration.get).toBeCalledWith(
+					'graph.uncommittedChanges',
+					'Open Circle at the Uncommitted Changes',
+				);
 				expect(value).toBe(GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges);
 			});
 
@@ -1865,7 +2188,10 @@ describe('Config', () => {
 				const value = config.graph.uncommittedChanges;
 
 				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes');
+				expect(workspaceConfiguration.get).toBeCalledWith(
+					'graph.uncommittedChanges',
+					'Open Circle at the Uncommitted Changes',
+				);
 				expect(value).toBe(GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges);
 			});
 		});
@@ -2040,7 +2366,10 @@ describe('Config', () => {
 
 			it('Should return the default keybinding when the value is not one of the available keybindings', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('keyboardShortcut.scrollToHead', 'CTRL/CMD + Shift + A');
+				vscode.mockExtensionSettingReturnValue(
+					'keyboardShortcut.scrollToHead',
+					'CTRL/CMD + Shift + A',
+				);
 
 				// Run
 				const value = config.keybindings.scrollToHead;
@@ -2099,7 +2428,10 @@ describe('Config', () => {
 
 			it('Should return the default keybinding when the value is not one of the available keybindings', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('keyboardShortcut.scrollToStash', 'CTRL/CMD + Shift + A');
+				vscode.mockExtensionSettingReturnValue(
+					'keyboardShortcut.scrollToStash',
+					'CTRL/CMD + Shift + A',
+				);
 
 				// Run
 				const value = config.keybindings.scrollToStash;
@@ -2312,55 +2644,86 @@ describe('Config', () => {
 		});
 	});
 
-	describe('openToTheRepoOfTheActiveTextEditorDocument', testBooleanExtensionSetting('openToTheRepoOfTheActiveTextEditorDocument', 'openToTheRepoOfTheActiveTextEditorDocument', false));
+	describe(
+		'openToTheRepoOfTheActiveTextEditorDocument',
+		testBooleanExtensionSetting(
+			'openToTheRepoOfTheActiveTextEditorDocument',
+			'openToTheRepoOfTheActiveTextEditorDocument',
+			false,
+		),
+	);
 
 	describe('referenceLabels', () => {
 		describe('combineLocalAndRemoteBranchLabels', () => {
 			it('Should return TRUE when the configuration value is TRUE', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('referenceLabels.combineLocalAndRemoteBranchLabels', true);
+				vscode.mockExtensionSettingReturnValue(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					true,
+				);
 
 				// Run
 				const value = config.referenceLabels.combineLocalAndRemoteBranchLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.combineLocalAndRemoteBranchLabels', 'combineLocalAndRemoteBranchLabels');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					'combineLocalAndRemoteBranchLabels',
+				);
 				expect(value).toBe(true);
 			});
 
 			it('Should return FALSE when the configuration value is FALSE', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('referenceLabels.combineLocalAndRemoteBranchLabels', false);
+				vscode.mockExtensionSettingReturnValue(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					false,
+				);
 
 				// Run
 				const value = config.referenceLabels.combineLocalAndRemoteBranchLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.combineLocalAndRemoteBranchLabels', 'combineLocalAndRemoteBranchLabels');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					'combineLocalAndRemoteBranchLabels',
+				);
 				expect(value).toBe(false);
 			});
 
 			it('Should return TRUE when the configuration value is truthy', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('referenceLabels.combineLocalAndRemoteBranchLabels', 5);
+				vscode.mockExtensionSettingReturnValue(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					5,
+				);
 
 				// Run
 				const value = config.referenceLabels.combineLocalAndRemoteBranchLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.combineLocalAndRemoteBranchLabels', 'combineLocalAndRemoteBranchLabels');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					'combineLocalAndRemoteBranchLabels',
+				);
 				expect(value).toBe(true);
 			});
 
 			it('Should return FALSE when the configuration value is falsy', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('referenceLabels.combineLocalAndRemoteBranchLabels', 0);
+				vscode.mockExtensionSettingReturnValue(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					0,
+				);
 
 				// Run
 				const value = config.referenceLabels.combineLocalAndRemoteBranchLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.combineLocalAndRemoteBranchLabels', 'combineLocalAndRemoteBranchLabels');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					'combineLocalAndRemoteBranchLabels',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -2369,7 +2732,10 @@ describe('Config', () => {
 				const value = config.referenceLabels.combineLocalAndRemoteBranchLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.combineLocalAndRemoteBranchLabels', 'combineLocalAndRemoteBranchLabels');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.combineLocalAndRemoteBranchLabels',
+					'combineLocalAndRemoteBranchLabels',
+				);
 				expect(value).toBe(true);
 			});
 		});
@@ -2383,33 +2749,48 @@ describe('Config', () => {
 				const value = config.referenceLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.alignment', 'referenceLabelAlignment');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.alignment',
+					'referenceLabelAlignment',
+				);
 				expect(value.branchLabelsAlignedToGraph).toBe(false);
 				expect(value.tagLabelsOnRight).toBe(false);
 			});
 
 			it('Should return correct alignment values when the configuration value is "Branches (on the left) & Tags (on the right)"', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('referenceLabels.alignment', 'Branches (on the left) & Tags (on the right)');
+				vscode.mockExtensionSettingReturnValue(
+					'referenceLabels.alignment',
+					'Branches (on the left) & Tags (on the right)',
+				);
 
 				// Run
 				const value = config.referenceLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.alignment', 'referenceLabelAlignment');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.alignment',
+					'referenceLabelAlignment',
+				);
 				expect(value.branchLabelsAlignedToGraph).toBe(false);
 				expect(value.tagLabelsOnRight).toBe(true);
 			});
 
 			it('Should return correct alignment values when the configuration value is "Branches (aligned to the graph) & Tags (on the right)"', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('referenceLabels.alignment', 'Branches (aligned to the graph) & Tags (on the right)');
+				vscode.mockExtensionSettingReturnValue(
+					'referenceLabels.alignment',
+					'Branches (aligned to the graph) & Tags (on the right)',
+				);
 
 				// Run
 				const value = config.referenceLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.alignment', 'referenceLabelAlignment');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.alignment',
+					'referenceLabelAlignment',
+				);
 				expect(value.branchLabelsAlignedToGraph).toBe(true);
 				expect(value.tagLabelsOnRight).toBe(true);
 			});
@@ -2422,7 +2803,10 @@ describe('Config', () => {
 				const value = config.referenceLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.alignment', 'referenceLabelAlignment');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.alignment',
+					'referenceLabelAlignment',
+				);
 				expect(value.branchLabelsAlignedToGraph).toBe(false);
 				expect(value.tagLabelsOnRight).toBe(false);
 			});
@@ -2432,14 +2816,25 @@ describe('Config', () => {
 				const value = config.referenceLabels;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('referenceLabels.alignment', 'referenceLabelAlignment');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'referenceLabels.alignment',
+					'referenceLabelAlignment',
+				);
 				expect(value.branchLabelsAlignedToGraph).toBe(false);
 				expect(value.tagLabelsOnRight).toBe(false);
 			});
 		});
 	});
 
-	describe('fetchAvatars', testRenamedBooleanExtensionSetting('fetchAvatars', 'repository.commits.fetchAvatars', 'fetchAvatars', false));
+	describe(
+		'fetchAvatars',
+		testRenamedBooleanExtensionSetting(
+			'fetchAvatars',
+			'repository.commits.fetchAvatars',
+			'fetchAvatars',
+			false,
+		),
+	);
 
 	describe('initialLoadCommits', () => {
 		it('Should return the configured value', () => {
@@ -2450,7 +2845,10 @@ describe('Config', () => {
 			const value = config.initialLoadCommits;
 
 			// Assert
-			expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.initialLoad', 'initialLoadCommits');
+			expectRenamedExtensionSettingToHaveBeenCalled(
+				'repository.commits.initialLoad',
+				'initialLoadCommits',
+			);
 			expect(value).toBe(600);
 		});
 
@@ -2459,7 +2857,10 @@ describe('Config', () => {
 			const value = config.initialLoadCommits;
 
 			// Assert
-			expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.initialLoad', 'initialLoadCommits');
+			expectRenamedExtensionSettingToHaveBeenCalled(
+				'repository.commits.initialLoad',
+				'initialLoadCommits',
+			);
 			expect(value).toBe(300);
 		});
 	});
@@ -2473,7 +2874,10 @@ describe('Config', () => {
 			const value = config.loadMoreCommits;
 
 			// Assert
-			expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.loadMore', 'loadMoreCommits');
+			expectRenamedExtensionSettingToHaveBeenCalled(
+				'repository.commits.loadMore',
+				'loadMoreCommits',
+			);
 			expect(value).toBe(200);
 		});
 
@@ -2482,60 +2886,95 @@ describe('Config', () => {
 			const value = config.loadMoreCommits;
 
 			// Assert
-			expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.loadMore', 'loadMoreCommits');
+			expectRenamedExtensionSettingToHaveBeenCalled(
+				'repository.commits.loadMore',
+				'loadMoreCommits',
+			);
 			expect(value).toBe(100);
 		});
 	});
 
-	describe('loadMoreCommitsAutomatically', testRenamedBooleanExtensionSetting('loadMoreCommitsAutomatically', 'repository.commits.loadMoreAutomatically', 'loadMoreCommitsAutomatically', true));
+	describe(
+		'loadMoreCommitsAutomatically',
+		testRenamedBooleanExtensionSetting(
+			'loadMoreCommitsAutomatically',
+			'repository.commits.loadMoreAutomatically',
+			'loadMoreCommitsAutomatically',
+			true,
+		),
+	);
 
 	describe('muteCommits', () => {
 		describe('commitsNotAncestorsOfHead', () => {
 			it('Should return TRUE when the configuration value is TRUE', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('repository.commits.mute.commitsThatAreNotAncestorsOfHead', true);
+				vscode.mockExtensionSettingReturnValue(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					true,
+				);
 
 				// Run
 				const value = config.muteCommits.commitsNotAncestorsOfHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 'muteCommitsThatAreNotAncestorsOfHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					'muteCommitsThatAreNotAncestorsOfHead',
+				);
 				expect(value).toBe(true);
 			});
 
 			it('Should return FALSE when the configuration value is FALSE', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('repository.commits.mute.commitsThatAreNotAncestorsOfHead', false);
+				vscode.mockExtensionSettingReturnValue(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					false,
+				);
 
 				// Run
 				const value = config.muteCommits.commitsNotAncestorsOfHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 'muteCommitsThatAreNotAncestorsOfHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					'muteCommitsThatAreNotAncestorsOfHead',
+				);
 				expect(value).toBe(false);
 			});
 
 			it('Should return TRUE when the configuration value is truthy', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 5);
+				vscode.mockExtensionSettingReturnValue(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					5,
+				);
 
 				// Run
 				const value = config.muteCommits.commitsNotAncestorsOfHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 'muteCommitsThatAreNotAncestorsOfHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					'muteCommitsThatAreNotAncestorsOfHead',
+				);
 				expect(value).toBe(true);
 			});
 
 			it('Should return FALSE when the configuration value is falsy', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 0);
+				vscode.mockExtensionSettingReturnValue(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					0,
+				);
 
 				// Run
 				const value = config.muteCommits.commitsNotAncestorsOfHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 'muteCommitsThatAreNotAncestorsOfHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					'muteCommitsThatAreNotAncestorsOfHead',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -2544,7 +2983,10 @@ describe('Config', () => {
 				const value = config.muteCommits.commitsNotAncestorsOfHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 'muteCommitsThatAreNotAncestorsOfHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+					'muteCommitsThatAreNotAncestorsOfHead',
+				);
 				expect(value).toBe(false);
 			});
 		});
@@ -2558,7 +3000,10 @@ describe('Config', () => {
 				const value = config.muteCommits.mergeCommits;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.mergeCommits', 'muteMergeCommits');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.mergeCommits',
+					'muteMergeCommits',
+				);
 				expect(value).toBe(true);
 			});
 
@@ -2570,7 +3015,10 @@ describe('Config', () => {
 				const value = config.muteCommits.mergeCommits;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.mergeCommits', 'muteMergeCommits');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.mergeCommits',
+					'muteMergeCommits',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -2582,7 +3030,10 @@ describe('Config', () => {
 				const value = config.muteCommits.mergeCommits;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.mergeCommits', 'muteMergeCommits');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.mergeCommits',
+					'muteMergeCommits',
+				);
 				expect(value).toBe(true);
 			});
 
@@ -2594,7 +3045,10 @@ describe('Config', () => {
 				const value = config.muteCommits.mergeCommits;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.mergeCommits', 'muteMergeCommits');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.mergeCommits',
+					'muteMergeCommits',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -2603,7 +3057,10 @@ describe('Config', () => {
 				const value = config.muteCommits.mergeCommits;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.commits.mute.mergeCommits', 'muteMergeCommits');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.commits.mute.mergeCommits',
+					'muteMergeCommits',
+				);
 				expect(value).toBe(true);
 			});
 		});
@@ -2668,11 +3125,30 @@ describe('Config', () => {
 		});
 	});
 
-	describe('fetchAndPrune', testRenamedBooleanExtensionSetting('fetchAndPrune', 'repository.fetchAndPrune', 'fetchAndPrune', false));
+	describe(
+		'fetchAndPrune',
+		testRenamedBooleanExtensionSetting(
+			'fetchAndPrune',
+			'repository.fetchAndPrune',
+			'fetchAndPrune',
+			false,
+		),
+	);
 
-	describe('fetchAndPruneTags', testBooleanExtensionSetting('fetchAndPruneTags', 'repository.fetchAndPruneTags', false));
+	describe(
+		'fetchAndPruneTags',
+		testBooleanExtensionSetting('fetchAndPruneTags', 'repository.fetchAndPruneTags', false),
+	);
 
-	describe('includeCommitsMentionedByReflogs', testRenamedBooleanExtensionSetting('includeCommitsMentionedByReflogs', 'repository.includeCommitsMentionedByReflogs', 'includeCommitsMentionedByReflogs', false));
+	describe(
+		'includeCommitsMentionedByReflogs',
+		testRenamedBooleanExtensionSetting(
+			'includeCommitsMentionedByReflogs',
+			'repository.includeCommitsMentionedByReflogs',
+			'includeCommitsMentionedByReflogs',
+			false,
+		),
+	);
 
 	describe('onRepoLoad', () => {
 		describe('scrollToHead', () => {
@@ -2684,7 +3160,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.scrollToHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.scrollToHead', 'openRepoToHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.scrollToHead',
+					'openRepoToHead',
+				);
 				expect(value).toBe(true);
 			});
 
@@ -2696,7 +3175,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.scrollToHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.scrollToHead', 'openRepoToHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.scrollToHead',
+					'openRepoToHead',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -2708,7 +3190,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.scrollToHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.scrollToHead', 'openRepoToHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.scrollToHead',
+					'openRepoToHead',
+				);
 				expect(value).toBe(true);
 			});
 
@@ -2720,7 +3205,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.scrollToHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.scrollToHead', 'openRepoToHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.scrollToHead',
+					'openRepoToHead',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -2729,7 +3217,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.scrollToHead;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.scrollToHead', 'openRepoToHead');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.scrollToHead',
+					'openRepoToHead',
+				);
 				expect(value).toBe(false);
 			});
 		});
@@ -2743,7 +3234,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.showCheckedOutBranch;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.showCheckedOutBranch', 'showCurrentBranchByDefault');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.showCheckedOutBranch',
+					'showCurrentBranchByDefault',
+				);
 				expect(value).toBe(true);
 			});
 
@@ -2755,7 +3249,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.showCheckedOutBranch;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.showCheckedOutBranch', 'showCurrentBranchByDefault');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.showCheckedOutBranch',
+					'showCurrentBranchByDefault',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -2767,7 +3264,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.showCheckedOutBranch;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.showCheckedOutBranch', 'showCurrentBranchByDefault');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.showCheckedOutBranch',
+					'showCurrentBranchByDefault',
+				);
 				expect(value).toBe(true);
 			});
 
@@ -2779,7 +3279,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.showCheckedOutBranch;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.showCheckedOutBranch', 'showCurrentBranchByDefault');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.showCheckedOutBranch',
+					'showCurrentBranchByDefault',
+				);
 				expect(value).toBe(false);
 			});
 
@@ -2788,7 +3291,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.showCheckedOutBranch;
 
 				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled('repository.onLoad.showCheckedOutBranch', 'showCurrentBranchByDefault');
+				expectRenamedExtensionSettingToHaveBeenCalled(
+					'repository.onLoad.showCheckedOutBranch',
+					'showCurrentBranchByDefault',
+				);
 				expect(value).toBe(false);
 			});
 		});
@@ -2796,25 +3302,38 @@ describe('Config', () => {
 		describe('showSpecificBranches', () => {
 			it('Should return all branches when correctly configured', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('repository.onLoad.showSpecificBranches', ['master', 'develop']);
+				vscode.mockExtensionSettingReturnValue('repository.onLoad.showSpecificBranches', [
+					'master',
+					'develop',
+				]);
 
 				// Run
 				const value = config.onRepoLoad.showSpecificBranches;
 
 				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith('repository.onLoad.showSpecificBranches', expect.anything());
+				expect(workspaceConfiguration.get).toBeCalledWith(
+					'repository.onLoad.showSpecificBranches',
+					expect.anything(),
+				);
 				expect(value).toStrictEqual(['master', 'develop']);
 			});
 
 			it('Should filter out all non-string branches', () => {
 				// Setup
-				vscode.mockExtensionSettingReturnValue('repository.onLoad.showSpecificBranches', ['master', 5, 'develop']);
+				vscode.mockExtensionSettingReturnValue('repository.onLoad.showSpecificBranches', [
+					'master',
+					5,
+					'develop',
+				]);
 
 				// Run
 				const value = config.onRepoLoad.showSpecificBranches;
 
 				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith('repository.onLoad.showSpecificBranches', expect.anything());
+				expect(workspaceConfiguration.get).toBeCalledWith(
+					'repository.onLoad.showSpecificBranches',
+					expect.anything(),
+				);
 				expect(value).toStrictEqual(['master', 'develop']);
 			});
 
@@ -2826,7 +3345,10 @@ describe('Config', () => {
 				const value = config.onRepoLoad.showSpecificBranches;
 
 				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith('repository.onLoad.showSpecificBranches', expect.anything());
+				expect(workspaceConfiguration.get).toBeCalledWith(
+					'repository.onLoad.showSpecificBranches',
+					expect.anything(),
+				);
 				expect(value).toStrictEqual([]);
 			});
 
@@ -2835,35 +3357,96 @@ describe('Config', () => {
 				const value = config.onRepoLoad.showSpecificBranches;
 
 				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith('repository.onLoad.showSpecificBranches', expect.anything());
+				expect(workspaceConfiguration.get).toBeCalledWith(
+					'repository.onLoad.showSpecificBranches',
+					expect.anything(),
+				);
 				expect(value).toStrictEqual([]);
 			});
 		});
 	});
 
-	describe('onlyFollowFirstParent', testRenamedBooleanExtensionSetting('onlyFollowFirstParent', 'repository.onlyFollowFirstParent', 'onlyFollowFirstParent', false));
+	describe(
+		'onlyFollowFirstParent',
+		testRenamedBooleanExtensionSetting(
+			'onlyFollowFirstParent',
+			'repository.onlyFollowFirstParent',
+			'onlyFollowFirstParent',
+			false,
+		),
+	);
 
-	describe('showCommitsOnlyReferencedByTags', testRenamedBooleanExtensionSetting('showCommitsOnlyReferencedByTags', 'repository.showCommitsOnlyReferencedByTags', 'showCommitsOnlyReferencedByTags', true));
+	describe(
+		'showCommitsOnlyReferencedByTags',
+		testRenamedBooleanExtensionSetting(
+			'showCommitsOnlyReferencedByTags',
+			'repository.showCommitsOnlyReferencedByTags',
+			'showCommitsOnlyReferencedByTags',
+			true,
+		),
+	);
 
-	describe('showSignatureStatus', testRenamedBooleanExtensionSetting('showSignatureStatus', 'repository.commits.showSignatureStatus', 'showSignatureStatus', false));
+	describe(
+		'showSignatureStatus',
+		testRenamedBooleanExtensionSetting(
+			'showSignatureStatus',
+			'repository.commits.showSignatureStatus',
+			'showSignatureStatus',
+			false,
+		),
+	);
 
-	describe('showRemoteBranches', testBooleanExtensionSetting('showRemoteBranches', 'repository.showRemoteBranches', true));
+	describe(
+		'showRemoteBranches',
+		testBooleanExtensionSetting('showRemoteBranches', 'repository.showRemoteBranches', true),
+	);
 
-	describe('showRemoteHeads', testBooleanExtensionSetting('showRemoteHeads', 'repository.showRemoteHeads', true));
+	describe(
+		'showRemoteHeads',
+		testBooleanExtensionSetting('showRemoteHeads', 'repository.showRemoteHeads', true),
+	);
 
-	describe('showStashes', testBooleanExtensionSetting('showStashes', 'repository.showStashes', true));
+	describe(
+		'showStashes',
+		testBooleanExtensionSetting('showStashes', 'repository.showStashes', true),
+	);
 
-	describe('showTags', testRenamedBooleanExtensionSetting('showTags', 'repository.showTags', 'showTags', true));
+	describe(
+		'showTags',
+		testRenamedBooleanExtensionSetting('showTags', 'repository.showTags', 'showTags', true),
+	);
 
-	describe('showUncommittedChanges', testRenamedBooleanExtensionSetting('showUncommittedChanges', 'repository.showUncommittedChanges', 'showUncommittedChanges', true));
+	describe(
+		'showUncommittedChanges',
+		testRenamedBooleanExtensionSetting(
+			'showUncommittedChanges',
+			'repository.showUncommittedChanges',
+			'showUncommittedChanges',
+			true,
+		),
+	);
 
-	describe('showUntrackedFiles', testRenamedBooleanExtensionSetting('showUntrackedFiles', 'repository.showUntrackedFiles', 'showUntrackedFiles', true));
+	describe(
+		'showUntrackedFiles',
+		testRenamedBooleanExtensionSetting(
+			'showUntrackedFiles',
+			'repository.showUntrackedFiles',
+			'showUntrackedFiles',
+			true,
+		),
+	);
 
-	describe('signCommits', testBooleanExtensionSetting('signCommits', 'repository.sign.commits', false));
+	describe(
+		'signCommits',
+		testBooleanExtensionSetting('signCommits', 'repository.sign.commits', false),
+	);
 
 	describe('signTags', testBooleanExtensionSetting('signTags', 'repository.sign.tags', false));
 
-	describe('useMailmap', testRenamedBooleanExtensionSetting('useMailmap', 'repository.useMailmap', 'useMailmap', false));
+	describe(
+		'useMailmap',
+		testRenamedBooleanExtensionSetting('useMailmap', 'repository.useMailmap', 'useMailmap', false),
+	);
 
 	describe('repoDropdownOrder', () => {
 		it('Should return RepoDropdownOrder.Name when the configuration value is "Name"', () => {
@@ -2874,7 +3457,10 @@ describe('Config', () => {
 			const value = config.repoDropdownOrder;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('repositoryDropdownOrder', 'Workspace Full Path');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'repositoryDropdownOrder',
+				'Workspace Full Path',
+			);
 			expect(value).toBe(RepoDropdownOrder.Name);
 		});
 
@@ -2886,7 +3472,10 @@ describe('Config', () => {
 			const value = config.repoDropdownOrder;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('repositoryDropdownOrder', 'Workspace Full Path');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'repositoryDropdownOrder',
+				'Workspace Full Path',
+			);
 			expect(value).toBe(RepoDropdownOrder.FullPath);
 		});
 
@@ -2898,7 +3487,10 @@ describe('Config', () => {
 			const value = config.repoDropdownOrder;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('repositoryDropdownOrder', 'Workspace Full Path');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'repositoryDropdownOrder',
+				'Workspace Full Path',
+			);
 			expect(value).toBe(RepoDropdownOrder.WorkspaceFullPath);
 		});
 
@@ -2910,7 +3502,10 @@ describe('Config', () => {
 			const value = config.repoDropdownOrder;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('repositoryDropdownOrder', 'Workspace Full Path');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'repositoryDropdownOrder',
+				'Workspace Full Path',
+			);
 			expect(value).toBe(RepoDropdownOrder.WorkspaceFullPath);
 		});
 
@@ -2919,14 +3514,23 @@ describe('Config', () => {
 			const value = config.repoDropdownOrder;
 
 			// Assert
-			expect(workspaceConfiguration.get).toBeCalledWith('repositoryDropdownOrder', 'Workspace Full Path');
+			expect(workspaceConfiguration.get).toBeCalledWith(
+				'repositoryDropdownOrder',
+				'Workspace Full Path',
+			);
 			expect(value).toBe(RepoDropdownOrder.WorkspaceFullPath);
 		});
 	});
 
-	describe('retainContextWhenHidden', testBooleanExtensionSetting('retainContextWhenHidden', 'retainContextWhenHidden', true));
+	describe(
+		'retainContextWhenHidden',
+		testBooleanExtensionSetting('retainContextWhenHidden', 'retainContextWhenHidden', true),
+	);
 
-	describe('showStatusBarItem', testBooleanExtensionSetting('showStatusBarItem', 'showStatusBarItem', true));
+	describe(
+		'showStatusBarItem',
+		testBooleanExtensionSetting('showStatusBarItem', 'showStatusBarItem', true),
+	);
 
 	describe('stickyHeader', testBooleanExtensionSetting('stickyHeader', 'stickyHeader', true));
 
@@ -2993,7 +3597,14 @@ describe('Config', () => {
 
 		it('Should return the valid configured paths', () => {
 			// Setup
-			vscode.mockExtensionSettingReturnValue('path', ['/path/to/first/git', '/path/to/second/git', 4, {}, null, '/path/to/third/git']);
+			vscode.mockExtensionSettingReturnValue('path', [
+				'/path/to/first/git',
+				'/path/to/second/git',
+				4,
+				{},
+				null,
+				'/path/to/third/git',
+			]);
 
 			// Run
 			const value = config.gitPaths;
@@ -3001,7 +3612,11 @@ describe('Config', () => {
 			// Assert
 			expect(vscode.workspace.getConfiguration).toBeCalledWith('git');
 			expect(workspaceConfiguration.get).toBeCalledWith('path', null);
-			expect(value).toStrictEqual(['/path/to/first/git', '/path/to/second/git', '/path/to/third/git']);
+			expect(value).toStrictEqual([
+				'/path/to/first/git',
+				'/path/to/second/git',
+				'/path/to/third/git',
+			]);
 		});
 
 		it('Should return an empty array when the configuration value is NULL', () => {
@@ -3046,11 +3661,11 @@ describe('Config', () => {
 			// Setup
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: true,
-				globalValue: false
+				globalValue: false,
 			});
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: false,
-				globalValue: false
+				globalValue: false,
 			});
 
 			// Run
@@ -3064,11 +3679,11 @@ describe('Config', () => {
 			// Setup
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: undefined,
-				globalValue: false
+				globalValue: false,
 			});
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: true,
-				globalValue: false
+				globalValue: false,
 			});
 
 			// Run
@@ -3082,11 +3697,11 @@ describe('Config', () => {
 			// Setup
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: undefined,
-				globalValue: true
+				globalValue: true,
 			});
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: undefined,
-				globalValue: false
+				globalValue: false,
 			});
 
 			// Run
@@ -3100,11 +3715,11 @@ describe('Config', () => {
 			// Setup
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: undefined,
-				globalValue: undefined
+				globalValue: undefined,
 			});
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: undefined,
-				globalValue: true
+				globalValue: true,
 			});
 
 			// Run
@@ -3118,11 +3733,11 @@ describe('Config', () => {
 			// Setup
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: undefined,
-				globalValue: undefined
+				globalValue: undefined,
 			});
 			workspaceConfiguration.inspect.mockReturnValueOnce({
 				workspaceValue: undefined,
-				globalValue: undefined
+				globalValue: undefined,
 			});
 
 			// Run
@@ -3133,7 +3748,11 @@ describe('Config', () => {
 		});
 	});
 
-	function testBooleanExtensionSetting(configKey: keyof Config, section: string, defaultValue: boolean) {
+	function testBooleanExtensionSetting(
+		configKey: keyof Config,
+		section: string,
+		defaultValue: boolean,
+	) {
 		return () => {
 			it('Should return TRUE when the configuration value is TRUE', () => {
 				// Setup
@@ -3183,18 +3802,28 @@ describe('Config', () => {
 				expect(value).toBe(false);
 			});
 
-			it('Should return the default value (' + (defaultValue ? 'TRUE' : 'FALSE') + ') when the configuration value is not set', () => {
-				// Run
-				const value = config[configKey];
+			it(
+				'Should return the default value (' +
+					(defaultValue ? 'TRUE' : 'FALSE') +
+					') when the configuration value is not set',
+				() => {
+					// Run
+					const value = config[configKey];
 
-				// Assert
-				expect(workspaceConfiguration.get).toBeCalledWith(section, defaultValue);
-				expect(value).toBe(defaultValue);
-			});
+					// Assert
+					expect(workspaceConfiguration.get).toBeCalledWith(section, defaultValue);
+					expect(value).toBe(defaultValue);
+				},
+			);
 		};
 	}
 
-	function testRenamedBooleanExtensionSetting(configKey: keyof Config, section: string, oldSection: string, defaultValue: boolean) {
+	function testRenamedBooleanExtensionSetting(
+		configKey: keyof Config,
+		section: string,
+		oldSection: string,
+		defaultValue: boolean,
+	) {
 		return () => {
 			it('Should return TRUE when the configuration value is TRUE', () => {
 				// Setup
@@ -3244,14 +3873,19 @@ describe('Config', () => {
 				expect(value).toBe(false);
 			});
 
-			it('Should return the default value (' + (defaultValue ? 'TRUE' : 'FALSE') + ') when the configuration value is not set', () => {
-				// Run
-				const value = config[configKey];
+			it(
+				'Should return the default value (' +
+					(defaultValue ? 'TRUE' : 'FALSE') +
+					') when the configuration value is not set',
+				() => {
+					// Run
+					const value = config[configKey];
 
-				// Assert
-				expectRenamedExtensionSettingToHaveBeenCalled(section, oldSection);
-				expect(value).toBe(defaultValue);
-			});
+					// Assert
+					expectRenamedExtensionSettingToHaveBeenCalled(section, oldSection);
+					expect(value).toBe(defaultValue);
+				},
+			);
 		};
 	}
 });

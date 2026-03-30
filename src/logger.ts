@@ -24,7 +24,20 @@ export class Logger extends Disposable {
 	 */
 	public log(message: string) {
 		const date = new Date();
-		const timestamp = date.getFullYear() + '-' + pad2(date.getMonth() + 1) + '-' + pad2(date.getDate()) + ' ' + pad2(date.getHours()) + ':' + pad2(date.getMinutes()) + ':' + pad2(date.getSeconds()) + '.' + pad3(date.getMilliseconds());
+		const timestamp =
+			date.getFullYear() +
+			'-' +
+			pad2(date.getMonth() + 1) +
+			'-' +
+			pad2(date.getDate()) +
+			' ' +
+			pad2(date.getHours()) +
+			':' +
+			pad2(date.getMinutes()) +
+			':' +
+			pad2(date.getSeconds()) +
+			'.' +
+			pad3(date.getMilliseconds());
 		this.channel.appendLine('[' + timestamp + '] ' + message);
 	}
 
@@ -34,14 +47,22 @@ export class Logger extends Disposable {
 	 * @param args The arguments passed to the command.
 	 */
 	public logCmd(cmd: string, args: string[]) {
-		this.log('> ' + cmd + ' ' + args.map((arg) => arg === ''
-			? '""'
-			: arg.startsWith('--format=')
-				? '--format=...'
-				: arg.includes(' ')
-					? '"' + arg.replace(DOUBLE_QUOTE_REGEXP, '\\"') + '"'
-					: arg
-		).join(' '));
+		this.log(
+			'> ' +
+				cmd +
+				' ' +
+				args
+					.map((arg) =>
+						arg === ''
+							? '""'
+							: arg.startsWith('--format=')
+								? '--format=...'
+								: arg.includes(' ')
+									? '"' + arg.replace(DOUBLE_QUOTE_REGEXP, '\\"') + '"'
+									: arg,
+					)
+					.join(' '),
+		);
 	}
 
 	/**
