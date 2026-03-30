@@ -108,7 +108,7 @@ export default [
 			'key-spacing': 'warn',
 			'linebreak-style': [
 				'warn',
-				'windows'
+				'unix'
 			],
 			'new-cap': 'warn',
 			'new-parens': 'warn',

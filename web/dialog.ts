@@ -318,7 +318,7 @@ class Dialog {
 	 * @param action A short name that identifies the action that is running.
 	 */
 	public showActionRunning(action: string) {
-		this.show(DialogType.ActionRunning, '<span class="actionRunning">' + SVG_ICONS.loading + action + ' ...</span>', null, getText('close'), null, null, null);
+		this.show(DialogType.ActionRunning, '<span class="actionRunning">' + SVG_ICONS.loading + action + getText('ui.dialogEllipsisRunning') + '</span>', null, getText('close'), null, null, null);
 	}
 
 	/**

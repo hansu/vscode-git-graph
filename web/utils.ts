@@ -152,9 +152,19 @@ let i18nTexts: any = {
 	FIND_CLOSE: 'Close (Escape)'
 };
 
-// 设置翻译文本
+const DEFAULT_I18N_TEXTS: any = JSON.parse(JSON.stringify(i18nTexts));
+
+// 设置翻译文本（与扩展注入合并，避免缺键；嵌套对象由扩展端整段覆盖）
 function setI18nTexts(texts: any) {
-	i18nTexts = texts;
+	i18nTexts = Object.assign({}, DEFAULT_I18N_TEXTS, texts && typeof texts === 'object' ? texts : {});
+}
+
+function getGitFileChangeTypeLabel(code: string): string {
+	return i18nTexts.GIT_FILE_CHANGE_TYPES[code] ?? code;
+}
+
+function getGitSignatureStatusDescription(code: string): string {
+	return i18nTexts.GIT_SIGNATURE_STATUS_DESCRIPTIONS[code] ?? '';
 }
 
 // 获取翻译文本（支持 ui.camelCase 键：与扩展端注入的 I18nTexts 大写下划线 / camelCase 字段对齐）
@@ -173,9 +183,6 @@ function getText(key: string, ...args: any[]) {
 	return text ?? key;
 }
 
-// 为了保持向后兼容，定义默认常量
-const GIT_FILE_CHANGE_TYPES = i18nTexts.GIT_FILE_CHANGE_TYPES;
-const GIT_SIGNATURE_STATUS_DESCRIPTIONS = i18nTexts.GIT_SIGNATURE_STATUS_DESCRIPTIONS;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const REF_INVALID_REGEX = /^[-\/].*|[\\" ><~^:?*[]|\.\.|\/\/|\/\.|@{|[.\/]$|\.lock$|^@$/g;
 
