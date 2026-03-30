@@ -418,11 +418,11 @@ export async function openFile(repo: string, filePath: string, hash: string | nu
 export function viewDiff(repo: string, fromHash: string, toHash: string, oldFilePath: string, newFilePath: string, type: GitFileStatus) {
 	if (type !== GitFileStatus.Untracked) {
 		let abbrevFromHash = abbrevCommit(fromHash), abbrevToHash = toHash !== UNCOMMITTED ? abbrevCommit(toHash) : vscode.l10n.t('ui.current'), pathComponents = newFilePath.split('/');
-			let desc = fromHash === toHash
-				? fromHash === UNCOMMITTED
-					? vscode.l10n.t('ui.uncommitted')
-					: (type === GitFileStatus.Added ? vscode.l10n.t('ui.addedAt', { commit: abbrevToHash }) : type === GitFileStatus.Deleted ? vscode.l10n.t('ui.deletedAt', { commit: abbrevToHash }) : abbrevFromHash + '^ ↔ ' + abbrevToHash)
-				: (type === GitFileStatus.Added ? vscode.l10n.t('ui.addedBetween', { commit1: abbrevFromHash, commit2: abbrevToHash }) : type === GitFileStatus.Deleted ? vscode.l10n.t('ui.deletedBetween', { commit1: abbrevFromHash, commit2: abbrevToHash }) : abbrevFromHash + ' ↔ ' + abbrevToHash);
+		let desc = fromHash === toHash
+			? fromHash === UNCOMMITTED
+				? vscode.l10n.t('ui.uncommitted')
+				: (type === GitFileStatus.Added ? vscode.l10n.t('ui.addedAt', { commit: abbrevToHash }) : type === GitFileStatus.Deleted ? vscode.l10n.t('ui.deletedAt', { commit: abbrevToHash }) : abbrevFromHash + '^ ↔ ' + abbrevToHash)
+			: (type === GitFileStatus.Added ? vscode.l10n.t('ui.addedBetween', { commit1: abbrevFromHash, commit2: abbrevToHash }) : type === GitFileStatus.Deleted ? vscode.l10n.t('ui.deletedBetween', { commit1: abbrevFromHash, commit2: abbrevToHash }) : abbrevFromHash + ' ↔ ' + abbrevToHash);
 		let title = pathComponents[pathComponents.length - 1] + ' (' + desc + ')';
 		if (fromHash === UNCOMMITTED) fromHash = 'HEAD';
 

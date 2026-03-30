@@ -1,5 +1,3 @@
-import { SVG_ICONS, getText } from './utils';
-
 const CLASS_FIND_CURRENT_COMMIT = 'findCurrentCommit';
 const CLASS_FIND_MATCH = 'findMatch';
 

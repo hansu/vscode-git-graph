@@ -157,19 +157,21 @@ function setI18nTexts(texts: any) {
 	i18nTexts = texts;
 }
 
-// 获取翻译文本
+// 获取翻译文本（支持 ui.camelCase 键：与扩展端注入的 I18nTexts 大写下划线 / camelCase 字段对齐）
 function getText(key: string, ...args: any[]) {
-	let text = i18nTexts[key];
+	let text: string | undefined = i18nTexts[key];
+	if (text === undefined && key.startsWith('ui.')) {
+		const rest = key.slice(3);
+		const upperSnake = rest.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toUpperCase();
+		text = i18nTexts[rest] ?? i18nTexts[upperSnake];
+	}
 	if (typeof text === 'string' && args.length > 0) {
 		for (let i = 0; i < args.length; i++) {
-			text = text.replace(`{${i}}`, args[i]);
+			text = text.replace(`{${i}}`, String(args[i]));
 		}
 	}
-	return text;
+	return text ?? key;
 }
-
-// 导出函数
-export { setI18nTexts, getText };
 
 // 为了保持向后兼容，定义默认常量
 const GIT_FILE_CHANGE_TYPES = i18nTexts.GIT_FILE_CHANGE_TYPES;

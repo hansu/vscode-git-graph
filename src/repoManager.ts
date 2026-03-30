@@ -651,13 +651,13 @@ export class RepoManager extends Disposable {
 					if (this.isKnownRepo(repo) && action) {
 						const state = this.repos[repo];
 						if (action === vscode.l10n.t('ui.yes')) {
-								applyExternalConfigFile(file, state);
-							}
-							state.lastImportAt = file.exportedAt;
-							this.extensionState.saveRepos(this.repos);
-							if (!isRepoNew && action === vscode.l10n.t('ui.yes')) {
-								showInformationMessage(vscode.l10n.t('ui.configFileImported', { repo: state.name || getRepoName(repo) }));
-							}
+							applyExternalConfigFile(file, state);
+						}
+						state.lastImportAt = file.exportedAt;
+						this.extensionState.saveRepos(this.repos);
+						if (!isRepoNew && action === vscode.l10n.t('ui.yes')) {
+							showInformationMessage(vscode.l10n.t('ui.configFileImported', { repo: state.name || getRepoName(repo) }));
+						}
 						return true;
 					}
 				} else {

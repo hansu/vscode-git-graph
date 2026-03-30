@@ -221,10 +221,10 @@ export class CommandManager extends Disposable {
 		}).then((item) => {
 			if (item && item.description !== undefined) {
 				if (this.repoManager.ignoreRepo(item.description)) {
-									showInformationMessage(vscode.l10n.t('ui.repoRemoved', { repo: item.label }));
-								} else {
-									showErrorMessage(vscode.l10n.t('ui.repoUnknown', { repo: item.label }));
-								}
+					showInformationMessage(vscode.l10n.t('ui.repoRemoved', { repo: item.label }));
+				} else {
+					showErrorMessage(vscode.l10n.t('ui.repoUnknown', { repo: item.label }));
+				}
 			}
 		}, () => { });
 	}
@@ -235,13 +235,13 @@ export class CommandManager extends Disposable {
 	private clearAvatarCache() {
 		this.avatarManager.clearCache().then((errorInfo) => {
 			if (errorInfo === null) {
-									showInformationMessage(vscode.l10n.t('ui.avatarCacheCleared'));
-								} else {
-									showErrorMessage(errorInfo);
-								}
-							}, () => {
-								showErrorMessage(vscode.l10n.t('ui.errorClearingAvatarCache'));
-							});
+				showInformationMessage(vscode.l10n.t('ui.avatarCacheCleared'));
+			} else {
+				showErrorMessage(errorInfo);
+			}
+		}, () => {
+			showErrorMessage(vscode.l10n.t('ui.errorClearingAvatarCache'));
+		});
 	}
 
 	/**
@@ -277,8 +277,8 @@ export class CommandManager extends Disposable {
 					});
 				}
 			}, () => {
-					showErrorMessage(vscode.l10n.t('ui.errorRunningFetchCommand'));
-				});
+				showErrorMessage(vscode.l10n.t('ui.errorRunningFetchCommand'));
+			});
 		} else if (repoPaths.length === 1) {
 			GitGraphView.createOrShow(this.context.extensionPath, this.dataSource, this.extensionState, this.avatarManager, this.repoManager, this.logger, {
 				repo: repoPaths[0],
@@ -303,9 +303,9 @@ export class CommandManager extends Disposable {
 	private endSpecificWorkspaceCodeReview() {
 		const codeReviews = this.extensionState.getCodeReviews();
 		if (Object.keys(codeReviews).length === 0) {
-					showErrorMessage(vscode.l10n.t('ui.noActiveCodeReviews'));
-					return;
-				}
+			showErrorMessage(vscode.l10n.t('ui.noActiveCodeReviews'));
+			return;
+		}
 
 		vscode.window.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
 			placeHolder: vscode.l10n.t('ui.selectCodeReviewToEnd'),
@@ -314,15 +314,15 @@ export class CommandManager extends Disposable {
 			if (item) {
 				this.extensionState.endCodeReview(item.codeReviewRepo, item.codeReviewId).then((errorInfo) => {
 					if (errorInfo === null) {
-									showInformationMessage(vscode.l10n.t('ui.codeReviewEnded', { review: item.label }));
-								} else {
-									showErrorMessage(errorInfo);
-								}
+						showInformationMessage(vscode.l10n.t('ui.codeReviewEnded', { review: item.label }));
+					} else {
+						showErrorMessage(errorInfo);
+					}
 				}, () => { });
 			}
 		}, () => {
-					showErrorMessage(vscode.l10n.t('ui.errorEndingCodeReview'));
-				});
+			showErrorMessage(vscode.l10n.t('ui.errorEndingCodeReview'));
+		});
 	}
 
 	/**
@@ -331,9 +331,9 @@ export class CommandManager extends Disposable {
 	private resumeWorkspaceCodeReview() {
 		const codeReviews = this.extensionState.getCodeReviews();
 		if (Object.keys(codeReviews).length === 0) {
-					showErrorMessage(vscode.l10n.t('ui.noActiveCodeReviews'));
-					return;
-				}
+			showErrorMessage(vscode.l10n.t('ui.noActiveCodeReviews'));
+			return;
+		}
 
 		vscode.window.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
 			placeHolder: vscode.l10n.t('ui.selectCodeReviewToResume'),
@@ -350,8 +350,8 @@ export class CommandManager extends Disposable {
 				});
 			}
 		}, () => {
-					showErrorMessage(vscode.l10n.t('ui.errorResumingCodeReview'));
-				});
+			showErrorMessage(vscode.l10n.t('ui.errorResumingCodeReview'));
+		});
 	}
 
 	/**
@@ -362,7 +362,7 @@ export class CommandManager extends Disposable {
 			const gitGraphVersion = await getExtensionVersion(this.context);
 			const information = 'Git Graph: ' + gitGraphVersion + '\nVisual Studio Code: ' + vscode.version + '\nOS: ' + os.type() + ' ' + os.arch() + ' ' + os.release() + '\nGit: ' + (this.gitExecutable !== null ? this.gitExecutable.version : '(none)');
 			vscode.window.showInformationMessage(information, { modal: true }, vscode.l10n.t('ui.copy')).then((selectedItem) => {
-					if (selectedItem === vscode.l10n.t('ui.copy')) {
+				if (selectedItem === vscode.l10n.t('ui.copy')) {
 					copyToClipboard(information).then((result) => {
 						if (result !== null) {
 							showErrorMessage(result);
@@ -387,8 +387,8 @@ export class CommandManager extends Disposable {
 			const request = decodeDiffDocUri(uri);
 			return openFile(request.repo, request.filePath, request.commit, this.dataSource, vscode.ViewColumn.Active).then((errorInfo) => {
 				if (errorInfo !== null) {
-									return showErrorMessage(vscode.l10n.t('ui.cannotOpenFile', { filePath: errorInfo }));
-								}
+					return showErrorMessage(vscode.l10n.t('ui.cannotOpenFile', { filePath: errorInfo }));
+				}
 			});
 		} else {
 			return showErrorMessage(vscode.l10n.t('ui.cannotOpenFileMissingArgs'));
