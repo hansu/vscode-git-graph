@@ -15,7 +15,10 @@ fs.readdirSync(OUT_DIRECTORY).forEach((fileName) => {
 		let script = fs.readFileSync(scriptFilePath).toString();
 		if (script.match(/require\("fs"\)/g)) {
 			// Adjust the requirement
-			script = script.replace('"use strict";', '"use strict";\r\nfunction requireWithFallback(electronModule, nodeModule) { try { return require(electronModule); } catch (err) {} return require(nodeModule); }');
+			script = script.replace(
+				'"use strict";',
+				'"use strict";\r\nfunction requireWithFallback(electronModule, nodeModule) { try { return require(electronModule); } catch (err) {} return require(nodeModule); }'
+			);
 			fs.writeFileSync(scriptFilePath, script.replace(/require\("fs"\)/g, 'requireWithFallback("original-fs", "fs")'));
 
 			// Adjust the mapping file, as we added requireWithFallback on a new line at the start of the file.

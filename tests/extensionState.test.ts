@@ -5,7 +5,14 @@ jest.mock('fs');
 
 import * as fs from 'fs';
 import { ExtensionState } from '../src/extensionState';
-import { BooleanOverride, FileViewType, GitGraphViewGlobalState, GitGraphViewWorkspaceState, GitRepoState, RepoCommitOrdering } from '../src/types';
+import {
+	BooleanOverride,
+	FileViewType,
+	GitGraphViewGlobalState,
+	GitGraphViewWorkspaceState,
+	GitRepoState,
+	RepoCommitOrdering
+} from '../src/types';
 import { GitExecutable } from '../src/utils';
 import { EventEmitter } from '../src/utils/event';
 
@@ -376,7 +383,7 @@ describe('ExtensionState', () => {
 			extensionContext.workspaceState.update.mockResolvedValueOnce(null);
 			extensionContext.workspaceState.get.mockReturnValueOnce({
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -392,7 +399,7 @@ describe('ExtensionState', () => {
 			expect(extensionContext.workspaceState.update).toHaveBeenNthCalledWith(1, 'lastActiveRepo', '/new/path/to/repo');
 			expect(extensionContext.workspaceState.update).toHaveBeenNthCalledWith(2, 'codeReviews', {
 				'/new/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -401,12 +408,12 @@ describe('ExtensionState', () => {
 			});
 		});
 
-		it('Shouldn\'t update the last active repo or code reviews when no match is found with the transfer repository', () => {
+		it("Shouldn't update the last active repo or code reviews when no match is found with the transfer repository", () => {
 			// Setup
 			extensionContext.workspaceState.get.mockReturnValueOnce('/path/to/repo');
 			extensionContext.workspaceState.get.mockReturnValueOnce({
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -910,7 +917,7 @@ describe('ExtensionState', () => {
 			expect(spyOnUnlink).toHaveBeenCalledTimes(0);
 		});
 
-		it('Shouldn\'t delete avatars on the file system if globalState.update rejects, and return the error message', async () => {
+		it("Shouldn't delete avatars on the file system if globalState.update rejects, and return the error message", async () => {
 			// Setup
 			extensionContext.globalState.update.mockRejectedValueOnce(null);
 
@@ -932,12 +939,17 @@ describe('ExtensionState', () => {
 			extensionContext.workspaceState.update.mockResolvedValueOnce(null);
 
 			// Run
-			const result = await extensionState.startCodeReview('/path/to/repo', 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2', ['file2.txt', 'file3.txt'], 'file1.txt');
+			const result = await extensionState.startCodeReview(
+				'/path/to/repo',
+				'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
+				['file2.txt', 'file3.txt'],
+				'file1.txt'
+			);
 
 			// Assert
 			expect(extensionContext.workspaceState.update).toHaveBeenCalledWith('codeReviews', {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -959,7 +971,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -970,12 +982,17 @@ describe('ExtensionState', () => {
 			extensionContext.workspaceState.update.mockResolvedValueOnce(null);
 
 			// Run
-			const result = await extensionState.startCodeReview('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', ['file5.txt', 'file6.txt'], 'file4.txt');
+			const result = await extensionState.startCodeReview(
+				'/path/to/repo',
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+				['file5.txt', 'file6.txt'],
+				'file4.txt'
+			);
 
 			// Assert
 			expect(extensionContext.workspaceState.update).toHaveBeenCalledWith('codeReviews', {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1005,7 +1022,12 @@ describe('ExtensionState', () => {
 			extensionContext.workspaceState.update.mockRejectedValueOnce(null);
 
 			// Run
-			const result = await extensionState.startCodeReview('/path/to/repo', 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2', ['file2.txt', 'file3.txt'], 'file1.txt');
+			const result = await extensionState.startCodeReview(
+				'/path/to/repo',
+				'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
+				['file2.txt', 'file3.txt'],
+				'file1.txt'
+			);
 
 			// Assert
 			expect(result.error).toBe('Visual Studio Code was unable to save the Git Graph Workspace State Memento.');
@@ -1017,7 +1039,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1039,7 +1061,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1074,7 +1096,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1090,7 +1112,7 @@ describe('ExtensionState', () => {
 			// Assert
 			expect(extensionContext.workspaceState.update).toHaveBeenCalledWith('codeReviews', {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1104,7 +1126,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1127,7 +1149,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559257000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1143,7 +1165,7 @@ describe('ExtensionState', () => {
 			// Assert
 			expect(extensionContext.workspaceState.update).toHaveBeenCalledWith('codeReviews', {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1162,7 +1184,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559257000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1182,7 +1204,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559257000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1297,7 +1319,7 @@ describe('ExtensionState', () => {
 			expect(extensionContext.workspaceState.update).toHaveBeenCalledWith('codeReviews', {});
 		});
 
-		it('Shouldn\'t change the state if no code review could be found in the specified repository', async () => {
+		it("Shouldn't change the state if no code review could be found in the specified repository", async () => {
 			// Run
 			const result = await extensionState.updateCodeReview(repo + '1', id, ['file3.txt'], null);
 
@@ -1306,7 +1328,7 @@ describe('ExtensionState', () => {
 			expect(extensionContext.workspaceState.update).toHaveBeenCalledTimes(0);
 		});
 
-		it('Shouldn\'t change the state if no code review could be found with the specified id', async () => {
+		it("Shouldn't change the state if no code review could be found with the specified id", async () => {
 			// Run
 			const result = await extensionState.updateCodeReview(repo, id + '1', ['file3.txt'], null);
 
@@ -1333,7 +1355,7 @@ describe('ExtensionState', () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo1': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1345,7 +1367,7 @@ describe('ExtensionState', () => {
 					}
 				},
 				'/path/to/repo2': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 0,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1361,7 +1383,7 @@ describe('ExtensionState', () => {
 			// Assert
 			expect(extensionContext.workspaceState.update).toHaveBeenCalledWith('codeReviews', {
 				'/path/to/repo1': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1370,11 +1392,11 @@ describe('ExtensionState', () => {
 			});
 		});
 
-		it('Shouldn\'t make any changes when no repositories have expired', () => {
+		it("Shouldn't make any changes when no repositories have expired", () => {
 			// Setup
 			const codeReviews = {
 				'/path/to/repo1': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']
@@ -1386,7 +1408,7 @@ describe('ExtensionState', () => {
 					}
 				},
 				'/path/to/repo2': {
-					'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2': {
+					a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: {
 						lastActive: 1587559258000,
 						lastViewedFile: 'file1.txt',
 						remainingFiles: ['file2.txt', 'file3.txt']

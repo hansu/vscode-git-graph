@@ -4,7 +4,6 @@ about: Suggest an improvement for this extension
 title: ''
 labels: improvement
 assignees: hansu
-
 ---
 
 **Describe the improvement that you'd like**

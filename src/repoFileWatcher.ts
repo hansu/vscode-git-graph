@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 import { Logger } from './logger';
 import { getPathFromUri } from './utils';
 
-const FILE_CHANGE_REGEX = /(^\.git\/(config|index|HEAD|refs\/stash|refs\/heads\/.*|refs\/remotes\/.*|refs\/tags\/.*)$)|(^(?!\.git).*$)|(^\.git[^\/]+$)/;
+const FILE_CHANGE_REGEX =
+	/(^\.git\/(config|index|HEAD|refs\/stash|refs\/heads\/.*|refs\/remotes\/.*|refs\/tags\/.*)$)|(^(?!\.git).*$)|(^\.git[^\/]+$)/;
 
 /**
  * Watches a Git repository for file events.
@@ -39,9 +40,9 @@ export class RepoFileWatcher {
 		this.repo = repo;
 		// Create a File System Watcher for all events within the specified repository
 		this.fsWatcher = vscode.workspace.createFileSystemWatcher(repo + '/**');
-		this.fsWatcher.onDidCreate(uri => this.refresh(uri));
-		this.fsWatcher.onDidChange(uri => this.refresh(uri));
-		this.fsWatcher.onDidDelete(uri => this.refresh(uri));
+		this.fsWatcher.onDidCreate((uri) => this.refresh(uri));
+		this.fsWatcher.onDidChange((uri) => this.refresh(uri));
+		this.fsWatcher.onDidDelete((uri) => this.refresh(uri));
 		this.logger.log('Started watching repo: ' + repo);
 	}
 
@@ -74,9 +75,8 @@ export class RepoFileWatcher {
 	 */
 	public unmute() {
 		this.muted = false;
-		this.resumeAt = (new Date()).getTime() + 1500;
+		this.resumeAt = new Date().getTime() + 1500;
 	}
-
 
 	/**
 	 * Handle a file event triggered by the File System Watcher.
@@ -84,8 +84,13 @@ export class RepoFileWatcher {
 	 */
 	private refresh(uri: vscode.Uri) {
 		if (this.muted) return;
-		if (!getPathFromUri(uri).replace(this.repo + '/', '').match(FILE_CHANGE_REGEX)) return;
-		if ((new Date()).getTime() < this.resumeAt) return;
+		if (
+			!getPathFromUri(uri)
+				.replace(this.repo + '/', '')
+				.match(FILE_CHANGE_REGEX)
+		)
+			return;
+		if (new Date().getTime() < this.resumeAt) return;
 
 		if (this.refreshTimeout !== null) {
 			clearTimeout(this.refreshTimeout);

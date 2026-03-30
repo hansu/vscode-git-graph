@@ -1,0 +1,8 @@
+# Git 钩子由非交互式 shell 执行，不会自动加载 .bash_profile，此处显式加载以便获得 node/pnpm 等
+[ -f "$HOME/.bash_profile" ] && . "$HOME/.bash_profile"
+[ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"
+
+# 将项目 node_modules/.bin 加入 PATH，便于直接执行本地安装的 oxfmt
+export PATH="$(pwd)/node_modules/.bin:$PATH"
+
+npx lint-staged

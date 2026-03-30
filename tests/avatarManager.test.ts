@@ -26,7 +26,13 @@ let onDidChangeGitExecutable: EventEmitter<GitExecutable>;
 let logger: Logger;
 let dataSource: DataSource;
 let extensionState: ExtensionState;
-let spyOnSaveAvatar: jest.SpyInstance, spyOnRemoveAvatarFromCache: jest.SpyInstance, spyOnHttpsGet: jest.SpyInstance, spyOnWriteFile: jest.SpyInstance, spyOnReadFile: jest.SpyInstance, spyOnLog: jest.SpyInstance, spyOnGetRemoteUrl: jest.SpyInstance;
+let spyOnSaveAvatar: jest.SpyInstance,
+	spyOnRemoveAvatarFromCache: jest.SpyInstance,
+	spyOnHttpsGet: jest.SpyInstance,
+	spyOnWriteFile: jest.SpyInstance,
+	spyOnReadFile: jest.SpyInstance,
+	spyOnLog: jest.SpyInstance,
+	spyOnGetRemoteUrl: jest.SpyInstance;
 
 beforeAll(() => {
 	onDidChangeConfiguration = new EventEmitter<ConfigurationChangeEvent>();
@@ -98,13 +104,17 @@ describe('AvatarManager', () => {
 			const avatarEvents = waitForEvents(avatarManager, 1);
 
 			// Run
-			avatarManager.fetchAvatarImage('user1@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user1@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
-			expect(await avatarEvents).toStrictEqual([{
-				email: 'user1@mhutchie.com',
-				image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-			}]);
+			expect(await avatarEvents).toStrictEqual([
+				{
+					email: 'user1@mhutchie.com',
+					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+				}
+			]);
 		});
 
 		describe('GitHub', () => {
@@ -118,28 +128,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'api.github.com',
-					path: '/repos/mhutchie/test-repo/commits/1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/&size=162',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'api.github.com',
+						path: '/repos/mhutchie/test-repo/commits/1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'avatar-url',
+						path: '/&size=162',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -171,25 +191,33 @@ describe('AvatarManager', () => {
 				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'api.github.com',
-					path: '/repos/mhutchie/test-repo/commits/2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/&size=162',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'api.github.com',
+						path: '/repos/mhutchie/test-repo/commits/2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'avatar-url',
+						path: '/&size=162',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -209,28 +237,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'api.github.com',
-					path: '/repos/mhutchie/test-repo/commits/1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'api.github.com',
+						path: '/repos/mhutchie/test-repo/commits/1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -250,28 +288,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'api.github.com',
-					path: '/repos/mhutchie/test-repo/commits/1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'api.github.com',
+						path: '/repos/mhutchie/test-repo/commits/1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -288,27 +336,35 @@ describe('AvatarManager', () => {
 				mockHttpsResponse(404, '');
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnLog).toHaveBeenCalledWith('Failed to download avatar from GitHub for user4@*****');
 				});
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'api.github.com',
-					path: '/repos/mhutchie/test-repo/commits/1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/&size=162',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'api.github.com',
+						path: '/repos/mhutchie/test-repo/commits/1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'avatar-url',
+						path: '/&size=162',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 			});
 
 			it('Should requeue the request when the GitHub API cannot find the commit', async () => {
@@ -317,7 +373,10 @@ describe('AvatarManager', () => {
 				mockHttpsResponse(422, '', { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': (date.now + 1).toString() });
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', '2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+					'2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -329,10 +388,7 @@ describe('AvatarManager', () => {
 						email: 'user4@mhutchie.com',
 						repo: 'test-repo',
 						remote: 'test-remote',
-						commits: [
-							'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-							'2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c'
-						],
+						commits: ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', '2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c'],
 						checkAfter: 0,
 						attempts: 1
 					}
@@ -345,11 +401,15 @@ describe('AvatarManager', () => {
 				mockHttpsResponse(403, '', { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': (date.now + 1).toString() });
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnLog).toHaveBeenCalledWith('GitHub API Rate Limit Reached - Paused fetching from GitHub until the Rate Limit is reset');
+					expect(spyOnLog).toHaveBeenCalledWith(
+						'GitHub API Rate Limit Reached - Paused fetching from GitHub until the Rate Limit is reset'
+					);
 				});
 				expect(avatarManager['queue']['queue']).toStrictEqual([
 					{
@@ -370,7 +430,9 @@ describe('AvatarManager', () => {
 				mockHttpsResponse(500, '');
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -394,7 +456,9 @@ describe('AvatarManager', () => {
 				mockHttpsClientRequestErrorEvent();
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -418,7 +482,9 @@ describe('AvatarManager', () => {
 				mockHttpsIncomingMessageErrorEvent();
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -442,7 +508,9 @@ describe('AvatarManager', () => {
 				mockHttpsMultipleErrorEvents();
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -460,13 +528,15 @@ describe('AvatarManager', () => {
 				]);
 			});
 
-			it('Should requeue the request when it\'s before the GitHub API timeout', async () => {
+			it("Should requeue the request when it's before the GitHub API timeout", async () => {
 				// Setup
 				spyOnGetRemoteUrl.mockResolvedValueOnce('https://github.com/mhutchie/test-repo.git');
 				avatarManager['githubTimeout'] = (date.now + 1) * 1000;
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -495,28 +565,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'gitlab.com',
-					path: '/api/v4/users?search=user4@mhutchie.com',
-					headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'gitlab.com',
+						path: '/api/v4/users?search=user4@mhutchie.com',
+						headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'avatar-url',
+						path: '/',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -536,28 +616,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'gitlab.com',
-					path: '/api/v4/users?search=user4@mhutchie.com',
-					headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'gitlab.com',
+						path: '/api/v4/users?search=user4@mhutchie.com',
+						headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'avatar-url',
+						path: '/',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -577,28 +667,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'gitlab.com',
-					path: '/api/v4/users?search=user4@mhutchie.com',
-					headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'gitlab.com',
+						path: '/api/v4/users?search=user4@mhutchie.com',
+						headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -618,28 +718,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'gitlab.com',
-					path: '/api/v4/users?search=user4@mhutchie.com',
-					headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'gitlab.com',
+						path: '/api/v4/users?search=user4@mhutchie.com',
+						headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -656,27 +766,35 @@ describe('AvatarManager', () => {
 				mockHttpsResponse(404, '');
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnLog).toHaveBeenCalledWith('Failed to download avatar from GitLab for user4@*****');
 				});
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'gitlab.com',
-					path: '/api/v4/users?search=user4@mhutchie.com',
-					headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'avatar-url',
-					path: '/',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'gitlab.com',
+						path: '/api/v4/users?search=user4@mhutchie.com',
+						headers: { 'User-Agent': 'vscode-git-graph', 'Private-Token': 'w87U_3gAxWWaPtFgCcus' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'avatar-url',
+						path: '/',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 			});
 
 			it('Should set the GitLab API timeout and requeue the request when the rate limit is reached', async () => {
@@ -685,11 +803,15 @@ describe('AvatarManager', () => {
 				mockHttpsResponse(429, '', { 'ratelimit-remaining': '0', 'ratelimit-reset': (date.now + 1).toString() });
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnLog).toHaveBeenCalledWith('GitLab API Rate Limit Reached - Paused fetching from GitLab until the Rate Limit is reset');
+					expect(spyOnLog).toHaveBeenCalledWith(
+						'GitLab API Rate Limit Reached - Paused fetching from GitLab until the Rate Limit is reset'
+					);
 				});
 				expect(avatarManager['queue']['queue']).toStrictEqual([
 					{
@@ -710,7 +832,9 @@ describe('AvatarManager', () => {
 				mockHttpsResponse(500, '');
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -734,7 +858,9 @@ describe('AvatarManager', () => {
 				mockHttpsClientRequestErrorEvent();
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -758,7 +884,9 @@ describe('AvatarManager', () => {
 				mockHttpsIncomingMessageErrorEvent();
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -782,7 +910,9 @@ describe('AvatarManager', () => {
 				mockHttpsMultipleErrorEvents();
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -800,13 +930,15 @@ describe('AvatarManager', () => {
 				]);
 			});
 
-			it('Should requeue the request when it\'s before the GitLab API timeout', async () => {
+			it("Should requeue the request when it's before the GitLab API timeout", async () => {
 				// Setup
 				spyOnGetRemoteUrl.mockResolvedValueOnce('https://gitlab.com/mhutchie/test-repo.git');
 				avatarManager['gitLabTimeout'] = (date.now + 1) * 1000;
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
@@ -834,25 +966,32 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				await waitForExpect(() => {
 					expect(spyOnLog).toHaveBeenCalledWith('Saved Avatar for user4@*****');
 					expect(spyOnLog).toHaveBeenCalledWith('Sent Avatar for user4@***** to the Git Graph View');
 				});
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -861,13 +1000,16 @@ describe('AvatarManager', () => {
 					identicon: false
 				});
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -887,28 +1029,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -925,27 +1077,35 @@ describe('AvatarManager', () => {
 				mockHttpsResponse(500, '');
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnLog).toHaveBeenCalledWith('No Avatar could be found for user4@*****');
 				});
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 			});
 
 			it('Should fetch an avatar from Gravatar when no remote is specified', async () => {
@@ -956,21 +1116,28 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', null, ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', null, [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).not.toHaveBeenCalled();
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -989,21 +1156,28 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -1024,28 +1198,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -1065,28 +1249,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -1106,28 +1300,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -1147,28 +1351,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledTimes(1);
@@ -1191,28 +1405,38 @@ describe('AvatarManager', () => {
 				const avatarEvents = waitForEvents(avatarManager, 1);
 
 				// Run
-				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+				avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+					'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+				]);
 
 				// Assert
-				expect(await avatarEvents).toStrictEqual([{
-					email: 'user4@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-				}]);
+				expect(await avatarEvents).toStrictEqual([
+					{
+						email: 'user4@mhutchie.com',
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					}
+				]);
 				expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
-				expect(spyOnHttpsGet).toHaveBeenCalledWith({
-					hostname: 'secure.gravatar.com',
-					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
-					headers: { 'User-Agent': 'vscode-git-graph' },
-					agent: false,
-					timeout: 15000
-				}, expect.anything());
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
+				expect(spyOnHttpsGet).toHaveBeenCalledWith(
+					{
+						hostname: 'secure.gravatar.com',
+						path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=identicon',
+						headers: { 'User-Agent': 'vscode-git-graph' },
+						agent: false,
+						timeout: 15000
+					},
+					expect.anything()
+				);
 				expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 				expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 				expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -1233,7 +1457,9 @@ describe('AvatarManager', () => {
 			const avatarEvents = waitForEvents(avatarManager, 2);
 
 			// Run
-			avatarManager.fetchAvatarImage('user2@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user2@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
 			expect(await avatarEvents).toStrictEqual([
@@ -1247,13 +1473,16 @@ describe('AvatarManager', () => {
 				}
 			]);
 			expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-			expect(spyOnHttpsGet).toHaveBeenCalledWith({
-				hostname: 'secure.gravatar.com',
-				path: '/avatar/57853c107d1aeaa7da6f3096385cb848?s=162&d=404',
-				headers: { 'User-Agent': 'vscode-git-graph' },
-				agent: false,
-				timeout: 15000
-			}, expect.anything());
+			expect(spyOnHttpsGet).toHaveBeenCalledWith(
+				{
+					hostname: 'secure.gravatar.com',
+					path: '/avatar/57853c107d1aeaa7da6f3096385cb848?s=162&d=404',
+					headers: { 'User-Agent': 'vscode-git-graph' },
+					agent: false,
+					timeout: 15000
+				},
+				expect.anything()
+			);
 			expectFileToHaveBeenWritten('/path/to/avatars/57853c107d1aeaa7da6f3096385cb848.png', 'new-binary-image-data');
 			expectFileToHaveBeenRead('/path/to/avatars/57853c107d1aeaa7da6f3096385cb848.png');
 			expect(spyOnSaveAvatar).toHaveBeenCalledWith('user2@mhutchie.com', {
@@ -1263,7 +1492,7 @@ describe('AvatarManager', () => {
 			});
 		});
 
-		it('Shouldn\'t replace the existing avatar if it wasn\'t an identicon and the new avatar is', async () => {
+		it("Shouldn't replace the existing avatar if it wasn't an identicon and the new avatar is", async () => {
 			// Setup
 			spyOnGetRemoteUrl.mockResolvedValueOnce(null);
 			mockReadFile('binary-image-data');
@@ -1274,7 +1503,9 @@ describe('AvatarManager', () => {
 			const avatarEvents = waitForEvents(avatarManager, 2);
 
 			// Run
-			avatarManager.fetchAvatarImage('user2@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user2@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
 			expect(await avatarEvents).toStrictEqual([
@@ -1288,13 +1519,16 @@ describe('AvatarManager', () => {
 				}
 			]);
 			expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-			expect(spyOnHttpsGet).toHaveBeenCalledWith({
-				hostname: 'secure.gravatar.com',
-				path: '/avatar/57853c107d1aeaa7da6f3096385cb848?s=162&d=404',
-				headers: { 'User-Agent': 'vscode-git-graph' },
-				agent: false,
-				timeout: 15000
-			}, expect.anything());
+			expect(spyOnHttpsGet).toHaveBeenCalledWith(
+				{
+					hostname: 'secure.gravatar.com',
+					path: '/avatar/57853c107d1aeaa7da6f3096385cb848?s=162&d=404',
+					headers: { 'User-Agent': 'vscode-git-graph' },
+					agent: false,
+					timeout: 15000
+				},
+				expect.anything()
+			);
 			expectFileToHaveBeenWritten('/path/to/avatars/57853c107d1aeaa7da6f3096385cb848.png', 'new-binary-image-data');
 			expectFileToHaveBeenRead('/path/to/avatars/57853c107d1aeaa7da6f3096385cb848.png');
 			expect(spyOnSaveAvatar).toHaveBeenCalledWith('user2@mhutchie.com', {
@@ -1314,7 +1548,9 @@ describe('AvatarManager', () => {
 			const avatarEvents = waitForEvents(avatarManager, 2);
 
 			// Run
-			avatarManager.fetchAvatarImage('user3@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user3@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
 			expect(await avatarEvents).toStrictEqual([
@@ -1328,13 +1564,16 @@ describe('AvatarManager', () => {
 				}
 			]);
 			expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-			expect(spyOnHttpsGet).toHaveBeenCalledWith({
-				hostname: 'secure.gravatar.com',
-				path: '/avatar/e36b61e2afd912d3665f1aa92932aa87?s=162&d=404',
-				headers: { 'User-Agent': 'vscode-git-graph' },
-				agent: false,
-				timeout: 15000
-			}, expect.anything());
+			expect(spyOnHttpsGet).toHaveBeenCalledWith(
+				{
+					hostname: 'secure.gravatar.com',
+					path: '/avatar/e36b61e2afd912d3665f1aa92932aa87?s=162&d=404',
+					headers: { 'User-Agent': 'vscode-git-graph' },
+					agent: false,
+					timeout: 15000
+				},
+				expect.anything()
+			);
 			expectFileToHaveBeenWritten('/path/to/avatars/e36b61e2afd912d3665f1aa92932aa87.png', 'new-binary-image-data');
 			expectFileToHaveBeenRead('/path/to/avatars/e36b61e2afd912d3665f1aa92932aa87.png');
 			expect(spyOnSaveAvatar).toHaveBeenCalledWith('user3@mhutchie.com', {
@@ -1357,8 +1596,12 @@ describe('AvatarManager', () => {
 			const avatarEvents = waitForEvents(avatarManager, 2, true);
 
 			// Run
-			avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
-			avatarManager.fetchAvatarImage('user5@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
+			avatarManager.fetchAvatarImage('user5@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
 			expect(await avatarEvents).toStrictEqual([
@@ -1372,13 +1615,16 @@ describe('AvatarManager', () => {
 				}
 			]);
 			expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-			expect(spyOnHttpsGet).toHaveBeenCalledWith({
-				hostname: 'secure.gravatar.com',
-				path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-				headers: { 'User-Agent': 'vscode-git-graph' },
-				agent: false,
-				timeout: 15000
-			}, expect.anything());
+			expect(spyOnHttpsGet).toHaveBeenCalledWith(
+				{
+					hostname: 'secure.gravatar.com',
+					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+					headers: { 'User-Agent': 'vscode-git-graph' },
+					agent: false,
+					timeout: 15000
+				},
+				expect.anything()
+			);
 			expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data-one');
 			expectFileToHaveBeenRead('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png');
 			expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
@@ -1386,13 +1632,16 @@ describe('AvatarManager', () => {
 				timestamp: 1587559258000,
 				identicon: false
 			});
-			expect(spyOnHttpsGet).toHaveBeenCalledWith({
-				hostname: 'secure.gravatar.com',
-				path: '/avatar/da4173f868c17bcd6353cdba41070ca9?s=162&d=404',
-				headers: { 'User-Agent': 'vscode-git-graph' },
-				agent: false,
-				timeout: 15000
-			}, expect.anything());
+			expect(spyOnHttpsGet).toHaveBeenCalledWith(
+				{
+					hostname: 'secure.gravatar.com',
+					path: '/avatar/da4173f868c17bcd6353cdba41070ca9?s=162&d=404',
+					headers: { 'User-Agent': 'vscode-git-graph' },
+					agent: false,
+					timeout: 15000
+				},
+				expect.anything()
+			);
 			expectFileToHaveBeenWritten('/path/to/avatars/da4173f868c17bcd6353cdba41070ca9.png', 'binary-image-data-two');
 			expectFileToHaveBeenRead('/path/to/avatars/da4173f868c17bcd6353cdba41070ca9.png');
 			expect(spyOnSaveAvatar).toHaveBeenCalledWith('user5@mhutchie.com', {
@@ -1402,7 +1651,7 @@ describe('AvatarManager', () => {
 			});
 		});
 
-		it('Should fetch a new avatar when the existing image can\'t be read', async () => {
+		it("Should fetch a new avatar when the existing image can't be read", async () => {
 			// Setup
 			spyOnGetRemoteUrl.mockResolvedValueOnce(null);
 			mockReadFile(null);
@@ -1412,22 +1661,29 @@ describe('AvatarManager', () => {
 			const avatarEvents = waitForEvents(avatarManager, 1);
 
 			// Run
-			avatarManager.fetchAvatarImage('user1@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user1@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
-			expect(await avatarEvents).toStrictEqual([{
-				email: 'user1@mhutchie.com',
-				image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-			}]);
+			expect(await avatarEvents).toStrictEqual([
+				{
+					email: 'user1@mhutchie.com',
+					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+				}
+			]);
 			expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
 			expect(spyOnRemoveAvatarFromCache).toHaveBeenCalledWith('user1@mhutchie.com');
-			expect(spyOnHttpsGet).toHaveBeenCalledWith({
-				hostname: 'secure.gravatar.com',
-				path: '/avatar/530a7b02594e057f39179d3bd8b849f0?s=162&d=404',
-				headers: { 'User-Agent': 'vscode-git-graph' },
-				agent: false,
-				timeout: 15000
-			}, expect.anything());
+			expect(spyOnHttpsGet).toHaveBeenCalledWith(
+				{
+					hostname: 'secure.gravatar.com',
+					path: '/avatar/530a7b02594e057f39179d3bd8b849f0?s=162&d=404',
+					headers: { 'User-Agent': 'vscode-git-graph' },
+					agent: false,
+					timeout: 15000
+				},
+				expect.anything()
+			);
 			expectFileToHaveBeenWritten('/path/to/avatars/530a7b02594e057f39179d3bd8b849f0.png', 'binary-image-data');
 			expectFileToHaveBeenRead('/path/to/avatars/530a7b02594e057f39179d3bd8b849f0.png');
 			expect(spyOnSaveAvatar).toHaveBeenCalledWith('user1@mhutchie.com', {
@@ -1443,10 +1699,12 @@ describe('AvatarManager', () => {
 			mockHttpsResponse(200, 'binary-image-data');
 			mockWriteFile(null);
 			mockReadFile(null);
-			avatarManager.onAvatar(() => { });
+			avatarManager.onAvatar(() => {});
 
 			// Run
-			avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
 			await waitForExpect(() => {
@@ -1454,13 +1712,16 @@ describe('AvatarManager', () => {
 				expect(spyOnLog).toHaveBeenCalledWith('Failed to Send Avatar for user4@***** to the Git Graph View');
 			});
 			expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-			expect(spyOnHttpsGet).toHaveBeenCalledWith({
-				hostname: 'secure.gravatar.com',
-				path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-				headers: { 'User-Agent': 'vscode-git-graph' },
-				agent: false,
-				timeout: 15000
-			}, expect.anything());
+			expect(spyOnHttpsGet).toHaveBeenCalledWith(
+				{
+					hostname: 'secure.gravatar.com',
+					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+					headers: { 'User-Agent': 'vscode-git-graph' },
+					agent: false,
+					timeout: 15000
+				},
+				expect.anything()
+			);
 			expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 			expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
 				image: '0ca9d3f228e867bd4feb6d62cc2edbfe.png',
@@ -1476,21 +1737,28 @@ describe('AvatarManager', () => {
 			mockWriteFile(null);
 
 			// Run
-			avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
 			await waitForExpect(() => {
 				expect(spyOnLog).toHaveBeenCalledWith('Saved Avatar for user4@*****');
-				expect(spyOnLog).toHaveBeenCalledWith('Avatar for user4@***** is ready to be used the next time the Git Graph View is opened');
+				expect(spyOnLog).toHaveBeenCalledWith(
+					'Avatar for user4@***** is ready to be used the next time the Git Graph View is opened'
+				);
 			});
 			expect(spyOnGetRemoteUrl).toHaveBeenCalledWith('test-repo', 'test-remote');
-			expect(spyOnHttpsGet).toHaveBeenCalledWith({
-				hostname: 'secure.gravatar.com',
-				path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
-				headers: { 'User-Agent': 'vscode-git-graph' },
-				agent: false,
-				timeout: 15000
-			}, expect.anything());
+			expect(spyOnHttpsGet).toHaveBeenCalledWith(
+				{
+					hostname: 'secure.gravatar.com',
+					path: '/avatar/0ca9d3f228e867bd4feb6d62cc2edbfe?s=162&d=404',
+					headers: { 'User-Agent': 'vscode-git-graph' },
+					agent: false,
+					timeout: 15000
+				},
+				expect.anything()
+			);
 			expectFileToHaveBeenWritten('/path/to/avatars/0ca9d3f228e867bd4feb6d62cc2edbfe.png', 'binary-image-data');
 			expect(spyOnSaveAvatar).toHaveBeenCalledWith('user4@mhutchie.com', {
 				image: '0ca9d3f228e867bd4feb6d62cc2edbfe.png',
@@ -1513,7 +1781,9 @@ describe('AvatarManager', () => {
 
 			// Assert
 			await waitForExpect(() => {
-				expect(spyOnLog).toHaveBeenCalledWith('GitHub API Rate Limit Reached - Paused fetching from GitHub until the Rate Limit is reset');
+				expect(spyOnLog).toHaveBeenCalledWith(
+					'GitHub API Rate Limit Reached - Paused fetching from GitHub until the Rate Limit is reset'
+				);
 			});
 
 			// Run
@@ -1550,16 +1820,24 @@ describe('AvatarManager', () => {
 			mockHttpsResponse(403, '', { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': (date.now + 1).toString() });
 
 			// Run
-			avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user4@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
 			await waitForExpect(() => {
-				expect(spyOnLog).toHaveBeenCalledWith('GitHub API Rate Limit Reached - Paused fetching from GitHub until the Rate Limit is reset');
+				expect(spyOnLog).toHaveBeenCalledWith(
+					'GitHub API Rate Limit Reached - Paused fetching from GitHub until the Rate Limit is reset'
+				);
 			});
 
 			// Run
-			avatarManager.fetchAvatarImage('user2@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
-			avatarManager.fetchAvatarImage('user5@mhutchie.com', 'test-repo', 'test-remote', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+			avatarManager.fetchAvatarImage('user2@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
+			avatarManager.fetchAvatarImage('user5@mhutchie.com', 'test-repo', 'test-remote', [
+				'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+			]);
 
 			// Assert
 			expect(avatarManager['queue']['queue']).toStrictEqual([
@@ -1592,7 +1870,7 @@ describe('AvatarManager', () => {
 	});
 
 	describe('getAvatarImage', () => {
-		it('Should return a Data Url of the avatar\'s image data', async () => {
+		it("Should return a Data Url of the avatar's image data", async () => {
 			// Setup
 			mockReadFile('binary-image-data');
 
@@ -1662,96 +1940,111 @@ describe('AvatarManager', () => {
 });
 
 function mockHttpsResponse(statusCode: number, imageData: string, headers: { [header: string]: string } = {}) {
-	spyOnHttpsGet.mockImplementationOnce((_: string | https.RequestOptions | URL, callback: (res: IncomingMessage) => void): ClientRequest => {
-		if (callback) {
+	spyOnHttpsGet.mockImplementationOnce(
+		(_: string | https.RequestOptions | URL, callback: (res: IncomingMessage) => void): ClientRequest => {
+			if (callback) {
+				const callbacks: { [event: string]: (...args: any) => void } = {};
+				const message: IncomingMessage = <any>{
+					statusCode: statusCode,
+					headers: Object.assign(
+						{
+							'content-type': 'image/png'
+						},
+						headers
+					),
+					on: (event: string, listener: () => void) => {
+						callbacks[event] = listener;
+						return message;
+					}
+				};
+				callback(message);
+				callbacks['data'](Buffer.from(imageData));
+				callbacks['end']();
+			}
+			return {
+				on: jest.fn()
+			} as any as ClientRequest;
+		}
+	);
+}
+
+function mockHttpsClientRequestErrorEvent() {
+	spyOnHttpsGet.mockImplementationOnce(
+		(_1: string | https.RequestOptions | URL, _2: (res: IncomingMessage) => void): ClientRequest => {
+			const request: ClientRequest = <any>{
+				on: (event: string, callback: () => void) => {
+					if (event === 'error') {
+						callback();
+					}
+					return request;
+				}
+			};
+			return request;
+		}
+	);
+}
+
+function mockHttpsIncomingMessageErrorEvent() {
+	spyOnHttpsGet.mockImplementationOnce(
+		(_: string | https.RequestOptions | URL, callback: (res: IncomingMessage) => void): ClientRequest => {
 			const callbacks: { [event: string]: (...args: any) => void } = {};
 			const message: IncomingMessage = <any>{
-				statusCode: statusCode,
-				headers: Object.assign({
-					'content-type': 'image/png'
-				}, headers),
 				on: (event: string, listener: () => void) => {
 					callbacks[event] = listener;
 					return message;
 				}
 			};
 			callback(message);
-			callbacks['data'](Buffer.from(imageData));
-			callbacks['end']();
+			callbacks['error']();
+			return {
+				on: jest.fn()
+			} as any as ClientRequest;
 		}
-		return ({
-			on: jest.fn()
-		}) as any as ClientRequest;
-	});
-}
-
-function mockHttpsClientRequestErrorEvent() {
-	spyOnHttpsGet.mockImplementationOnce((_1: string | https.RequestOptions | URL, _2: (res: IncomingMessage) => void): ClientRequest => {
-		const request: ClientRequest = <any>{
-			on: (event: string, callback: () => void) => {
-				if (event === 'error') {
-					callback();
-				}
-				return request;
-			}
-		};
-		return request;
-	});
-}
-
-function mockHttpsIncomingMessageErrorEvent() {
-	spyOnHttpsGet.mockImplementationOnce((_: string | https.RequestOptions | URL, callback: (res: IncomingMessage) => void): ClientRequest => {
-		const callbacks: { [event: string]: (...args: any) => void } = {};
-		const message: IncomingMessage = <any>{
-			on: (event: string, listener: () => void) => {
-				callbacks[event] = listener;
-				return message;
-			}
-		};
-		callback(message);
-		callbacks['error']();
-		return ({
-			on: jest.fn()
-		}) as any as ClientRequest;
-	});
+	);
 }
 
 function mockHttpsMultipleErrorEvents() {
-	spyOnHttpsGet.mockImplementationOnce((_: string | https.RequestOptions | URL, callback: (res: IncomingMessage) => void): ClientRequest => {
-		const callbacks: { [event: string]: (...args: any) => void } = {};
-		const message: IncomingMessage = <any>{
-			on: (event: string, listener: () => void) => {
-				callbacks[event] = listener;
-				return message;
-			}
-		};
-		callback(message);
-		callbacks['error']();
-
-		const request: ClientRequest = <any>{
-			on: (event: string, callback: () => void) => {
-				if (event === 'error') {
-					callback();
+	spyOnHttpsGet.mockImplementationOnce(
+		(_: string | https.RequestOptions | URL, callback: (res: IncomingMessage) => void): ClientRequest => {
+			const callbacks: { [event: string]: (...args: any) => void } = {};
+			const message: IncomingMessage = <any>{
+				on: (event: string, listener: () => void) => {
+					callbacks[event] = listener;
+					return message;
 				}
-				return request;
-			}
-		};
-		return request;
-	});
+			};
+			callback(message);
+			callbacks['error']();
+
+			const request: ClientRequest = <any>{
+				on: (event: string, callback: () => void) => {
+					if (event === 'error') {
+						callback();
+					}
+					return request;
+				}
+			};
+			return request;
+		}
+	);
 }
 
 function mockWriteFile(error: NodeJS.ErrnoException | null) {
-	spyOnWriteFile.mockImplementationOnce((_1: fs.PathLike | number, _2: Buffer, callback: (err: NodeJS.ErrnoException | null) => void) => callback(error));
+	spyOnWriteFile.mockImplementationOnce(
+		(_1: fs.PathLike | number, _2: Buffer, callback: (err: NodeJS.ErrnoException | null) => void) => callback(error)
+	);
 }
 
 function mockReadFile(data: string | null) {
-	spyOnReadFile.mockImplementationOnce((_: fs.PathLike | number, callback: (err: NodeJS.ErrnoException | null, _: Buffer) => void) => {
-		if (data) {
-			callback(null, Buffer.from(data));
-		} else {
-			callback(new Error(), Buffer.alloc(0));
+	spyOnReadFile.mockImplementationOnce(
+		(_: fs.PathLike | number, callback: (err: NodeJS.ErrnoException | null, _: Buffer) => void) => {
+			if (data) {
+				callback(null, Buffer.from(data));
+			} else {
+				callback(new Error(), Buffer.alloc(0));
+			}
 		}
-	});
+	);
 }
 
 function expectFileToHaveBeenWritten(name: string, data: string) {

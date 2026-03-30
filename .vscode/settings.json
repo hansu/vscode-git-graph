@@ -1,21 +1,21 @@
 {
-    "files.exclude": {
-        "out": false
-    },
-    "search.exclude": {
-        "out": true
-    },
-    "task.problemMatchers.neverPrompt": {
-        "npm": true
-    },
-    "[typescript]": {
-        "editor.formatOnSave": true,
-    },
-    "[javascript]": {
-        "editor.formatOnSave": true,
-    },
-    "[jsonc]": {
-        "editor.formatOnSave": true,
-    },
-    "typescript.tsdk": "./node_modules/typescript/lib"
+	"files.exclude": {
+		"out": false
+	},
+	"search.exclude": {
+		"out": true
+	},
+	"task.problemMatchers.neverPrompt": {
+		"npm": true
+	},
+	"[typescript]": {
+		"editor.formatOnSave": true
+	},
+	"[javascript]": {
+		"editor.formatOnSave": true
+	},
+	"[jsonc]": {
+		"editor.formatOnSave": true
+	},
+	"typescript.tsdk": "./node_modules/typescript/lib"
 }

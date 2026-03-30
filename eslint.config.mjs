@@ -9,11 +9,7 @@ export default [
 		languageOptions: {
 			parser: typescriptParser,
 			parserOptions: {
-				project: [
-					'./src/tsconfig.json',
-					'./tests/tsconfig.json',
-					'./web/tsconfig.json'
-				]
+				project: ['./src/tsconfig.json', './tests/tsconfig.json', './web/tsconfig.json']
 			},
 			globals: {
 				// Node.js globals
@@ -73,43 +69,37 @@ export default [
 			'no-control-regex': 'off',
 			// Enable TypeScript specific rules
 			'@typescript-eslint/no-unused-vars': 'off',
+			// Stylistic formatting handled by oxfmt (see npm run format)
+			'arrow-spacing': 'off',
+			'brace-style': 'off',
+			'comma-dangle': 'off',
+			'comma-spacing': 'off',
+			'comma-style': 'off',
+			'dot-location': 'off',
+			'eol-last': 'off',
+			'func-call-spacing': 'off',
+			indent: 'off',
+			'key-spacing': 'off',
+			'linebreak-style': 'off',
+			'no-mixed-spaces-and-tabs': 'off',
+			'no-multi-spaces': 'off',
+			'no-trailing-spaces': 'off',
+			'no-whitespace-before-property': 'off',
+			'padded-blocks': 'off',
+			quotes: 'off',
+			'rest-spread-spacing': 'off',
+			semi: 'off',
+			'space-before-function-paren': 'off',
+			'space-before-blocks': 'off',
+			'space-infix-ops': 'off',
+			'spaced-comment': 'off',
+			'template-curly-spacing': 'off',
+			'wrap-iife': 'off',
 			// Other rules
-			'arrow-spacing': [
-				'warn',
-				{
-					'before': true,
-					'after': true
-				}
-			],
-			'brace-style': [
-				'warn',
-				'1tbs',
-				{
-					'allowSingleLine': true
-				}
-			],
-			'comma-dangle': 'warn',
-			'comma-spacing': 'warn',
-			'comma-style': 'warn',
-			'dot-location': [
-				'warn',
-				'property'
-			],
-			'eol-last': 'warn',
-			'eqeqeq': 'warn',
+			eqeqeq: 'warn',
 			'func-call-spacing': 'warn',
-			'indent': [
-				'warn',
-				'tab',
-				{
-					'SwitchCase': 1
-				}
-			],
 			'key-spacing': 'warn',
-			'linebreak-style': [
-				'warn',
-				'windows'
-			],
+			'linebreak-style': ['warn', 'windows'],
 			'new-cap': 'warn',
 			'new-parens': 'warn',
 			'no-alert': 'error',
@@ -119,7 +109,6 @@ export default [
 			'no-implied-eval': 'error',
 			'no-irregular-whitespace': 'warn',
 			'no-labels': 'error',
-			'no-multi-spaces': 'warn',
 			'no-proto': 'error',
 			'no-prototype-builtins': 'error',
 			'no-redeclare': 'error',
@@ -134,77 +123,37 @@ export default [
 			'no-unsafe-negation': 'warn',
 			'no-unused-expressions': 'warn',
 			'no-var': 'warn',
-			'no-whitespace-before-property': 'warn',
 			'no-with': 'error',
-			'padded-blocks': [
-				'warn',
-				{
-					'classes': 'never',
-					'switches': 'never'
-				}
-			],
-			'quotes': [
-				'warn',
-				'single'
-			],
-			'rest-spread-spacing': 'warn',
-			'semi': 'warn',
 			'sort-imports': [
 				'warn',
 				{
-					'allowSeparatedGroups': true,
-					'ignoreDeclarationSort': true
+					allowSeparatedGroups: true,
+					ignoreDeclarationSort: true
 				}
 			],
-			'space-before-function-paren': [
-				'warn',
-				{
-					'anonymous': 'always',
-					'named': 'never',
-					'asyncArrow': 'always'
-				}
-			],
-			'space-before-blocks': 'warn',
-			'space-infix-ops': 'warn',
-			'spaced-comment': 'warn',
-			'template-curly-spacing': 'warn',
-			'wrap-iife': [
-				'warn',
-				'inside'
-			],
-			'yoda': 'warn',
+			yoda: 'warn',
 			'@typescript-eslint/await-thenable': 'warn',
 			'@typescript-eslint/ban-ts-comment': 'error',
-			'@typescript-eslint/class-literal-property-style': [
-				'warn',
-				'fields'
-			],
+			'@typescript-eslint/class-literal-property-style': ['warn', 'fields'],
 			'@typescript-eslint/explicit-member-accessibility': [
 				'warn',
 				{
-					'overrides': {
-						'accessors': 'off',
-						'constructors': 'off'
+					overrides: {
+						accessors: 'off',
+						constructors: 'off'
 					}
 				}
 			],
-			'@typescript-eslint/method-signature-style': [
-				'warn',
-				'property'
-			],
+			'@typescript-eslint/method-signature-style': ['warn', 'property'],
 			'@typescript-eslint/naming-convention': [
 				'warn',
 				{
-					'selector': 'class',
-					'format': [
-						'StrictPascalCase'
-					]
+					selector: 'class',
+					format: ['StrictPascalCase']
 				},
 				{
-					'selector': 'function',
-					'format': [
-						'camelCase'
-					]
+					selector: 'function',
+					format: ['camelCase']
 				}
 			],
 			'@typescript-eslint/no-misused-new': 'warn',

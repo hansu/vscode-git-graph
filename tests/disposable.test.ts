@@ -91,7 +91,7 @@ describe('Disposable', () => {
 describe('toDisposable', () => {
 	it('Should wrap a function with a disposable', () => {
 		// Setup
-		const fn = () => { };
+		const fn = () => {};
 
 		// Run
 		const result = toDisposable(fn);

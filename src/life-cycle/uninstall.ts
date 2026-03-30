@@ -23,5 +23,5 @@ import { LifeCycleStage, generateNonce, getDataDirectory, getLifeCycleStateInDir
 				await sendQueue(state.queue);
 			}
 		}
-	} catch (_) { }
+	} catch (_) {}
 })();

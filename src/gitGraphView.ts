@@ -27,7 +27,15 @@ export class GitGraphView extends BaseGitGraphView {
 	 * @param logger The Git Graph Logger instance.
 	 * @param loadViewTo What to load the view to.
 	 */
-	public static createOrShow(extensionPath: string, dataSource: DataSource, extensionState: ExtensionState, avatarManager: AvatarManager, repoManager: RepoManager, logger: Logger, loadViewTo: LoadGitGraphViewTo) {
+	public static createOrShow(
+		extensionPath: string,
+		dataSource: DataSource,
+		extensionState: ExtensionState,
+		avatarManager: AvatarManager,
+		repoManager: RepoManager,
+		logger: Logger,
+		loadViewTo: LoadGitGraphViewTo
+	) {
 		const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 
 		if (GitGraphView.currentPanel) {
@@ -36,7 +44,16 @@ export class GitGraphView extends BaseGitGraphView {
 			GitGraphView.currentPanel.panel.reveal(column);
 		} else {
 			// If Git Graph panel doesn't already exist
-			GitGraphView.currentPanel = new GitGraphView(extensionPath, dataSource, extensionState, avatarManager, repoManager, logger, loadViewTo, column);
+			GitGraphView.currentPanel = new GitGraphView(
+				extensionPath,
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				loadViewTo,
+				column
+			);
 		}
 	}
 
@@ -65,7 +82,16 @@ export class GitGraphView extends BaseGitGraphView {
 	 * @param loadViewTo What to load the view to.
 	 * @param column The column the view should be loaded in.
 	 */
-	private constructor(extensionPath: string, dataSource: DataSource, extensionState: ExtensionState, avatarManager: AvatarManager, repoManager: RepoManager, logger: Logger, loadViewTo: LoadGitGraphViewTo, column: vscode.ViewColumn | undefined) {
+	private constructor(
+		extensionPath: string,
+		dataSource: DataSource,
+		extensionState: ExtensionState,
+		avatarManager: AvatarManager,
+		repoManager: RepoManager,
+		logger: Logger,
+		loadViewTo: LoadGitGraphViewTo,
+		column: vscode.ViewColumn | undefined
+	) {
 		super(extensionPath, dataSource, extensionState, avatarManager, repoManager, logger, loadViewTo);
 
 		const config = getConfig();
@@ -74,13 +100,13 @@ export class GitGraphView extends BaseGitGraphView {
 			localResourceRoots: [vscode.Uri.file(extensionPath + '/media')],
 			retainContextWhenHidden: config.retainContextWhenHidden
 		});
-		this.panel.iconPath = config.tabIconColourTheme === TabIconColourTheme.Colour
-			? this.getResourcesUri('webview-icon.svg')
-			: {
-				light: this.getResourcesUri('webview-icon-light.svg'),
-				dark: this.getResourcesUri('webview-icon-dark.svg')
-			};
-
+		this.panel.iconPath =
+			config.tabIconColourTheme === TabIconColourTheme.Colour
+				? this.getResourcesUri('webview-icon.svg')
+				: {
+						light: this.getResourcesUri('webview-icon-light.svg'),
+						dark: this.getResourcesUri('webview-icon-dark.svg')
+					};
 
 		this.registerDisposables(
 			// Dispose Git Graph View resources when disposed

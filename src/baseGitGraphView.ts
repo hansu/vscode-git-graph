@@ -7,8 +7,37 @@ import { ExtensionState } from './extensionState';
 import { Logger } from './logger';
 import { RepoFileWatcher } from './repoFileWatcher';
 import { RepoManager } from './repoManager';
-import { ErrorInfo, GitConfigLocation, GitGraphViewInitialState, GitPushBranchMode, GitRepoSet, LoadGitGraphViewTo, RequestDropCommits, RequestMessage, RequestSquashCommits, ResponseMessage } from './types';
-import { UNABLE_TO_FIND_GIT_MSG, UNCOMMITTED, archive, copyFilePathToClipboard, copyToClipboard, createPullRequest, getNonce, getPathFromUri, openExtensionSettings, openExternalUrl, openFile, pathWithTrailingSlash, showErrorMessage, viewDiff, viewDiffWithWorkingFile, viewFileAtRevision, viewScm } from './utils';
+import {
+	ErrorInfo,
+	GitConfigLocation,
+	GitGraphViewInitialState,
+	GitPushBranchMode,
+	GitRepoSet,
+	LoadGitGraphViewTo,
+	RequestDropCommits,
+	RequestMessage,
+	RequestSquashCommits,
+	ResponseMessage
+} from './types';
+import {
+	UNABLE_TO_FIND_GIT_MSG,
+	UNCOMMITTED,
+	archive,
+	copyFilePathToClipboard,
+	copyToClipboard,
+	createPullRequest,
+	getNonce,
+	getPathFromUri,
+	openExtensionSettings,
+	openExternalUrl,
+	openFile,
+	pathWithTrailingSlash,
+	showErrorMessage,
+	viewDiff,
+	viewDiffWithWorkingFile,
+	viewFileAtRevision,
+	viewScm
+} from './utils';
 import { Disposable, toDisposable } from './utils/disposable';
 
 /**
@@ -50,7 +79,15 @@ export abstract class BaseGitGraphView extends Disposable {
 	 * @param logger The Git Graph Logger instance.
 	 * @param loadViewTo What to load the view to.
 	 */
-	protected constructor(extensionPath: string, dataSource: DataSource, extensionState: ExtensionState, avatarManager: AvatarManager, repoManager: RepoManager, logger: Logger, loadViewTo: LoadGitGraphViewTo) {
+	protected constructor(
+		extensionPath: string,
+		dataSource: DataSource,
+		extensionState: ExtensionState,
+		avatarManager: AvatarManager,
+		repoManager: RepoManager,
+		logger: Logger,
+		loadViewTo: LoadGitGraphViewTo
+	) {
 		super();
 		this.extensionPath = extensionPath;
 		this.avatarManager = avatarManager;
@@ -116,7 +153,9 @@ export abstract class BaseGitGraphView extends Disposable {
 		// Render the content of the Webview
 		this.update();
 
-		this.logger.log('Created Git Graph View' + (this.loadViewTo !== null ? ' (active repo: ' + this.loadViewTo.repo + ')' : ''));
+		this.logger.log(
+			'Created Git Graph View' + (this.loadViewTo !== null ? ' (active repo: ' + this.loadViewTo.repo + ')' : '')
+		);
 	}
 
 	/**
@@ -166,9 +205,19 @@ export abstract class BaseGitGraphView extends Disposable {
 				});
 				break;
 			case 'addTag':
-				errorInfos = [await this.dataSource.addTag(msg.repo, msg.tagName, msg.commitHash, msg.type, msg.message, msg.force)];
+				errorInfos = [
+					await this.dataSource.addTag(msg.repo, msg.tagName, msg.commitHash, msg.type, msg.message, msg.force)
+				];
 				if (errorInfos[0] === null && msg.pushToRemote !== null) {
-					errorInfos.push(...await this.dataSource.pushTag(msg.repo, msg.tagName, [msg.pushToRemote], msg.commitHash, msg.pushSkipRemoteCheck));
+					errorInfos.push(
+						...(await this.dataSource.pushTag(
+							msg.repo,
+							msg.tagName,
+							[msg.pushToRemote],
+							msg.commitHash,
+							msg.pushSkipRemoteCheck
+						))
+					);
 				}
 				this.sendMessage({
 					command: 'addTag',
@@ -194,7 +243,16 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'checkoutBranch':
 				errorInfos = [await this.dataSource.checkoutBranch(msg.repo, msg.branchName, msg.remoteBranch)];
 				if (errorInfos[0] === null && msg.pullAfterwards !== null) {
-					errorInfos.push(await this.dataSource.pullBranch(msg.repo, msg.pullAfterwards.branchName, msg.pullAfterwards.remote, msg.pullAfterwards.createNewCommit, msg.pullAfterwards.squash, msg.pullAfterwards.noVerify));
+					errorInfos.push(
+						await this.dataSource.pullBranch(
+							msg.repo,
+							msg.pullAfterwards.branchName,
+							msg.pullAfterwards.remote,
+							msg.pullAfterwards.createNewCommit,
+							msg.pullAfterwards.squash,
+							msg.pullAfterwards.noVerify
+						)
+					);
 				}
 				this.sendMessage({
 					command: 'checkoutBranch',
@@ -209,7 +267,15 @@ export abstract class BaseGitGraphView extends Disposable {
 				});
 				break;
 			case 'cherrypickCommit':
-				errorInfos = [await this.dataSource.cherrypickCommit(msg.repo, msg.commitHash, msg.parentIndex, msg.recordOrigin, msg.noCommit)];
+				errorInfos = [
+					await this.dataSource.cherrypickCommit(
+						msg.repo,
+						msg.commitHash,
+						msg.parentIndex,
+						msg.recordOrigin,
+						msg.noCommit
+					)
+				];
 				if (errorInfos[0] === null && msg.noCommit) {
 					errorInfos.push(await viewScm());
 				}
@@ -234,7 +300,8 @@ export abstract class BaseGitGraphView extends Disposable {
 					command: 'commitDetails',
 					...data[0],
 					avatar: data[1],
-					codeReview: msg.commitHash !== UNCOMMITTED ? this.extensionState.getCodeReview(msg.repo, msg.commitHash) : null,
+					codeReview:
+						msg.commitHash !== UNCOMMITTED ? this.extensionState.getCodeReview(msg.repo, msg.commitHash) : null,
 					refresh: msg.refresh
 				});
 				break;
@@ -243,8 +310,11 @@ export abstract class BaseGitGraphView extends Disposable {
 					command: 'compareCommits',
 					commitHash: msg.commitHash,
 					compareWithHash: msg.compareWithHash,
-					...await this.dataSource.getCommitComparison(msg.repo, msg.fromHash, msg.toHash),
-					codeReview: msg.toHash !== UNCOMMITTED ? this.extensionState.getCodeReview(msg.repo, msg.fromHash + '-' + msg.toHash) : null,
+					...(await this.dataSource.getCommitComparison(msg.repo, msg.fromHash, msg.toHash)),
+					codeReview:
+						msg.toHash !== UNCOMMITTED
+							? this.extensionState.getCodeReview(msg.repo, msg.fromHash + '-' + msg.toHash)
+							: null,
 					refresh: msg.refresh
 				});
 				break;
@@ -274,7 +344,18 @@ export abstract class BaseGitGraphView extends Disposable {
 				});
 				break;
 			case 'createPullRequest':
-				errorInfos = [msg.push ? await this.dataSource.pushBranch(msg.repo, msg.sourceBranch, msg.sourceRemote, true, GitPushBranchMode.Normal, false) : null];
+				errorInfos = [
+					msg.push
+						? await this.dataSource.pushBranch(
+								msg.repo,
+								msg.sourceBranch,
+								msg.sourceRemote,
+								true,
+								GitPushBranchMode.Normal,
+								false
+							)
+						: null
+				];
 				if (errorInfos[0] === null) {
 					errorInfos.push(await createPullRequest(msg.config, msg.sourceOwner, msg.sourceRepo, msg.sourceBranch));
 				}
@@ -351,13 +432,26 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'squashCommits':
 				this.sendMessage({
 					command: 'squashCommits',
-					error: await this.dataSource.squashCommits(msg.repo, (msg as RequestSquashCommits).commits, (msg as RequestSquashCommits).commitMessage, (msg as RequestSquashCommits).noVerify)
+					error: await this.dataSource.squashCommits(
+						msg.repo,
+						(msg as RequestSquashCommits).commits,
+						(msg as RequestSquashCommits).commitMessage,
+						(msg as RequestSquashCommits).noVerify
+					)
 				});
 				break;
 			case 'editRemote':
 				this.sendMessage({
 					command: 'editRemote',
-					error: await this.dataSource.editRemote(msg.repo, msg.nameOld, msg.nameNew, msg.urlOld, msg.urlNew, msg.pushUrlOld, msg.pushUrlNew)
+					error: await this.dataSource.editRemote(
+						msg.repo,
+						msg.nameOld,
+						msg.nameNew,
+						msg.urlOld,
+						msg.urlNew,
+						msg.pushUrlOld,
+						msg.pushUrlNew
+					)
 				});
 				break;
 			case 'editUserDetails':
@@ -367,10 +461,14 @@ export abstract class BaseGitGraphView extends Disposable {
 				];
 				if (errorInfos[0] === null && errorInfos[1] === null) {
 					if (msg.deleteLocalName) {
-						errorInfos.push(await this.dataSource.unsetConfigValue(msg.repo, GitConfigKey.UserName, GitConfigLocation.Local));
+						errorInfos.push(
+							await this.dataSource.unsetConfigValue(msg.repo, GitConfigKey.UserName, GitConfigLocation.Local)
+						);
 					}
 					if (msg.deleteLocalEmail) {
-						errorInfos.push(await this.dataSource.unsetConfigValue(msg.repo, GitConfigKey.UserEmail, GitConfigLocation.Local));
+						errorInfos.push(
+							await this.dataSource.unsetConfigValue(msg.repo, GitConfigKey.UserEmail, GitConfigLocation.Local)
+						);
 					}
 				}
 				this.sendMessage({
@@ -399,7 +497,13 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'fetchIntoLocalBranch':
 				this.sendMessage({
 					command: 'fetchIntoLocalBranch',
-					error: await this.dataSource.fetchIntoLocalBranch(msg.repo, msg.remote, msg.remoteBranch, msg.localBranch, msg.force)
+					error: await this.dataSource.fetchIntoLocalBranch(
+						msg.repo,
+						msg.remote,
+						msg.remoteBranch,
+						msg.localBranch,
+						msg.force
+					)
 				});
 				break;
 			case 'loadCommits':
@@ -408,19 +512,40 @@ export abstract class BaseGitGraphView extends Disposable {
 					command: 'loadCommits',
 					refreshId: msg.refreshId,
 					onlyFollowFirstParent: msg.onlyFollowFirstParent,
-					...await this.dataSource.getCommits(msg.repo, msg.branches, msg.authors, msg.maxCommits, msg.showTags, msg.showRemoteBranches, msg.includeCommitsMentionedByReflogs, msg.onlyFollowFirstParent, msg.commitOrdering, msg.remotes, msg.hideRemotes, msg.stashes, msg.simplifyByDecoration, msg.pathFilter)
+					...(await this.dataSource.getCommits(
+						msg.repo,
+						msg.branches,
+						msg.authors,
+						msg.maxCommits,
+						msg.showTags,
+						msg.showRemoteBranches,
+						msg.includeCommitsMentionedByReflogs,
+						msg.onlyFollowFirstParent,
+						msg.commitOrdering,
+						msg.remotes,
+						msg.hideRemotes,
+						msg.stashes,
+						msg.simplifyByDecoration,
+						msg.pathFilter
+					))
 				});
 				break;
 			case 'loadConfig':
 				this.sendMessage({
 					command: 'loadConfig',
 					repo: msg.repo,
-					...await this.dataSource.getConfig(msg.repo, msg.remotes)
+					...(await this.dataSource.getConfig(msg.repo, msg.remotes))
 				});
 				break;
 			case 'loadRepoInfo':
 				this.loadRepoInfoRefreshId = msg.refreshId;
-				let repoInfo = await this.dataSource.getRepoInfo(msg.repo, msg.showRemoteBranches, msg.showStashes, msg.hideRemotes), isRepo = true;
+				let repoInfo = await this.dataSource.getRepoInfo(
+						msg.repo,
+						msg.showRemoteBranches,
+						msg.showStashes,
+						msg.hideRemotes
+					),
+					isRepo = true;
 				if (repoInfo.error) {
 					// If an error occurred, check to make sure the repo still exists
 					isRepo = (await this.dataSource.repoRoot(msg.repo)) !== null;
@@ -439,7 +564,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				}
 				break;
 			case 'loadRepos':
-				if (!msg.check || !await this.repoManager.checkReposExist()) {
+				if (!msg.check || !(await this.repoManager.checkReposExist())) {
 					// If not required to check repos, or no changes were found when checking, respond with repos
 					this.respondLoadRepos(this.repoManager.getRepos(), null);
 				}
@@ -448,7 +573,16 @@ export abstract class BaseGitGraphView extends Disposable {
 				this.sendMessage({
 					command: 'merge',
 					actionOn: msg.actionOn,
-					error: await this.dataSource.merge(msg.repo, msg.obj, msg.actionOn, msg.createNewCommit, msg.allowUnrelatedHistories, msg.squash, msg.noVerify, msg.noCommit)
+					error: await this.dataSource.merge(
+						msg.repo,
+						msg.obj,
+						msg.actionOn,
+						msg.createNewCommit,
+						msg.allowUnrelatedHistories,
+						msg.squash,
+						msg.noVerify,
+						msg.noCommit
+					)
 				});
 				break;
 			case 'openExtensionSettings':
@@ -496,14 +630,28 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'pullBranch':
 				this.sendMessage({
 					command: 'pullBranch',
-					error: await this.dataSource.pullBranch(msg.repo, msg.branchName, msg.remote, msg.createNewCommit, msg.squash, msg.noVerify)
+					error: await this.dataSource.pullBranch(
+						msg.repo,
+						msg.branchName,
+						msg.remote,
+						msg.createNewCommit,
+						msg.squash,
+						msg.noVerify
+					)
 				});
 				break;
 			case 'pushBranch':
 				this.sendMessage({
 					command: 'pushBranch',
 					willUpdateBranchConfig: msg.willUpdateBranchConfig,
-					errors: await this.dataSource.pushBranchToMultipleRemotes(msg.repo, msg.branchName, msg.remotes, msg.setUpstream, msg.mode, msg.noVerify)
+					errors: await this.dataSource.pushBranchToMultipleRemotes(
+						msg.repo,
+						msg.branchName,
+						msg.remotes,
+						msg.setUpstream,
+						msg.mode,
+						msg.noVerify
+					)
 				});
 				break;
 			case 'pushStash':
@@ -527,7 +675,14 @@ export abstract class BaseGitGraphView extends Disposable {
 					command: 'rebase',
 					actionOn: msg.actionOn,
 					interactive: msg.interactive,
-					error: await this.dataSource.rebase(msg.repo, msg.obj, msg.actionOn, msg.ignoreDate, msg.interactive, msg.signoff)
+					error: await this.dataSource.rebase(
+						msg.repo,
+						msg.obj,
+						msg.actionOn,
+						msg.ignoreDate,
+						msg.interactive,
+						msg.signoff
+					)
 				});
 				break;
 			case 'getRebaseTodoList': {
@@ -542,7 +697,13 @@ export abstract class BaseGitGraphView extends Disposable {
 			case 'rebaseInteractive':
 				this.sendMessage({
 					command: 'rebaseInteractive',
-					error: await this.dataSource.rebaseInteractiveWithTodo(msg.repo, msg.obj, msg.actionOn, msg.entries, msg.signoff)
+					error: await this.dataSource.rebaseInteractiveWithTodo(
+						msg.repo,
+						msg.obj,
+						msg.actionOn,
+						msg.entries,
+						msg.signoff
+					)
 				});
 				break;
 			case 'renameBranch':
@@ -609,7 +770,7 @@ export abstract class BaseGitGraphView extends Disposable {
 					command: 'startCodeReview',
 					commitHash: msg.commitHash,
 					compareWithHash: msg.compareWithHash,
-					...await this.extensionState.startCodeReview(msg.repo, msg.id, msg.files, msg.lastViewedFile)
+					...(await this.extensionState.startCodeReview(msg.repo, msg.id, msg.files, msg.lastViewedFile))
 				});
 				break;
 			case 'tagDetails':
@@ -617,7 +778,7 @@ export abstract class BaseGitGraphView extends Disposable {
 					command: 'tagDetails',
 					tagName: msg.tagName,
 					commitHash: msg.commitHash,
-					...await this.dataSource.getTagDetails(msg.repo, msg.tagName)
+					...(await this.dataSource.getTagDetails(msg.repo, msg.tagName))
 				});
 				break;
 			case 'updateCodeReview':
@@ -664,7 +825,7 @@ export abstract class BaseGitGraphView extends Disposable {
 			this.logger.log('The Git Graph View has already been disposed, ignored sending "' + msg.command + '" message.');
 		} else {
 			this.webview.postMessage(msg).then(
-				() => { },
+				() => {},
 				() => {
 					if (this.isDisposed()) {
 						this.logger.log('The Git Graph View was disposed while sending "' + msg.command + '" message.');
@@ -688,7 +849,8 @@ export abstract class BaseGitGraphView extends Disposable {
 	 * @returns The HTML.
 	 */
 	protected getHtmlForWebview() {
-		const config = getConfig(), nonce = getNonce();
+		const config = getConfig(),
+			nonce = getNonce();
 		const initialState: GitGraphViewInitialState = {
 			config: {
 				commitDetailsView: config.commitDetailsView,
@@ -735,7 +897,10 @@ export abstract class BaseGitGraphView extends Disposable {
 		const globalState = this.extensionState.getGlobalViewState();
 		const workspaceState = this.extensionState.getWorkspaceViewState();
 
-		let body, numRepos = Object.keys(initialState.repos).length, colorVars = '', colorParams = '';
+		let body,
+			numRepos = Object.keys(initialState.repos).length,
+			colorVars = '',
+			colorParams = '';
 		for (let i = 0; i < initialState.config.graph.colours.length; i++) {
 			colorVars += '--git-graph-color' + i + ':' + initialState.config.graph.colours[i] + '; ';
 			colorParams += '[data-color="' + i + '"]{--git-graph-color:var(--git-graph-color' + i + ');} ';
@@ -748,9 +913,14 @@ export abstract class BaseGitGraphView extends Disposable {
 			</body>`;
 		} else if (numRepos > 0) {
 			const stickyClassAttr = initialState.config.stickyHeader ? ' class="sticky"' : '';
-			let hideRemotes = '', hideSimplify = '';
-			if (!config.toolbarButtonVisibility.remotes) { hideRemotes = 'style="display: none"'; }
-			if (!config.toolbarButtonVisibility.simplify) { hideSimplify = 'style="display: none"'; }
+			let hideRemotes = '',
+				hideSimplify = '';
+			if (!config.toolbarButtonVisibility.remotes) {
+				hideRemotes = 'style="display: none"';
+			}
+			if (!config.toolbarButtonVisibility.simplify) {
+				hideSimplify = 'style="display: none"';
+			}
 			body = `<body>
 			<div id="view" tabindex="-1">
 				<div id="controls"${stickyClassAttr}>
@@ -880,10 +1050,14 @@ function getWorkspaceFolderRelativePaths(repos: GitRepoSet): { [repo: string]: s
  */
 export function standardiseCspSource(cspSource: string) {
 	if (cspSource.startsWith('http://') || cspSource.startsWith('https://')) {
-		const pathIndex = cspSource.indexOf('/', 8), queryIndex = cspSource.indexOf('?', 8), fragmentIndex = cspSource.indexOf('#', 8);
+		const pathIndex = cspSource.indexOf('/', 8),
+			queryIndex = cspSource.indexOf('?', 8),
+			fragmentIndex = cspSource.indexOf('#', 8);
 		let endOfAuthorityIndex = pathIndex;
-		if (queryIndex > -1 && (queryIndex < endOfAuthorityIndex || endOfAuthorityIndex === -1)) endOfAuthorityIndex = queryIndex;
-		if (fragmentIndex > -1 && (fragmentIndex < endOfAuthorityIndex || endOfAuthorityIndex === -1)) endOfAuthorityIndex = fragmentIndex;
+		if (queryIndex > -1 && (queryIndex < endOfAuthorityIndex || endOfAuthorityIndex === -1))
+			endOfAuthorityIndex = queryIndex;
+		if (fragmentIndex > -1 && (fragmentIndex < endOfAuthorityIndex || endOfAuthorityIndex === -1))
+			endOfAuthorityIndex = fragmentIndex;
 		return endOfAuthorityIndex > -1 ? cspSource.substring(0, endOfAuthorityIndex) : cspSource;
 	} else {
 		return cspSource;

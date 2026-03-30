@@ -15,11 +15,15 @@ const OUTPUT_TMP_JS_FILE = 'out.tmp.js';
 
 const DEBUG = process.argv.length > 2 && process.argv[2] === 'debug';
 
-
 // Determine the JS files to be packaged. The order is: utils.ts, *.ts, and then main.ts
 let packageJsFiles = [path.join(MEDIA_DIRECTORY, UTILS_JS_FILE)];
 fs.readdirSync(MEDIA_DIRECTORY).forEach((fileName) => {
-	if (fileName.endsWith('.js') && fileName !== OUTPUT_MIN_JS_FILE && fileName !== UTILS_JS_FILE && fileName !== MAIN_JS_FILE) {
+	if (
+		fileName.endsWith('.js') &&
+		fileName !== OUTPUT_MIN_JS_FILE &&
+		fileName !== UTILS_JS_FILE &&
+		fileName !== MAIN_JS_FILE
+	) {
 		packageJsFiles.push(path.join(MEDIA_DIRECTORY, fileName));
 	}
 });
@@ -34,10 +38,9 @@ fs.readdirSync(STYLES_DIRECTORY).forEach((fileName) => {
 });
 
 // Log packaging information
-console.log('Packaging Mode = ' + (DEBUG ? "DEBUG" : "PRODUCTION"));
+console.log('Packaging Mode = ' + (DEBUG ? 'DEBUG' : 'PRODUCTION'));
 console.log('Packaging CSS files: ' + packageCssFiles.join(', '));
 console.log('Packaging JS files: ' + packageJsFiles.join(', '));
-
 
 // Combine the JS files into an IIFE, with a single "use strict" directive
 let jsFileContents = '';
@@ -45,25 +48,35 @@ packageJsFiles.forEach((fileName) => {
 	jsFileContents += fs.readFileSync(fileName).toString().replace('"use strict";\r\n', '') + '\r\n';
 	fs.unlinkSync(fileName);
 });
-fs.writeFileSync(path.join(MEDIA_DIRECTORY, OUTPUT_TMP_JS_FILE), '"use strict";\r\n(function(document, window){\r\n' + jsFileContents + '})(document, window);\r\n');
-
+fs.writeFileSync(
+	path.join(MEDIA_DIRECTORY, OUTPUT_TMP_JS_FILE),
+	'"use strict";\r\n(function(document, window){\r\n' + jsFileContents + '})(document, window);\r\n'
+);
 
 // Run uglifyjs with the required arguments
-cp.exec('uglifyjs ' + path.join(MEDIA_DIRECTORY, OUTPUT_TMP_JS_FILE) + ' ' + (DEBUG ? '-b' : '--mangle') + ' --output ' + path.join(MEDIA_DIRECTORY, OUTPUT_MIN_JS_FILE), (err, stdout, stderr) => {
-	if (err) {
-		console.log('ERROR:');
-		console.log(err);
-		process.exit(1);
-	} else if (stderr) {
-		console.log('ERROR:');
-		console.log(stderr);
-		process.exit(1);
-	} else {
-		console.log('');
-		if (stdout !== '') console.log(stdout);
-		fs.unlinkSync(path.join(MEDIA_DIRECTORY, OUTPUT_TMP_JS_FILE));
+cp.exec(
+	'uglifyjs ' +
+		path.join(MEDIA_DIRECTORY, OUTPUT_TMP_JS_FILE) +
+		' ' +
+		(DEBUG ? '-b' : '--mangle') +
+		' --output ' +
+		path.join(MEDIA_DIRECTORY, OUTPUT_MIN_JS_FILE),
+	(err, stdout, stderr) => {
+		if (err) {
+			console.log('ERROR:');
+			console.log(err);
+			process.exit(1);
+		} else if (stderr) {
+			console.log('ERROR:');
+			console.log(stderr);
+			process.exit(1);
+		} else {
+			console.log('');
+			if (stdout !== '') console.log(stdout);
+			fs.unlinkSync(path.join(MEDIA_DIRECTORY, OUTPUT_TMP_JS_FILE));
+		}
 	}
-});
+);
 
 // Combine the CSS files
 let cssFileContents = '';

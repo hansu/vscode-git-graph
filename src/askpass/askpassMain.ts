@@ -23,12 +23,12 @@ function main(argv: string[]): void {
 	const output = process.env['VSCODE_GIT_GRAPH_ASKPASS_PIPE']!;
 	const socketPath = process.env['VSCODE_GIT_GRAPH_ASKPASS_HANDLE']!;
 
-	const req = http.request({ socketPath, path: '/', method: 'POST' }, res => {
+	const req = http.request({ socketPath, path: '/', method: 'POST' }, (res) => {
 		if (res.statusCode !== 200) return fatal('Bad status code: ' + res.statusCode);
 
 		let resData = '';
 		res.setEncoding('utf8');
-		res.on('data', (d) => resData += d);
+		res.on('data', (d) => (resData += d));
 		res.on('end', () => {
 			try {
 				let response = JSON.parse(resData);

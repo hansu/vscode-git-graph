@@ -94,7 +94,6 @@ class DiffDocument {
 	}
 }
 
-
 /* Encoding and decoding URI's */
 
 /**
@@ -116,12 +115,20 @@ type DiffDocUriData = {
  * @param diffSide The side of the Diff View that this URI will be displayed on.
  * @returns A URI of the form `git-graph://file.ext?encoded-data` or `file://path/file.ext`
  */
-export function encodeDiffDocUri(repo: string, filePath: string, commit: string, type: GitFileStatus, diffSide: DiffSide): vscode.Uri {
+export function encodeDiffDocUri(
+	repo: string,
+	filePath: string,
+	commit: string,
+	type: GitFileStatus,
+	diffSide: DiffSide
+): vscode.Uri {
 	if (commit === UNCOMMITTED && type !== GitFileStatus.Deleted) {
 		return vscode.Uri.file(path.join(repo, filePath));
 	}
 
-	const fileDoesNotExist = (diffSide === DiffSide.Old && type === GitFileStatus.Added) || (diffSide === DiffSide.New && type === GitFileStatus.Deleted);
+	const fileDoesNotExist =
+		(diffSide === DiffSide.Old && type === GitFileStatus.Added) ||
+		(diffSide === DiffSide.New && type === GitFileStatus.Deleted);
 	const data: DiffDocUriData = {
 		filePath: getPathFromStr(filePath),
 		commit: commit,

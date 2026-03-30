@@ -4,7 +4,6 @@ about: Suggest an idea for this extension
 title: ''
 labels: feature request
 assignees: hansu
-
 ---
 
 **Describe the feature that you'd like**

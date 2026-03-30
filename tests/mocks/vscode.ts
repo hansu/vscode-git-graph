@@ -1,25 +1,24 @@
 import * as vscode from 'vscode';
 import { RequestMessage, ResponseMessage, Writeable } from '../../src/types';
 
-
 /* Mocks */
 
 const mockedExtensionSettingValues: { [section: string]: any } = {};
 const mockedCommands: { [command: string]: (...args: any[]) => any } = {};
 
 interface WebviewPanelMocks {
-	messages: ResponseMessage[],
+	messages: ResponseMessage[];
 	panel: {
-		onDidChangeViewState: (e: vscode.WebviewPanelOnDidChangeViewStateEvent) => any,
-		onDidDispose: (e: void) => any,
-		setVisibility: (visible: boolean) => void,
+		onDidChangeViewState: (e: vscode.WebviewPanelOnDidChangeViewStateEvent) => any;
+		onDidDispose: (e: void) => any;
+		setVisibility: (visible: boolean) => void;
 		webview: {
-			onDidReceiveMessage: (msg: RequestMessage) => void
-		}
-	}
+			onDidReceiveMessage: (msg: RequestMessage) => void;
+		};
+	};
 }
 
-let mockedWebviews: { panel: vscode.WebviewPanel, mocks: WebviewPanelMocks }[] = [];
+let mockedWebviews: { panel: vscode.WebviewPanel; mocks: WebviewPanelMocks }[] = [];
 
 export const mocks = {
 	extensionContext: {
@@ -67,7 +66,6 @@ export const mocks = {
 	}
 };
 
-
 /* Visual Studio Code API Mocks */
 
 export const commands = {
@@ -113,12 +111,30 @@ export class Uri implements vscode.Uri {
 		return this.path;
 	}
 
-	public with(change: { scheme?: string | undefined; authority?: string | undefined; path?: string | undefined; query?: string | undefined; fragment?: string | undefined; }): vscode.Uri {
-		return new Uri(change.scheme || this.scheme, change.authority || this.authority, change.path || this.path, change.query || this.query, change.fragment || this.fragment);
+	public with(change: {
+		scheme?: string | undefined;
+		authority?: string | undefined;
+		path?: string | undefined;
+		query?: string | undefined;
+		fragment?: string | undefined;
+	}): vscode.Uri {
+		return new Uri(
+			change.scheme || this.scheme,
+			change.authority || this.authority,
+			change.path || this.path,
+			change.query || this.query,
+			change.fragment || this.fragment
+		);
 	}
 
 	public toString() {
-		return this.scheme + '://' + this.path + (this.query ? '?' + this.query : '') + (this.fragment ? '#' + this.fragment : '');
+		return (
+			this.scheme +
+			'://' +
+			this.path +
+			(this.query ? '?' + this.query : '') +
+			(this.fragment ? '#' + this.fragment : '')
+		);
 	}
 
 	public toJSON() {
@@ -179,21 +195,26 @@ export const workspace = {
 	getConfiguration: jest.fn(() => mocks.workspaceConfiguration),
 	onDidChangeWorkspaceFolders: jest.fn((_: () => Promise<void>) => ({ dispose: jest.fn() })),
 	onDidCloseTextDocument: jest.fn((_: () => void) => ({ dispose: jest.fn() })),
-	workspaceFolders: <{ uri: Uri, index: number }[] | undefined>undefined
+	workspaceFolders: <{ uri: Uri; index: number }[] | undefined>undefined
 };
 
-function createWebviewPanel(viewType: string, title: string, _showOptions: ViewColumn | { viewColumn: ViewColumn, preserveFocus?: boolean }, _options?: vscode.WebviewPanelOptions & vscode.WebviewOptions) {
+function createWebviewPanel(
+	viewType: string,
+	title: string,
+	_showOptions: ViewColumn | { viewColumn: ViewColumn; preserveFocus?: boolean },
+	_options?: vscode.WebviewPanelOptions & vscode.WebviewOptions
+) {
 	const mocks: WebviewPanelMocks = {
 		messages: [],
 		panel: {
-			onDidChangeViewState: () => { },
-			onDidDispose: () => { },
+			onDidChangeViewState: () => {},
+			onDidDispose: () => {},
 			setVisibility: (visible) => {
 				webviewPanel.visible = visible;
 				mocks.panel.onDidChangeViewState({ webviewPanel: webviewPanel });
 			},
 			webview: {
-				onDidReceiveMessage: () => { }
+				onDidReceiveMessage: () => {}
 			}
 		}
 	};
@@ -211,12 +232,14 @@ function createWebviewPanel(viewType: string, title: string, _showOptions: ViewC
 			return { dispose: jest.fn() };
 		}),
 		options: {},
-		reveal: jest.fn((_viewColumn?: ViewColumn, _preserveFocus?: boolean) => { }),
+		reveal: jest.fn((_viewColumn?: ViewColumn, _preserveFocus?: boolean) => {}),
 		title: title,
 		visible: true,
 		viewType: viewType,
 		webview: {
-			asWebviewUri: jest.fn((uri: Uri) => uri.with({ scheme: 'vscode-webview-resource', path: 'file//' + uri.path.replace(/\\/g, '/') })),
+			asWebviewUri: jest.fn((uri: Uri) =>
+				uri.with({ scheme: 'vscode-webview-resource', path: 'file//' + uri.path.replace(/\\/g, '/') })
+			),
 			cspSource: 'vscode-webview-resource:',
 			html: '',
 			onDidReceiveMessage: jest.fn((onDidReceiveMessage) => {
@@ -234,7 +257,6 @@ function createWebviewPanel(viewType: string, title: string, _showOptions: ViewC
 	mockedWebviews.push({ panel: webviewPanel, mocks: mocks });
 	return webviewPanel;
 }
-
 
 /* Utilities */
 

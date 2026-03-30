@@ -1,7 +1,7 @@
 module.exports = {
 	roots: ['./tests'],
 	transform: {
-		'^.+\\.ts$': 'ts-jest',
+		'^.+\\.ts$': 'ts-jest'
 	},
 	testRegex: '\\.test\\.ts$',
 	moduleFileExtensions: ['ts', 'js'],
@@ -10,8 +10,5 @@ module.exports = {
 			tsconfig: './tests/tsconfig.json'
 		}
 	},
-	collectCoverageFrom: [
-		'src/utils/*.ts',
-		'src/*.ts'
-	]
+	collectCoverageFrom: ['src/utils/*.ts', 'src/*.ts']
 };

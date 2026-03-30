@@ -10,7 +10,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { LifeCycleStage, LifeCycleState, generateNonce, getDataDirectory, getLifeCycleStateInDirectory, saveLifeCycleStateInDirectory, sendQueue } from './utils';
+import {
+	LifeCycleStage,
+	LifeCycleState,
+	generateNonce,
+	getDataDirectory,
+	getLifeCycleStateInDirectory,
+	saveLifeCycleStateInDirectory,
+	sendQueue
+} from './utils';
 import { getExtensionVersion } from '../utils';
 
 /**
@@ -45,12 +53,14 @@ export async function onStartUp(extensionContext: vscode.ExtensionContext) {
 				previous: null,
 				current: versions,
 				apiAvailable: true,
-				queue: [{
-					stage: LifeCycleStage.Install,
-					extension: versions.extension,
-					vscode: versions.vscode,
-					nonce: nonce
-				}],
+				queue: [
+					{
+						stage: LifeCycleStage.Install,
+						extension: versions.extension,
+						vscode: versions.vscode,
+						nonce: nonce
+					}
+				],
 				attempts: 1
 			};
 		} else {
@@ -70,7 +80,6 @@ export async function onStartUp(extensionContext: vscode.ExtensionContext) {
 		state.apiAvailable = await sendQueue(state.queue);
 		state.queue = [];
 		await saveLifeCycleState(extensionContext, state);
-
 	} else if (state.queue.length > 0 && state.attempts < 2) {
 		// There are one or more events in the queue that previously failed to send, send them
 		state.attempts++;

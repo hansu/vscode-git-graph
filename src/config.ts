@@ -30,17 +30,17 @@ import {
 } from './types';
 
 const VIEW_COLUMN_MAPPING: { [column: string]: vscode.ViewColumn } = {
-	'Active': vscode.ViewColumn.Active,
-	'Beside': vscode.ViewColumn.Beside,
-	'One': vscode.ViewColumn.One,
-	'Two': vscode.ViewColumn.Two,
-	'Three': vscode.ViewColumn.Three,
-	'Four': vscode.ViewColumn.Four,
-	'Five': vscode.ViewColumn.Five,
-	'Six': vscode.ViewColumn.Six,
-	'Seven': vscode.ViewColumn.Seven,
-	'Eight': vscode.ViewColumn.Eight,
-	'Nine': vscode.ViewColumn.Nine
+	Active: vscode.ViewColumn.Active,
+	Beside: vscode.ViewColumn.Beside,
+	One: vscode.ViewColumn.One,
+	Two: vscode.ViewColumn.Two,
+	Three: vscode.ViewColumn.Three,
+	Four: vscode.ViewColumn.Four,
+	Five: vscode.ViewColumn.Five,
+	Six: vscode.ViewColumn.Six,
+	Seven: vscode.ViewColumn.Seven,
+	Eight: vscode.ViewColumn.Eight,
+	Nine: vscode.ViewColumn.Nine
 };
 
 /**
@@ -65,15 +65,30 @@ class Config {
 	 */
 	get commitDetailsView(): CommitDetailsViewConfig {
 		return {
-			autoCenter: !!this.getRenamedExtensionSetting('commitDetailsView.autoCenter', 'autoCenterCommitDetailsView', true),
+			autoCenter: !!this.getRenamedExtensionSetting(
+				'commitDetailsView.autoCenter',
+				'autoCenterCommitDetailsView',
+				true
+			),
 			autoScroll: !!this.config.get<boolean>('commitDetailsView.autoScroll', true),
-			fileTreeCompactFolders: !!this.getRenamedExtensionSetting('commitDetailsView.fileView.fileTree.compactFolders', 'commitDetailsViewFileTreeCompactFolders', true),
-			fileViewType: this.getRenamedExtensionSetting<string>('commitDetailsView.fileView.type', 'defaultFileViewType', 'File Tree') === 'File List'
-				? FileViewType.List
-				: FileViewType.Tree,
-			location: this.getRenamedExtensionSetting<string>('commitDetailsView.location', 'commitDetailsViewLocation', 'Inline') === 'Docked to Bottom'
-				? CommitDetailsViewLocation.DockedToBottom
-				: CommitDetailsViewLocation.Inline
+			fileTreeCompactFolders: !!this.getRenamedExtensionSetting(
+				'commitDetailsView.fileView.fileTree.compactFolders',
+				'commitDetailsViewFileTreeCompactFolders',
+				true
+			),
+			fileViewType:
+				this.getRenamedExtensionSetting<string>(
+					'commitDetailsView.fileView.type',
+					'defaultFileViewType',
+					'File Tree'
+				) === 'File List'
+					? FileViewType.List
+					: FileViewType.Tree,
+			location:
+				this.getRenamedExtensionSetting<string>('commitDetailsView.location', 'commitDetailsViewLocation', 'Inline') ===
+				'Docked to Bottom'
+					? CommitDetailsViewLocation.DockedToBottom
+					: CommitDetailsViewLocation.Inline
 		};
 	}
 
@@ -83,10 +98,62 @@ class Config {
 	get contextMenuActionsVisibility(): ContextMenuActionsVisibility {
 		const userConfig = this.config.get('contextMenuActionsVisibility', {});
 		const config: ContextMenuActionsVisibility = {
-			branch: { checkout: true, rename: true, delete: true, merge: true, rebase: true, push: true, pull: true, createBranch: true, viewIssue: true, createPullRequest: true, createArchive: true, selectInBranchesDropdown: true, unselectInBranchesDropdown: true, copyName: true },
-			commit: { addTag: true, createBranch: true, checkout: true, cherrypick: true, revert: true, drop: true, merge: true, rebase: true, reset: true, undo: true, editMessage: true, copyHash: true, copySubject: true },
-			commitDetailsViewFile: { viewDiff: true, viewFileAtThisRevision: true, viewDiffWithWorkingFile: true, openFile: true, markAsReviewed: true, markAsNotReviewed: true, resetFileToThisRevision: true, copyAbsoluteFilePath: true, copyRelativeFilePath: true },
-			remoteBranch: { checkout: true, delete: true, fetch: true, merge: true, pull: true, createBranch: true, viewIssue: true, createPullRequest: true, createArchive: true, selectInBranchesDropdown: true, unselectInBranchesDropdown: true, copyName: true },
+			branch: {
+				checkout: true,
+				rename: true,
+				delete: true,
+				merge: true,
+				rebase: true,
+				push: true,
+				pull: true,
+				createBranch: true,
+				viewIssue: true,
+				createPullRequest: true,
+				createArchive: true,
+				selectInBranchesDropdown: true,
+				unselectInBranchesDropdown: true,
+				copyName: true
+			},
+			commit: {
+				addTag: true,
+				createBranch: true,
+				checkout: true,
+				cherrypick: true,
+				revert: true,
+				drop: true,
+				merge: true,
+				rebase: true,
+				reset: true,
+				undo: true,
+				editMessage: true,
+				copyHash: true,
+				copySubject: true
+			},
+			commitDetailsViewFile: {
+				viewDiff: true,
+				viewFileAtThisRevision: true,
+				viewDiffWithWorkingFile: true,
+				openFile: true,
+				markAsReviewed: true,
+				markAsNotReviewed: true,
+				resetFileToThisRevision: true,
+				copyAbsoluteFilePath: true,
+				copyRelativeFilePath: true
+			},
+			remoteBranch: {
+				checkout: true,
+				delete: true,
+				fetch: true,
+				merge: true,
+				pull: true,
+				createBranch: true,
+				viewIssue: true,
+				createPullRequest: true,
+				createArchive: true,
+				selectInBranchesDropdown: true,
+				unselectInBranchesDropdown: true,
+				copyName: true
+			},
 			stash: { apply: true, createBranch: true, pop: true, drop: true, copyName: true, copyHash: true },
 			tag: { viewDetails: true, delete: true, push: true, createArchive: true, copyName: true },
 			uncommittedChanges: { stash: true, reset: true, clean: true, openSourceControlView: true }
@@ -130,8 +197,8 @@ class Config {
 		let providers = this.config.get('customPullRequestProviders', <any[]>[]);
 		return Array.isArray(providers)
 			? providers
-				.filter((provider) => typeof provider.name === 'string' && typeof provider.templateUrl === 'string')
-				.map((provider) => ({ name: provider.name, templateUrl: provider.templateUrl }))
+					.filter((provider) => typeof provider.name === 'string' && typeof provider.templateUrl === 'string')
+					.map((provider) => ({ name: provider.name, templateUrl: provider.templateUrl }))
 			: [];
 	}
 
@@ -139,7 +206,9 @@ class Config {
 	 * Get the value of the `git-graph.date.format` Extension Setting.
 	 */
 	get dateFormat(): DateFormat {
-		let configValue = this.getRenamedExtensionSetting<string>('date.format', 'dateFormat', 'Date & Time'), type = DateFormatType.DateAndTime, iso = false;
+		let configValue = this.getRenamedExtensionSetting<string>('date.format', 'dateFormat', 'Date & Time'),
+			type = DateFormatType.DateAndTime,
+			iso = false;
 		if (configValue === 'Relative') {
 			type = DateFormatType.Relative;
 		} else {
@@ -163,7 +232,13 @@ class Config {
 	 */
 	get defaultColumnVisibility(): DefaultColumnVisibility {
 		let obj: any = this.config.get('defaultColumnVisibility', {});
-		if (typeof obj === 'object' && obj !== null && typeof obj['Date'] === 'boolean' && typeof obj['Author'] === 'boolean' && typeof obj['Commit'] === 'boolean') {
+		if (
+			typeof obj === 'object' &&
+			obj !== null &&
+			typeof obj['Date'] === 'boolean' &&
+			typeof obj['Author'] === 'boolean' &&
+			typeof obj['Commit'] === 'boolean'
+		) {
 			return { author: obj['Author'], commit: obj['Commit'], date: obj['Date'] };
 		} else {
 			return { author: true, commit: true, date: true };
@@ -175,7 +250,12 @@ class Config {
 	 */
 	get toolbarButtonVisibility(): ToolbarButtonVisibility {
 		let obj: any = this.config.get('toolbarButtonVisibility', {});
-		if (typeof obj === 'object' && obj !== null && typeof obj['Remotes'] === 'boolean' && typeof obj['Simplify'] === 'boolean') {
+		if (
+			typeof obj === 'object' &&
+			obj !== null &&
+			typeof obj['Remotes'] === 'boolean' &&
+			typeof obj['Simplify'] === 'boolean'
+		) {
 			return { remotes: obj['Remotes'], simplify: obj['Simplify'] };
 		} else {
 			return { remotes: true, simplify: true };
@@ -193,7 +273,10 @@ class Config {
 		return {
 			addTag: {
 				pushToRemote: !!this.config.get('dialog.addTag.pushToRemote', false),
-				type: this.config.get<string>('dialog.addTag.type', 'Annotated') === 'Lightweight' ? TagType.Lightweight : TagType.Annotated
+				type:
+					this.config.get<string>('dialog.addTag.type', 'Annotated') === 'Lightweight'
+						? TagType.Lightweight
+						: TagType.Annotated
 			},
 			applyStash: {
 				reinstateIndex: !!this.config.get('dialog.applyStash.reinstateIndex', false)
@@ -216,7 +299,8 @@ class Config {
 				pruneTags: !!this.config.get('dialog.fetchRemote.pruneTags', false)
 			},
 			general: {
-				referenceInputSpaceSubstitution: refInputSpaceSubstitution === 'Hyphen' ? '-' : refInputSpaceSubstitution === 'Underscore' ? '_' : null
+				referenceInputSpaceSubstitution:
+					refInputSpaceSubstitution === 'Hyphen' ? '-' : refInputSpaceSubstitution === 'Underscore' ? '_' : null
 			},
 			merge: {
 				noCommit: !!this.config.get('dialog.merge.noCommit', false),
@@ -236,7 +320,12 @@ class Config {
 				interactive: !!this.config.get('dialog.rebase.launchInteractiveRebase', false)
 			},
 			resetCommit: {
-				mode: resetCommitMode === 'Soft' ? GitResetMode.Soft : (resetCommitMode === 'Hard' ? GitResetMode.Hard : GitResetMode.Mixed)
+				mode:
+					resetCommitMode === 'Soft'
+						? GitResetMode.Soft
+						: resetCommitMode === 'Hard'
+							? GitResetMode.Hard
+							: GitResetMode.Mixed
 			},
 			resetUncommitted: {
 				mode: resetUncommittedMode === 'Hard' ? GitResetMode.Hard : GitResetMode.Mixed
@@ -285,16 +374,37 @@ class Config {
 	get graph(): GraphConfig {
 		const colours = this.getRenamedExtensionSetting<string[]>('graph.colours', 'graphColours', []);
 		return {
-			colours: Array.isArray(colours) && colours.length > 0
-				? colours.filter((v) => v.match(/^\s*(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|rgb[a]?\s*\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\))\s*$/) !== null)
-				: ['#0085d9', '#d9008f', '#00d90a', '#d98500', '#a300d9', '#ff0000', '#00d9cc', '#e138e8', '#85d900', '#dc5b23', '#6f24d6', '#ffcc00'],
-			style: this.getRenamedExtensionSetting<string>('graph.style', 'graphStyle', 'rounded') === 'angular'
-				? GraphStyle.Angular
-				: GraphStyle.Rounded,
+			colours:
+				Array.isArray(colours) && colours.length > 0
+					? colours.filter(
+							(v) =>
+								v.match(/^\s*(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|rgb[a]?\s*\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\))\s*$/) !==
+								null
+						)
+					: [
+							'#0085d9',
+							'#d9008f',
+							'#00d90a',
+							'#d98500',
+							'#a300d9',
+							'#ff0000',
+							'#00d9cc',
+							'#e138e8',
+							'#85d900',
+							'#dc5b23',
+							'#6f24d6',
+							'#ffcc00'
+						],
+			style:
+				this.getRenamedExtensionSetting<string>('graph.style', 'graphStyle', 'rounded') === 'angular'
+					? GraphStyle.Angular
+					: GraphStyle.Rounded,
 			grid: { x: 16, y: 24, offsetX: 16, offsetY: 12, expandY: 250 },
-			uncommittedChanges: this.config.get<string>('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes') === 'Open Circle at the Checked Out Commit'
-				? GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit
-				: GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges
+			uncommittedChanges:
+				this.config.get<string>('graph.uncommittedChanges', 'Open Circle at the Uncommitted Changes') ===
+				'Open Circle at the Checked Out Commit'
+					? GraphUncommittedChangesStyle.OpenCircleAtTheCheckedOutCommit
+					: GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges
 		};
 	}
 
@@ -352,15 +462,24 @@ class Config {
 	 * Get the reference label configuration from the Extension Settings.
 	 */
 	get referenceLabels(): ReferenceLabelsConfig {
-		const alignmentConfigValue = this.getRenamedExtensionSetting<string>('referenceLabels.alignment', 'referenceLabelAlignment', 'Normal');
-		const alignment = alignmentConfigValue === 'Branches (on the left) & Tags (on the right)'
-			? RefLabelAlignment.BranchesOnLeftAndTagsOnRight
-			: alignmentConfigValue === 'Branches (aligned to the graph) & Tags (on the right)'
-				? RefLabelAlignment.BranchesAlignedToGraphAndTagsOnRight
-				: RefLabelAlignment.Normal;
+		const alignmentConfigValue = this.getRenamedExtensionSetting<string>(
+			'referenceLabels.alignment',
+			'referenceLabelAlignment',
+			'Normal'
+		);
+		const alignment =
+			alignmentConfigValue === 'Branches (on the left) & Tags (on the right)'
+				? RefLabelAlignment.BranchesOnLeftAndTagsOnRight
+				: alignmentConfigValue === 'Branches (aligned to the graph) & Tags (on the right)'
+					? RefLabelAlignment.BranchesAlignedToGraphAndTagsOnRight
+					: RefLabelAlignment.Normal;
 		return {
 			branchLabelsAlignedToGraph: alignment === RefLabelAlignment.BranchesAlignedToGraphAndTagsOnRight,
-			combineLocalAndRemoteBranchLabels: !!this.getRenamedExtensionSetting('referenceLabels.combineLocalAndRemoteBranchLabels', 'combineLocalAndRemoteBranchLabels', true),
+			combineLocalAndRemoteBranchLabels: !!this.getRenamedExtensionSetting(
+				'referenceLabels.combineLocalAndRemoteBranchLabels',
+				'combineLocalAndRemoteBranchLabels',
+				true
+			),
 			tagLabelsOnRight: alignment !== RefLabelAlignment.Normal
 		};
 	}
@@ -379,7 +498,6 @@ class Config {
 		return this.getRenamedExtensionSetting('repository.commits.initialLoad', 'initialLoadCommits', 300);
 	}
 
-
 	/**
 	 * Get the value of the `git-graph.repository.commits.loadMore` Extension Setting.
 	 */
@@ -391,7 +509,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.commits.loadMoreAutomatically` Extension Setting.
 	 */
 	get loadMoreCommitsAutomatically() {
-		return !!this.getRenamedExtensionSetting('repository.commits.loadMoreAutomatically', 'loadMoreCommitsAutomatically', true);
+		return !!this.getRenamedExtensionSetting(
+			'repository.commits.loadMoreAutomatically',
+			'loadMoreCommitsAutomatically',
+			true
+		);
 	}
 
 	/**
@@ -399,7 +521,11 @@ class Config {
 	 */
 	get muteCommits(): MuteCommitsConfig {
 		return {
-			commitsNotAncestorsOfHead: !!this.getRenamedExtensionSetting('repository.commits.mute.commitsThatAreNotAncestorsOfHead', 'muteCommitsThatAreNotAncestorsOfHead', false),
+			commitsNotAncestorsOfHead: !!this.getRenamedExtensionSetting(
+				'repository.commits.mute.commitsThatAreNotAncestorsOfHead',
+				'muteCommitsThatAreNotAncestorsOfHead',
+				false
+			),
 			mergeCommits: !!this.getRenamedExtensionSetting('repository.commits.mute.mergeCommits', 'muteMergeCommits', true)
 		};
 	}
@@ -441,7 +567,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.includeCommitsMentionedByReflogs` Extension Setting.
 	 */
 	get includeCommitsMentionedByReflogs() {
-		return !!this.getRenamedExtensionSetting('repository.includeCommitsMentionedByReflogs', 'includeCommitsMentionedByReflogs', false);
+		return !!this.getRenamedExtensionSetting(
+			'repository.includeCommitsMentionedByReflogs',
+			'includeCommitsMentionedByReflogs',
+			false
+		);
 	}
 
 	/**
@@ -451,10 +581,12 @@ class Config {
 		const branches = this.config.get('repository.onLoad.showSpecificBranches', []);
 		return {
 			scrollToHead: !!this.getRenamedExtensionSetting('repository.onLoad.scrollToHead', 'openRepoToHead', false),
-			showCheckedOutBranch: !!this.getRenamedExtensionSetting('repository.onLoad.showCheckedOutBranch', 'showCurrentBranchByDefault', false),
-			showSpecificBranches: Array.isArray(branches)
-				? branches.filter((branch) => typeof branch === 'string')
-				: []
+			showCheckedOutBranch: !!this.getRenamedExtensionSetting(
+				'repository.onLoad.showCheckedOutBranch',
+				'showCurrentBranchByDefault',
+				false
+			),
+			showSpecificBranches: Array.isArray(branches) ? branches.filter((branch) => typeof branch === 'string') : []
 		};
 	}
 
@@ -483,7 +615,11 @@ class Config {
 	 * Get the value of the `git-graph.repository.showCommitsOnlyReferencedByTags` Extension Setting.
 	 */
 	get showCommitsOnlyReferencedByTags() {
-		return !!this.getRenamedExtensionSetting('repository.showCommitsOnlyReferencedByTags', 'showCommitsOnlyReferencedByTags', true);
+		return !!this.getRenamedExtensionSetting(
+			'repository.showCommitsOnlyReferencedByTags',
+			'showCommitsOnlyReferencedByTags',
+			true
+		);
 	}
 
 	/**
@@ -648,9 +784,12 @@ class Config {
 	 * @returns The value of the extension setting.
 	 */
 	private getRenamedExtensionSetting<T>(newSection: string, oldSection: string, defaultValue: T) {
-		const newValues = this.config.inspect<T>(newSection), oldValues = this.config.inspect<T>(oldSection);
-		if (typeof newValues !== 'undefined' && typeof newValues.workspaceValue !== 'undefined') return newValues.workspaceValue;
-		if (typeof oldValues !== 'undefined' && typeof oldValues.workspaceValue !== 'undefined') return oldValues.workspaceValue;
+		const newValues = this.config.inspect<T>(newSection),
+			oldValues = this.config.inspect<T>(oldSection);
+		if (typeof newValues !== 'undefined' && typeof newValues.workspaceValue !== 'undefined')
+			return newValues.workspaceValue;
+		if (typeof oldValues !== 'undefined' && typeof oldValues.workspaceValue !== 'undefined')
+			return oldValues.workspaceValue;
 		if (typeof newValues !== 'undefined' && typeof newValues.globalValue !== 'undefined') return newValues.globalValue;
 		if (typeof oldValues !== 'undefined' && typeof oldValues.globalValue !== 'undefined') return oldValues.globalValue;
 		return defaultValue;

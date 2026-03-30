@@ -54,7 +54,9 @@ describe('Logger', () => {
 			logger.logCmd('git', ['cmd', 'argument with spaces']);
 
 			// Assert
-			expect(outputChannel.appendLine).toHaveBeenCalledWith('[2020-04-22 12:40:58.000] > git cmd "argument with spaces"');
+			expect(outputChannel.appendLine).toHaveBeenCalledWith(
+				'[2020-04-22 12:40:58.000] > git cmd "argument with spaces"'
+			);
 		});
 
 		it('Arguments with spaces are surrounded with double quotes, and any internal double quotes are escaped', () => {
@@ -62,7 +64,9 @@ describe('Logger', () => {
 			logger.logCmd('git', ['cmd', 'argument with "double quotes" and spaces']);
 
 			// Assert
-			expect(outputChannel.appendLine).toHaveBeenCalledWith('[2020-04-22 12:40:58.000] > git cmd "argument with \\"double quotes\\" and spaces"');
+			expect(outputChannel.appendLine).toHaveBeenCalledWith(
+				'[2020-04-22 12:40:58.000] > git cmd "argument with \\"double quotes\\" and spaces"'
+			);
 		});
 
 		it('Empty string arguments are shown as two double quotes', () => {
@@ -78,10 +82,19 @@ describe('Logger', () => {
 			date.setCurrentTime(1587559258.1);
 
 			// Run
-			logger.logCmd('git', ['cmd', '--arg1', '--format="format-string"', '', 'argument with spaces', 'argument with "double quotes" and spaces']);
+			logger.logCmd('git', [
+				'cmd',
+				'--arg1',
+				'--format="format-string"',
+				'',
+				'argument with spaces',
+				'argument with "double quotes" and spaces'
+			]);
 
 			// Assert
-			expect(outputChannel.appendLine).toHaveBeenCalledWith('[2020-04-22 12:40:58.100] > git cmd --arg1 --format=... "" "argument with spaces" "argument with \\"double quotes\\" and spaces"');
+			expect(outputChannel.appendLine).toHaveBeenCalledWith(
+				'[2020-04-22 12:40:58.100] > git cmd --arg1 --format=... "" "argument with spaces" "argument with \\"double quotes\\" and spaces"'
+			);
 		});
 	});
 

@@ -1,155 +1,155 @@
-.dropdown{
-	display:none;
-	position:relative;
-	font-size:13px;
-	vertical-align:top;
-	margin-top:3px;
-	font-weight:normal;
-	text-align:left;
+.dropdown {
+	display: none;
+	position: relative;
+	font-size: 13px;
+	vertical-align: top;
+	margin-top: 3px;
+	font-weight: normal;
+	text-align: left;
 }
-.dropdown.loaded{
-	display:inline-block;
+.dropdown.loaded {
+	display: inline-block;
 }
-.dropdownCurrentValue{
-	background-color:rgba(128,128,128,0.1);
-	border:1px solid rgba(128,128,128,0.5);
-	border-radius:6px;
-	box-sizing:border-box;
-	height:26px;
-	line-height:24px;
-	padding-left:10px;
-	padding-right:20px;
-	cursor:pointer;
-	-webkit-user-select:none;
-	user-select:none;
-	white-space:nowrap;
-	overflow-x:hidden;
-	text-overflow:ellipsis;
+.dropdownCurrentValue {
+	background-color: rgba(128, 128, 128, 0.1);
+	border: 1px solid rgba(128, 128, 128, 0.5);
+	border-radius: 6px;
+	box-sizing: border-box;
+	height: 26px;
+	line-height: 24px;
+	padding-left: 10px;
+	padding-right: 20px;
+	cursor: pointer;
+	-webkit-user-select: none;
+	user-select: none;
+	white-space: nowrap;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
 }
-.dropdownCurrentValue:hover{
-	background-color:rgba(128,128,128,0.2);
+.dropdownCurrentValue:hover {
+	background-color: rgba(128, 128, 128, 0.2);
 }
-.dropdownCurrentValue:after{
-	position:absolute;
-	content:"";
-	top:11px;
-	right:7px;
-	width:0;
-	height:0;
-	border:4px solid transparent;
-	border-color:var(--vscode-editor-foreground) transparent transparent transparent;
+.dropdownCurrentValue:after {
+	position: absolute;
+	content: '';
+	top: 11px;
+	right: 7px;
+	width: 0;
+	height: 0;
+	border: 4px solid transparent;
+	border-color: var(--vscode-editor-foreground) transparent transparent transparent;
 }
-.dropdown.dropdownOpen .dropdownCurrentValue:after{
-	border-color:transparent transparent var(--vscode-editor-foreground) transparent;
-	top:7px;
-}
-
-.dropdownMenu{
-	display:none;
-	position:absolute;
-	background-color:var(--vscode-menu-background);
-	color:var(--vscode-menu-foreground);
-	top:100%;
-	left:0;
-	z-index:19;
-	line-height:20px;
-	border:1px solid rgba(128,128,128,0.5);
-	border-radius:0 0 6px 6px;
-	overflow-x:hidden;
-	margin-top:-1px;
-	white-space:nowrap;
+.dropdown.dropdownOpen .dropdownCurrentValue:after {
+	border-color: transparent transparent var(--vscode-editor-foreground) transparent;
+	top: 7px;
 }
 
-.dropdownOption{
-	position:relative;
-	cursor:pointer;
-	padding:4px 10px;
-	-webkit-user-select:none;
-	user-select:none;
-	text-overflow:ellipsis;
-	white-space:nowrap;
-	overflow:hidden;
-}
-.dropdown.multi .dropdownOption{
-	padding-left:30px;
-}
-.dropdownOptions.showInfo .dropdownOption{
-	padding-right:30px;
-}
-.dropdownOption.selected{
-	background-color:rgba(128,128,128,0.15);
-}
-.dropdownOption:hover{
-	background-color:var(--vscode-menu-selectionBackground, var(--vscode-menu-background));
-	color:var(--vscode-menu-selectionForeground, var(--vscode-menu-foreground));
-}
-body.vscode-high-contrast .dropdownOption:hover{
-	outline:1px dotted var(--vscode-menu-selectionBorder, transparent);
-	outline-offset:-2px;
-}
-.dropdownOptionHint{
-	opacity:0.6;
-	margin-left:8px;
-}
-.dropdownOptionInfo{
-	position:absolute;
-	width:14px;
-	height:16px;
-	top:6px;
-	right:10px;
-}
-.dropdownOptionInfo svg{
-	fill:var(--vscode-menu-foreground);
-	opacity:0.35;
+.dropdownMenu {
+	display: none;
+	position: absolute;
+	background-color: var(--vscode-menu-background);
+	color: var(--vscode-menu-foreground);
+	top: 100%;
+	left: 0;
+	z-index: 19;
+	line-height: 20px;
+	border: 1px solid rgba(128, 128, 128, 0.5);
+	border-radius: 0 0 6px 6px;
+	overflow-x: hidden;
+	margin-top: -1px;
+	white-space: nowrap;
 }
 
-.dropdownOptionMultiSelected{
-	position:absolute;
-	width:12px;
-	height:16px;
-	top:7px;
-	left:10px;
+.dropdownOption {
+	position: relative;
+	cursor: pointer;
+	padding: 4px 10px;
+	-webkit-user-select: none;
+	user-select: none;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
 }
-.dropdownOptionMultiSelected svg{
-	fill:var(--vscode-menu-foreground);
-	opacity:0.7;
+.dropdown.multi .dropdownOption {
+	padding-left: 30px;
+}
+.dropdownOptions.showInfo .dropdownOption {
+	padding-right: 30px;
+}
+.dropdownOption.selected {
+	background-color: rgba(128, 128, 128, 0.15);
+}
+.dropdownOption:hover {
+	background-color: var(--vscode-menu-selectionBackground, var(--vscode-menu-background));
+	color: var(--vscode-menu-selectionForeground, var(--vscode-menu-foreground));
+}
+body.vscode-high-contrast .dropdownOption:hover {
+	outline: 1px dotted var(--vscode-menu-selectionBorder, transparent);
+	outline-offset: -2px;
+}
+.dropdownOptionHint {
+	opacity: 0.6;
+	margin-left: 8px;
+}
+.dropdownOptionInfo {
+	position: absolute;
+	width: 14px;
+	height: 16px;
+	top: 6px;
+	right: 10px;
+}
+.dropdownOptionInfo svg {
+	fill: var(--vscode-menu-foreground);
+	opacity: 0.35;
 }
 
-.dropdownOption:hover svg{
-	fill:var(--vscode-menu-selectionForeground, var(--vscode-menu-foreground));
-	opacity:0.85;
+.dropdownOptionMultiSelected {
+	position: absolute;
+	width: 12px;
+	height: 16px;
+	top: 7px;
+	left: 10px;
+}
+.dropdownOptionMultiSelected svg {
+	fill: var(--vscode-menu-foreground);
+	opacity: 0.7;
 }
 
-.dropdown.dropdownOpen .dropdownCurrentValue{
-	border-radius:6px 6px 0 0;
-}
-.dropdown.dropdownOpen .dropdownMenu{
-	display:block;
+.dropdownOption:hover svg {
+	fill: var(--vscode-menu-selectionForeground, var(--vscode-menu-foreground));
+	opacity: 0.85;
 }
 
-.dropdownFilter{
-	position:relative;
-	padding:3px 3px;
-	-webkit-user-select:none;
-	user-select:none;
+.dropdown.dropdownOpen .dropdownCurrentValue {
+	border-radius: 6px 6px 0 0;
 }
-.dropdownFilterInput{
-	width:100%;
-	box-sizing:border-box;
-	background:none;
-	border:1px solid rgba(128,128,128,0.5);
-	outline:none;
-	border-radius:4px;
-	padding:3px 6px;
-	font-size:13px;
-	line-height:17px;
-	color:var(--vscode-menu-foreground);
+.dropdown.dropdownOpen .dropdownMenu {
+	display: block;
 }
 
-.dropdownNoResults{
-	position:relative;
-	padding:4px 10px;
-	-webkit-user-select:none;
-	user-select:none;
-	font-style:italic;
+.dropdownFilter {
+	position: relative;
+	padding: 3px 3px;
+	-webkit-user-select: none;
+	user-select: none;
+}
+.dropdownFilterInput {
+	width: 100%;
+	box-sizing: border-box;
+	background: none;
+	border: 1px solid rgba(128, 128, 128, 0.5);
+	outline: none;
+	border-radius: 4px;
+	padding: 3px 6px;
+	font-size: 13px;
+	line-height: 17px;
+	color: var(--vscode-menu-foreground);
+}
+
+.dropdownNoResults {
+	position: relative;
+	padding: 4px 10px;
+	-webkit-user-select: none;
+	user-select: none;
+	font-style: italic;
 }
