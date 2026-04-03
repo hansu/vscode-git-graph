@@ -1869,6 +1869,24 @@ describe('Config', () => {
 				expect(value).toBe(GraphUncommittedChangesStyle.OpenCircleAtTheUncommittedChanges);
 			});
 		});
+
+		describe('headOnLeft', () => {
+			it('Should return false when the configuration value is unset', () => {
+				const value = config.graph.headOnLeft;
+
+				expect(workspaceConfiguration.get).toBeCalledWith('repository.commits.headOnLeft', false);
+				expect(value).toBe(false);
+			});
+
+			it('Should return true when the configuration value is true', () => {
+				vscode.mockExtensionSettingReturnValue('repository.commits.headOnLeft', true);
+
+				const value = config.graph.headOnLeft;
+
+				expect(workspaceConfiguration.get).toBeCalledWith('repository.commits.headOnLeft', false);
+				expect(value).toBe(true);
+			});
+		});
 	});
 
 	describe('integratedTerminalShell', () => {
