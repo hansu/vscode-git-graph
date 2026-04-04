@@ -10,7 +10,14 @@ import { onStartUp } from './life-cycle/startup';
 import { Logger } from './logger';
 import { RepoManager } from './repoManager';
 import { StatusBarItem } from './statusBarItem';
-import { GitExecutable, UNABLE_TO_FIND_GIT_MSG, findGit, getGitExecutableFromPaths, showErrorMessage, showInformationMessage } from './utils';
+import {
+	GitExecutable,
+	UNABLE_TO_FIND_GIT_MSG,
+	findGit,
+	getGitExecutableFromPaths,
+	showErrorMessage,
+	showInformationMessage,
+} from './utils';
 import { EventEmitter } from './utils/event';
 
 /**
@@ -40,11 +47,30 @@ export async function activate(context: vscode.ExtensionContext) {
 	const configurationEmitter = new EventEmitter<vscode.ConfigurationChangeEvent>();
 	const onDidChangeConfiguration = configurationEmitter.subscribe;
 
-	const dataSource = new DataSource(gitExecutable, onDidChangeConfiguration, onDidChangeGitExecutable, logger);
+	const dataSource = new DataSource(
+		gitExecutable,
+		onDidChangeConfiguration,
+		onDidChangeGitExecutable,
+		logger,
+	);
 	const avatarManager = new AvatarManager(dataSource, extensionState, logger);
 	const repoManager = new RepoManager(dataSource, extensionState, onDidChangeConfiguration, logger);
-	const statusBarItem = new StatusBarItem(repoManager.getNumRepos(), repoManager.onDidChangeRepos, onDidChangeConfiguration, logger);
-	const commandManager = new CommandManager(context, avatarManager, dataSource, extensionState, repoManager, gitExecutable, onDidChangeGitExecutable, logger);
+	const statusBarItem = new StatusBarItem(
+		repoManager.getNumRepos(),
+		repoManager.onDidChangeRepos,
+		onDidChangeConfiguration,
+		logger,
+	);
+	const commandManager = new CommandManager(
+		context,
+		avatarManager,
+		dataSource,
+		extensionState,
+		repoManager,
+		gitExecutable,
+		onDidChangeGitExecutable,
+		logger,
+	);
 	const diffDocProvider = new DiffDocProvider(dataSource);
 	// Always register the panel view provider (so users can switch modes without restarting)
 	const panelProvider = GitGraphPanelView.getInstance(
@@ -53,10 +79,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		extensionState,
 		avatarManager,
 		repoManager,
-		logger
+		logger,
 	);
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(GitGraphPanelView.viewType, panelProvider)
+		vscode.window.registerWebviewViewProvider(GitGraphPanelView.viewType, panelProvider),
 	);
 
 	context.subscriptions.push(
@@ -68,17 +94,26 @@ export async function activate(context: vscode.ExtensionContext) {
 				const paths = getConfig().gitPaths;
 				if (paths.length === 0) return;
 
-				getGitExecutableFromPaths(paths).then((gitExecutable) => {
-					gitExecutableEmitter.emit(gitExecutable);
-					const msg = 'Git Graph is now using ' + gitExecutable.path + ' (version: ' + gitExecutable.version + ')';
-					showInformationMessage(msg);
-					logger.log(msg);
-					repoManager.searchWorkspaceForRepos();
-				}, () => {
-					const msg = 'The new value of "git.path" ("' + paths.join('", "') + '") does not ' + (paths.length > 1 ? 'contain a string that matches' : 'match') + ' the path and filename of a valid Git executable.';
-					showErrorMessage(msg);
-					logger.logError(msg);
-				});
+				getGitExecutableFromPaths(paths).then(
+					(gitExecutable) => {
+						gitExecutableEmitter.emit(gitExecutable);
+						const msg = vscode.l10n.t('ui.gitGraphNowUsing', {
+							path: gitExecutable.path,
+							version: gitExecutable.version,
+						});
+						showInformationMessage(msg);
+						logger.log(msg);
+						repoManager.searchWorkspaceForRepos();
+					},
+					() => {
+						const msg = vscode.l10n.t('ui.gitPathNewValue', {
+							paths: paths.join('", "'),
+							plural: paths.length > 1,
+						});
+						showErrorMessage(msg);
+						logger.logError(msg);
+					},
+				);
 			}
 		}),
 		diffDocProvider,
@@ -90,15 +125,15 @@ export async function activate(context: vscode.ExtensionContext) {
 		configurationEmitter,
 		extensionState,
 		gitExecutableEmitter,
-		logger
+		logger,
 	);
 	logger.log('Started Git Graph - Ready to use!');
 
 	extensionState.expireOldCodeReviews();
-	onStartUp(context).catch(() => { });
+	onStartUp(context).catch(() => {});
 }
 
 /**
  * Deactivate Git Graph.
  */
-export function deactivate() { }
+export function deactivate() {}

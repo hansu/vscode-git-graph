@@ -6,7 +6,12 @@ jest.mock('../src/logger');
 import * as path from 'path';
 import { ConfigurationChangeEvent } from 'vscode';
 import { DataSource } from '../src/dataSource';
-import { DiffDocProvider, DiffSide, decodeDiffDocUri, encodeDiffDocUri } from '../src/diffDocProvider';
+import {
+	DiffDocProvider,
+	DiffSide,
+	decodeDiffDocUri,
+	encodeDiffDocUri,
+} from '../src/diffDocProvider';
 import { Logger } from '../src/logger';
 import { GitFileStatus } from '../src/types';
 import { GitExecutable, UNCOMMITTED } from '../src/utils';
@@ -21,7 +26,12 @@ beforeAll(() => {
 	onDidChangeConfiguration = new EventEmitter<ConfigurationChangeEvent>();
 	onDidChangeGitExecutable = new EventEmitter<GitExecutable>();
 	logger = new Logger();
-	dataSource = new DataSource(null, onDidChangeConfiguration.subscribe, onDidChangeGitExecutable.subscribe, logger);
+	dataSource = new DataSource(
+		null,
+		onDidChangeConfiguration.subscribe,
+		onDidChangeGitExecutable.subscribe,
+		logger,
+	);
 });
 
 afterAll(() => {
@@ -34,7 +44,13 @@ afterAll(() => {
 describe('DiffDocProvider', () => {
 	it('Should construct a DiffDocProvider, provide a document, and be disposed', async () => {
 		// Setup
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitFileStatus.Modified, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+			GitFileStatus.Modified,
+			DiffSide.New,
+		);
 		jest.spyOn(dataSource, 'getCommitFile').mockResolvedValueOnce('file-contents');
 
 		// Run
@@ -58,14 +74,22 @@ describe('DiffDocProvider', () => {
 
 	it('Should remove a cached document once it is closed', async () => {
 		// Setup
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitFileStatus.Modified, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+			GitFileStatus.Modified,
+			DiffSide.New,
+		);
 		jest.spyOn(dataSource, 'getCommitFile').mockResolvedValueOnce('file-contents');
 
 		let closeTextDocument: (doc: { uri: vscode.Uri }) => void;
-		vscode.workspace.onDidCloseTextDocument.mockImplementationOnce((callback: (_: { uri: vscode.Uri }) => void) => {
-			closeTextDocument = callback;
-			return { dispose: jest.fn() };
-		});
+		vscode.workspace.onDidCloseTextDocument.mockImplementationOnce(
+			(callback: (_: { uri: vscode.Uri }) => void) => {
+				closeTextDocument = callback;
+				return { dispose: jest.fn() };
+			},
+		);
 
 		// Run
 		const diffDocProvider = new DiffDocProvider(dataSource);
@@ -87,7 +111,13 @@ describe('DiffDocProvider', () => {
 
 	it('Should reuse a cached document if it exists', async () => {
 		// Setup
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitFileStatus.Modified, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+			GitFileStatus.Modified,
+			DiffSide.New,
+		);
 		const spyOnGetCommitFile = jest.spyOn(dataSource, 'getCommitFile');
 		spyOnGetCommitFile.mockResolvedValueOnce('file-contents');
 
@@ -107,7 +137,13 @@ describe('DiffDocProvider', () => {
 
 	it('Should return an empty document if requested', async () => {
 		// Setup
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', UNCOMMITTED, GitFileStatus.Deleted, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			UNCOMMITTED,
+			GitFileStatus.Deleted,
+			DiffSide.New,
+		);
 
 		// Run
 		const diffDocProvider = new DiffDocProvider(dataSource);
@@ -122,7 +158,13 @@ describe('DiffDocProvider', () => {
 
 	it('Should display an error message if an error occurred when fetching the file contents from the DataSource, and return an empty document', async () => {
 		// Setup
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitFileStatus.Modified, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+			GitFileStatus.Modified,
+			DiffSide.New,
+		);
 		jest.spyOn(dataSource, 'getCommitFile').mockRejectedValueOnce('error-message');
 		vscode.window.showErrorMessage.mockResolvedValue(null);
 
@@ -142,7 +184,13 @@ describe('DiffDocProvider', () => {
 describe('encodeDiffDocUri', () => {
 	it('Should return a file URI if requested on uncommitted changes and it is not deleted', () => {
 		// Run
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', UNCOMMITTED, GitFileStatus.Added, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			UNCOMMITTED,
+			GitFileStatus.Added,
+			DiffSide.New,
+		);
 
 		// Assert
 		expect(uri.scheme).toBe('file');
@@ -151,59 +199,94 @@ describe('encodeDiffDocUri', () => {
 
 	it('Should return an empty file URI if requested on a file displayed on the old side of the diff, and it is added', () => {
 		// Run
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitFileStatus.Added, DiffSide.Old);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+			GitFileStatus.Added,
+			DiffSide.Old,
+		);
 
 		// Assert
 		expect(uri.scheme).toBe('git-graph');
 		expect(uri.fsPath).toBe('file');
-		expect(uri.query).toBe('eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZS50eHQiLCJjb21taXQiOiIxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiIiwicmVwbyI6Ii9yZXBvIiwiZXhpc3RzIjpmYWxzZX0=');
+		expect(uri.query).toBe(
+			'eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZS50eHQiLCJjb21taXQiOiIxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiIiwicmVwbyI6Ii9yZXBvIiwiZXhpc3RzIjpmYWxzZX0=',
+		);
 	});
 
 	it('Should return an empty file URI if requested on a file displayed on the new side of the diff, and it is deleted', () => {
 		// Run
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitFileStatus.Deleted, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+			GitFileStatus.Deleted,
+			DiffSide.New,
+		);
 
 		// Assert
 		expect(uri.scheme).toBe('git-graph');
 		expect(uri.fsPath).toBe('file');
-		expect(uri.query).toBe('eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZS50eHQiLCJjb21taXQiOiIxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiIiwicmVwbyI6Ii9yZXBvIiwiZXhpc3RzIjpmYWxzZX0=');
+		expect(uri.query).toBe(
+			'eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZS50eHQiLCJjb21taXQiOiIxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiIiwicmVwbyI6Ii9yZXBvIiwiZXhpc3RzIjpmYWxzZX0=',
+		);
 	});
 
 	it('Should return a git-graph URI with the provided file extension', () => {
 		// Run
-		const uri = encodeDiffDocUri('/repo', 'path/to/file.txt', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitFileStatus.Modified, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file.txt',
+			'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+			GitFileStatus.Modified,
+			DiffSide.New,
+		);
 
 		// Assert
 		expect(uri.scheme).toBe('git-graph');
 		expect(uri.fsPath).toBe('file.txt');
-		expect(uri.query).toBe('eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZS50eHQiLCJjb21taXQiOiIxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiIiwicmVwbyI6Ii9yZXBvIiwiZXhpc3RzIjp0cnVlfQ==');
+		expect(uri.query).toBe(
+			'eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZS50eHQiLCJjb21taXQiOiIxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiIiwicmVwbyI6Ii9yZXBvIiwiZXhpc3RzIjp0cnVlfQ==',
+		);
 	});
 
 	it('Should return a git-graph URI with no file extension when it is not provided', () => {
 		// Run
-		const uri = encodeDiffDocUri('/repo', 'path/to/file', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitFileStatus.Modified, DiffSide.New);
+		const uri = encodeDiffDocUri(
+			'/repo',
+			'path/to/file',
+			'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+			GitFileStatus.Modified,
+			DiffSide.New,
+		);
 
 		// Assert
 		expect(uri.scheme).toBe('git-graph');
 		expect(uri.fsPath).toBe('file');
-		expect(uri.query).toBe('eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZSIsImNvbW1pdCI6IjFhMmIzYzRkNWU2ZjFhMmIzYzRkNWU2ZjFhMmIzYzRkNWU2ZjFhMmIiLCJyZXBvIjoiL3JlcG8iLCJleGlzdHMiOnRydWV9');
+		expect(uri.query).toBe(
+			'eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZSIsImNvbW1pdCI6IjFhMmIzYzRkNWU2ZjFhMmIzYzRkNWU2ZjFhMmIzYzRkNWU2ZjFhMmIiLCJyZXBvIjoiL3JlcG8iLCJleGlzdHMiOnRydWV9',
+		);
 	});
 });
 
 describe('decodeDiffDocUri', () => {
 	it('Should return the parsed DiffDocUriData from the URI', () => {
 		// Run
-		const value = decodeDiffDocUri(vscode.Uri.file('file.txt').with({
-			scheme: 'git-graph',
-			query: 'eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZS50eHQiLCJjb21taXQiOiIxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiIiwicmVwbyI6Ii9yZXBvIiwiZXhpc3RzIjp0cnVlfQ=='
-		}));
+		const value = decodeDiffDocUri(
+			vscode.Uri.file('file.txt').with({
+				scheme: 'git-graph',
+				query:
+					'eyJmaWxlUGF0aCI6InBhdGgvdG8vZmlsZS50eHQiLCJjb21taXQiOiIxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiM2M0ZDVlNmYxYTJiIiwicmVwbyI6Ii9yZXBvIiwiZXhpc3RzIjp0cnVlfQ==',
+			}),
+		);
 
 		// Assert
 		expect(value).toStrictEqual({
 			filePath: 'path/to/file.txt',
 			commit: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 			repo: '/repo',
-			exists: true
+			exists: true,
 		});
 	});
 });

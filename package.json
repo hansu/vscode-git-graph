@@ -1,13 +1,13 @@
 {
 	"name": "git-graph-2",
-	"displayName": "Git Graph 2",
+	"displayName": "%extension.name%",
 	"version": "1.31.7",
 	"publisher": "hansu",
 	"author": {
 		"name": "Michael Hutchison",
 		"email": "mhutchie@16right.com"
 	},
-	"description": "Fork of mhutchie's Git Graph with further improvements.",
+	"description": "%extension.description%",
 	"keywords": [
 		"git",
 		"graph",
@@ -30,22 +30,25 @@
 	"license": "SEE LICENSE IN 'LICENSE'",
 	"icon": "resources/icon.png",
 	"engines": {
-		"vscode": "^1.50.0",
+		"vscode": "^1.68.0",
 		"node": ">=18.18.0"
 	},
 	"extensionKind": [
 		"workspace"
 	],
 	"activationEvents": [
-		"*"
+		"onStartupFinished"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"l10n": {
+			"folder": ""
+		},
 		"commands": [
 			{
 				"category": "Git Graph",
 				"command": "git-graph.view",
-				"title": "View Git Graph (git log)",
+				"title": "%command.view%",
 				"icon": {
 					"light": "resources/cmd-icon-light.svg",
 					"dark": "resources/cmd-icon-dark.svg"
@@ -54,105 +57,120 @@
 			{
 				"category": "Git Graph",
 				"command": "git-graph.addGitRepository",
-				"title": "Add Git Repository..."
+				"title": "%command.addGitRepository%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.clearAvatarCache",
-				"title": "Clear Avatar Cache"
+				"title": "%command.clearAvatarCache%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.endAllWorkspaceCodeReviews",
-				"title": "End All Code Reviews in Workspace"
+				"title": "%command.endAllWorkspaceCodeReviews%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.endSpecificWorkspaceCodeReview",
-				"title": "End a specific Code Review in Workspace..."
+				"title": "%command.endSpecificWorkspaceCodeReview%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.fetch",
-				"title": "Fetch from Remote(s)"
+				"title": "%command.fetch%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.removeGitRepository",
-				"title": "Remove Git Repository..."
+				"title": "%command.removeGitRepository%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.resumeWorkspaceCodeReview",
-				"title": "Resume a specific Code Review in Workspace..."
+				"title": "%command.resumeWorkspaceCodeReview%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.version",
-				"title": "Get Version Information"
+				"title": "%command.version%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.openFile",
-				"title": "Open File",
+				"title": "%command.openFile%",
 				"icon": "$(go-to-file)",
 				"enablement": "isInDiffEditor && resourceScheme == git-graph && git-graph:codiconsSupported"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.viewInEditor",
-				"title": "View Git Graph in Editor"
+				"title": "%command.viewInEditor%"
 			},
 			{
 				"category": "Git Graph",
 				"command": "git-graph.viewInPanel",
-				"title": "View Git Graph in Panel"
+				"title": "%command.viewInPanel%"
 			}
 		],
 		"configuration": {
 			"type": "object",
-			"title": "Git Graph",
+			"title": "%extension.name%",
 			"properties": {
+				"git-graph.language": {
+					"type": "string",
+					"enum": [
+						"",
+						"en",
+						"zh"
+					],
+					"enumDescriptions": [
+						"%configuration.language.enum%",
+						"%configuration.language.enum.en%",
+						"%configuration.language.enum.zh%"
+					],
+					"default": "",
+					"description": "%configuration.language%"
+				},
 				"git-graph.commitDetailsView.autoCenter": {
 					"type": "boolean",
 					"default": true,
-					"description": "Automatically center the Commit Details View when it is opened."
+					"description": "%configuration.commitDetailsView.autoCenter%"
 				},
 				"git-graph.commitDetailsView.autoScroll": {
 					"type": "boolean",
 					"default": true,
-					"description": "Automatically scroll the view to show the commit when opening the Commit Details View."
+					"description": "%configuration.commitDetailsView.autoScroll%"
 				},
 				"git-graph.commitDetailsView.fileView.fileTree.compactFolders": {
 					"type": "boolean",
 					"default": true,
-					"description": "Render the File Tree in the Commit Details View in a compacted form, such that folders with a single child folder are compressed into a single combined folder element."
+					"description": "%configuration.commitDetailsView.fileView.fileTree.compactFolders%"
 				},
 				"git-graph.commitDetailsView.fileView.type": {
 					"type": "string",
 					"enum": [
-						"File Tree",
-						"File List"
+						"%configuration.commitDetailsView.fileView.type.enum.fileTree%",
+						"%configuration.commitDetailsView.fileView.type.enum.fileList%"
 					],
 					"enumDescriptions": [
-						"Display files in a tree structure.",
-						"Display files in a list (useful for repositories with deep folder structures)."
+						"%configuration.commitDetailsView.fileView.type.enumDescription.fileTree%",
+						"%configuration.commitDetailsView.fileView.type.enumDescription.fileList%"
 					],
-					"default": "File Tree",
-					"description": "Sets the default type of File View used in the Commit Details View. This can be overridden per repository using the controls on the right side of the Commit Details View."
+					"default": "%configuration.commitDetailsView.fileView.type.enum.fileTree%",
+					"description": "%configuration.commitDetailsView.fileView.type%"
 				},
 				"git-graph.commitDetailsView.location": {
 					"type": "string",
 					"enum": [
-						"Inline",
-						"Docked to Bottom"
+						"%configuration.commitDetailsView.location.enum.inline%",
+						"%configuration.commitDetailsView.location.enum.dockedToBottom%"
 					],
 					"enumDescriptions": [
-						"Show the Commit Details View inline with the graph & commits.",
-						"Show the Commit Details View docked to the bottom of the Git Graph View."
+						"%configuration.commitDetailsView.location.enumDescription.inline%",
+						"%configuration.commitDetailsView.location.enumDescription.dockedToBottom%"
 					],
-					"default": "Inline",
-					"description": "Specifies where the Commit Details View is rendered in the Git Graph View."
+					"default": "%configuration.commitDetailsView.location.enum.inline%",
+					"description": "%configuration.commitDetailsView.location%"
 				},
 				"git-graph.contextMenuActionsVisibility": {
 					"type": "object",
@@ -163,59 +181,59 @@
 							"properties": {
 								"checkout": {
 									"type": "boolean",
-									"title": "Checkout Branch"
+									"title": "%configuration.contextMenuActionsVisibility.branch.checkout%"
 								},
 								"rename": {
 									"type": "boolean",
-									"title": "Rename Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.branch.rename%"
 								},
 								"createBranch": {
 									"type": "boolean",
-									"title": "Create Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.branch.createBranch%"
 								},
 								"delete": {
 									"type": "boolean",
-									"title": "Delete Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.branch.delete%"
 								},
 								"merge": {
 									"type": "boolean",
-									"title": "Merge into current branch..."
+									"title": "%configuration.contextMenuActionsVisibility.branch.merge%"
 								},
 								"rebase": {
 									"type": "boolean",
-									"title": "Rebase current branch on Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.branch.rebase%"
 								},
 								"push": {
 									"type": "boolean",
-									"title": "Push Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.branch.push%"
 								},
 								"pull": {
 									"type": "boolean",
-									"title": "Pull Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.branch.pull%"
 								},
 								"viewIssue": {
 									"type": "boolean",
-									"title": "View Issue"
+									"title": "%configuration.contextMenuActionsVisibility.branch.viewIssue%"
 								},
 								"createPullRequest": {
 									"type": "boolean",
-									"title": "Create Pull Request..."
+									"title": "%configuration.contextMenuActionsVisibility.branch.createPullRequest%"
 								},
 								"createArchive": {
 									"type": "boolean",
-									"title": "Create Archive"
+									"title": "%configuration.contextMenuActionsVisibility.branch.createArchive%"
 								},
 								"selectInBranchesDropdown": {
 									"type": "boolean",
-									"title": "Select in Branches Dropdown"
+									"title": "%configuration.contextMenuActionsVisibility.branch.selectInBranchesDropdown%"
 								},
 								"unselectInBranchesDropdown": {
 									"type": "boolean",
-									"title": "Unselect in Branches Dropdown"
+									"title": "%configuration.contextMenuActionsVisibility.branch.unselectInBranchesDropdown%"
 								},
 								"copyName": {
 									"type": "boolean",
-									"title": "Copy Branch Name to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.branch.copyName%"
 								}
 							}
 						},
@@ -224,51 +242,51 @@
 							"properties": {
 								"addTag": {
 									"type": "boolean",
-									"title": "Add Tag..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.addTag%"
 								},
 								"createBranch": {
 									"type": "boolean",
-									"title": "Create Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.createBranch%"
 								},
 								"checkout": {
 									"type": "boolean",
-									"title": "Checkout..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.checkout%"
 								},
 								"cherrypick": {
 									"type": "boolean",
-									"title": "Cherry Pick..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.cherrypick%"
 								},
 								"revert": {
 									"type": "boolean",
-									"title": "Revert..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.revert%"
 								},
 								"undo": {
 									"type": "boolean",
-									"title": "Reset Last Commit"
+									"title": "%configuration.contextMenuActionsVisibility.commit.undo%"
 								},
 								"drop": {
 									"type": "boolean",
-									"title": "Drop..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.drop%"
 								},
 								"merge": {
 									"type": "boolean",
-									"title": "Merge into current Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.merge%"
 								},
 								"rebase": {
 									"type": "boolean",
-									"title": "Rebase current Branch on this Commit..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.rebase%"
 								},
 								"reset": {
 									"type": "boolean",
-									"title": "Reset current Branch to this Commit..."
+									"title": "%configuration.contextMenuActionsVisibility.commit.reset%"
 								},
 								"copyHash": {
 									"type": "boolean",
-									"title": "Copy Commit Hash to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.commit.copyHash%"
 								},
 								"copySubject": {
 									"type": "boolean",
-									"title": "Copy Commit Subject to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.commit.copySubject%"
 								}
 							}
 						},
@@ -277,39 +295,39 @@
 							"properties": {
 								"viewDiff": {
 									"type": "boolean",
-									"title": "View Diff"
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.viewDiff%"
 								},
 								"viewFileAtThisRevision": {
 									"type": "boolean",
-									"title": "View File at this Revision"
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.viewFileAtThisRevision%"
 								},
 								"viewDiffWithWorkingFile": {
 									"type": "boolean",
-									"title": "View Diff with Working File"
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.viewDiffWithWorkingFile%"
 								},
 								"openFile": {
 									"type": "boolean",
-									"title": "Open File"
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.openFile%"
 								},
 								"markAsReviewed": {
 									"type": "boolean",
-									"title": "Mark as Reviewed"
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.markAsReviewed%"
 								},
 								"markAsNotReviewed": {
 									"type": "boolean",
-									"title": "Mark as Not Reviewed"
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.markAsNotReviewed%"
 								},
 								"resetFileToThisRevision": {
 									"type": "boolean",
-									"title": "Reset File to this Revision..."
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.resetFileToThisRevision%"
 								},
 								"copyAbsoluteFilePath": {
 									"type": "boolean",
-									"title": "Copy Absolute File Path to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.copyAbsoluteFilePath%"
 								},
 								"copyRelativeFilePath": {
 									"type": "boolean",
-									"title": "Copy Relative File Path to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.commitDetailsViewFile.copyRelativeFilePath%"
 								}
 							}
 						},
@@ -318,51 +336,51 @@
 							"properties": {
 								"checkout": {
 									"type": "boolean",
-									"title": "Checkout Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.checkout%"
 								},
 								"delete": {
 									"type": "boolean",
-									"title": "Delete Remote Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.delete%"
 								},
 								"fetch": {
 									"type": "boolean",
-									"title": "Fetch into local branch..."
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.fetch%"
 								},
 								"merge": {
 									"type": "boolean",
-									"title": "Merge into current branch..."
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.merge%"
 								},
 								"pull": {
 									"type": "boolean",
-									"title": "Pull into current branch..."
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.pull%"
 								},
 								"createBranch": {
 									"type": "boolean",
-									"title": "Create Branch..."
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.createBranch%"
 								},
 								"viewIssue": {
 									"type": "boolean",
-									"title": "View Issue"
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.viewIssue%"
 								},
 								"createPullRequest": {
 									"type": "boolean",
-									"title": "Create Pull Request"
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.createPullRequest%"
 								},
 								"createArchive": {
 									"type": "boolean",
-									"title": "Create Archive"
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.createArchive%"
 								},
 								"selectInBranchesDropdown": {
 									"type": "boolean",
-									"title": "Select in Branches Dropdown"
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.selectInBranchesDropdown%"
 								},
 								"unselectInBranchesDropdown": {
 									"type": "boolean",
-									"title": "Unselect in Branches Dropdown"
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.unselectInBranchesDropdown%"
 								},
 								"copyName": {
 									"type": "boolean",
-									"title": "Copy Branch Name to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.remoteBranch.copyName%"
 								}
 							}
 						},
@@ -371,27 +389,27 @@
 							"properties": {
 								"apply": {
 									"type": "boolean",
-									"title": "Apply Stash..."
+									"title": "%configuration.contextMenuActionsVisibility.stash.apply%"
 								},
 								"createBranch": {
 									"type": "boolean",
-									"title": "Create Branch from Stash..."
+									"title": "%configuration.contextMenuActionsVisibility.stash.createBranch%"
 								},
 								"pop": {
 									"type": "boolean",
-									"title": "Pop Stash..."
+									"title": "%configuration.contextMenuActionsVisibility.stash.pop%"
 								},
 								"drop": {
 									"type": "boolean",
-									"title": "Drop Stash..."
+									"title": "%configuration.contextMenuActionsVisibility.stash.drop%"
 								},
 								"copyName": {
 									"type": "boolean",
-									"title": "Copy Stash Name to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.stash.copyName%"
 								},
 								"copyHash": {
 									"type": "boolean",
-									"title": "Copy Stash Hash to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.stash.copyHash%"
 								}
 							}
 						},
@@ -400,23 +418,23 @@
 							"properties": {
 								"viewDetails": {
 									"type": "boolean",
-									"title": "View Details"
+									"title": "%configuration.contextMenuActionsVisibility.tag.viewDetails%"
 								},
 								"delete": {
 									"type": "boolean",
-									"title": "Delete Tag..."
+									"title": "%configuration.contextMenuActionsVisibility.tag.delete%"
 								},
 								"push": {
 									"type": "boolean",
-									"title": "Push Tag..."
+									"title": "%configuration.contextMenuActionsVisibility.tag.push%"
 								},
 								"createArchive": {
 									"type": "boolean",
-									"title": "Create Archive"
+									"title": "%configuration.contextMenuActionsVisibility.tag.createArchive%"
 								},
 								"copyName": {
 									"type": "boolean",
-									"title": "Copy Tag Name to Clipboard"
+									"title": "%configuration.contextMenuActionsVisibility.tag.copyName%"
 								}
 							}
 						},
@@ -425,30 +443,30 @@
 							"properties": {
 								"stash": {
 									"type": "boolean",
-									"title": "Stash uncommitted changes..."
+									"title": "%configuration.contextMenuActionsVisibility.uncommittedChanges.stash%"
 								},
 								"reset": {
 									"type": "boolean",
-									"title": "Reset uncommitted changes..."
+									"title": "%configuration.contextMenuActionsVisibility.uncommittedChanges.reset%"
 								},
 								"clean": {
 									"type": "boolean",
-									"title": "Clean untracked files..."
+									"title": "%configuration.contextMenuActionsVisibility.uncommittedChanges.clean%"
 								},
 								"openSourceControlView": {
 									"type": "boolean",
-									"title": "Open Source Control View"
+									"title": "%configuration.contextMenuActionsVisibility.uncommittedChanges.openSourceControlView%"
 								}
 							}
 						}
 					},
-					"markdownDescription": "Customise which context menu actions are visible. For example, if you want to hide the rebase action from the branch context menu, a suitable value for this setting is `{ \"branch\": { \"rebase\": false } }`. For more information of how to configure this setting, view the documentation [here](https://github.com/hansu/vscode-git-graph/wiki/Extension-Settings#context-menu-actions-visibility)."
+					"markdownDescription": "%configuration.contextMenuActionsVisibility%"
 				},
 				"git-graph.customBranchGlobPatterns": {
 					"type": "array",
 					"items": {
 						"type": "object",
-						"title": "Branch Glob Pattern",
+						"title": "%configuration.customBranchGlobPatterns.item.title%",
 						"required": [
 							"name",
 							"glob"
@@ -456,24 +474,24 @@
 						"properties": {
 							"name": {
 								"type": "string",
-								"title": "Name of pattern",
-								"description": "Name used to reference the pattern in the 'Branches' dropdown"
+								"title": "%configuration.customBranchGlobPatterns.item.name.title%",
+								"description": "%configuration.customBranchGlobPatterns.item.name.description%"
 							},
 							"glob": {
 								"type": "string",
-								"title": "Glob pattern",
-								"description": "The Glob Pattern <glob-pattern>, as used in 'git log --glob=<glob-pattern>'. For example: heads/feature/*"
+								"title": "%configuration.customBranchGlobPatterns.item.glob.title%",
+								"description": "%configuration.customBranchGlobPatterns.item.glob.description%"
 							}
 						}
 					},
 					"default": [],
-					"description": "An array of Custom Branch Glob Patterns to be shown in the 'Branches' dropdown. Example: [{\"name\": \"Feature Requests\", \"glob\": \"heads/feature/*\"}]"
+					"description": "%configuration.customBranchGlobPatterns%"
 				},
 				"git-graph.customEmojiShortcodeMappings": {
 					"type": "array",
 					"items": {
 						"type": "object",
-						"title": "Custom Emoji Shortcode Mapping",
+						"title": "%configuration.customEmojiShortcodeMappings.item.title%",
 						"required": [
 							"shortcode",
 							"emoji"
@@ -481,24 +499,24 @@
 						"properties": {
 							"shortcode": {
 								"type": "string",
-								"title": "Emoji Shortcode",
-								"description": "Emoji Shortcode (e.g. \":sparkles:\")"
+								"title": "%configuration.customEmojiShortcodeMappings.item.shortcode.title%",
+								"description": "%configuration.customEmojiShortcodeMappings.item.shortcode.description%"
 							},
 							"emoji": {
 								"type": "string",
-								"title": "Emoji",
-								"description": "Emoji (e.g. \"✨\")"
+								"title": "%configuration.customEmojiShortcodeMappings.item.emoji.title%",
+								"description": "%configuration.customEmojiShortcodeMappings.item.emoji.description%"
 							}
 						}
 					},
 					"default": [],
-					"description": "An array of custom Emoji Shortcode mappings. Example: [{\"shortcode\": \":sparkles:\", \"emoji\":\"✨\"}]"
+					"description": "%configuration.customEmojiShortcodeMappings%"
 				},
 				"git-graph.customPullRequestProviders": {
 					"type": "array",
 					"items": {
 						"type": "object",
-						"title": "Pull Request Provider",
+						"title": "%configuration.customPullRequestProviders.item.title%",
 						"required": [
 							"name",
 							"templateUrl"
@@ -506,65 +524,65 @@
 						"properties": {
 							"name": {
 								"type": "string",
-								"title": "Name of the Provider",
-								"description": "A unique, identifying, display name for the provider."
+								"title": "%configuration.customPullRequestProviders.item.name.title%",
+								"description": "%configuration.customPullRequestProviders.item.name.description%"
 							},
 							"templateUrl": {
 								"type": "string",
-								"title": "Template URL",
-								"markdownDescription": "A template URL that can be used to create a Pull Request, after the $1 - $8 variables have been substituted to construct the final URL. For information on how to configure this setting, see the documentation [here](https://github.com/hansu/vscode-git-graph/wiki/Configuring-a-custom-Pull-Request-Provider)."
+								"title": "%configuration.customPullRequestProviders.item.templateUrl.title%",
+								"markdownDescription": "%configuration.customPullRequestProviders.item.templateUrl.description%"
 							}
 						}
 					},
 					"default": [],
-					"markdownDescription": "An array of custom Pull Request providers that can be used in the \"Pull Request Creation\" Integration. For information on how to configure this setting, see the documentation [here](https://github.com/hansu/vscode-git-graph/wiki/Configuring-a-custom-Pull-Request-Provider)."
+					"markdownDescription": "%configuration.customPullRequestProviders%"
 				},
 				"git-graph.date.format": {
 					"type": "string",
 					"enum": [
-						"Date & Time",
-						"Date Only",
-						"ISO Date & Time",
-						"ISO Date Only",
-						"Relative"
+						"%configuration.date.format.enum.dateAndTime%",
+						"%configuration.date.format.enum.dateOnly%",
+						"%configuration.date.format.enum.isoDateAndTime%",
+						"%configuration.date.format.enum.isoDateOnly%",
+						"%configuration.date.format.enum.relative%"
 					],
 					"enumDescriptions": [
-						"Show the date and time (e.g. \"24 Mar 2019 21:34\")",
-						"Show the date only (e.g. \"24 Mar 2019\")",
-						"Show the ISO date and time (e.g. \"2019-03-24 21:34\")",
-						"Show the ISO date only (e.g. \"2019-03-24\")",
-						"Show relative times (e.g. \"5 minutes ago\")"
+						"%configuration.date.format.enumDescription.dateAndTime%",
+						"%configuration.date.format.enumDescription.dateOnly%",
+						"%configuration.date.format.enumDescription.isoDateAndTime%",
+						"%configuration.date.format.enumDescription.isoDateOnly%",
+						"%configuration.date.format.enumDescription.relative%"
 					],
-					"default": "Date & Time",
-					"description": "Specifies the date format to be used in the \"Date\" column on the Git Graph View."
+					"default": "%configuration.date.format.enum.dateAndTime%",
+					"description": "%configuration.date.format%"
 				},
 				"git-graph.date.type": {
 					"type": "string",
 					"enum": [
-						"Author Date",
-						"Commit Date"
+						"%configuration.date.type.enum.authorDate%",
+						"%configuration.date.type.enum.commitDate%"
 					],
 					"enumDescriptions": [
-						"Use the author date of a commit.",
-						"Use the committer date of a commit."
+						"%configuration.date.type.enumDescription.authorDate%",
+						"%configuration.date.type.enumDescription.commitDate%"
 					],
-					"default": "Author Date",
-					"description": "Specifies the date type to be displayed in the \"Date\" column on the Git Graph View."
+					"default": "%configuration.date.type.enum.authorDate%",
+					"description": "%configuration.date.type%"
 				},
 				"git-graph.defaultColumnVisibility": {
 					"type": "object",
 					"properties": {
 						"Date": {
 							"type": "boolean",
-							"title": "Visibility of the Date column"
+							"title": "%configuration.defaultColumnVisibility.Date%"
 						},
 						"Author": {
 							"type": "boolean",
-							"title": "Visibility of the Author column"
+							"title": "%configuration.defaultColumnVisibility.Author%"
 						},
 						"Commit": {
 							"type": "boolean",
-							"title": "Visibility of the Commit column"
+							"title": "%configuration.defaultColumnVisibility.Commit%"
 						}
 					},
 					"default": {
@@ -572,215 +590,215 @@
 						"Author": true,
 						"Commit": true
 					},
-					"description": "An object specifying the default visibility of the Date, Author & Commit columns. Example: {\"Date\": true, \"Author\": true, \"Commit\": true}"
+					"description": "%configuration.defaultColumnVisibility%"
 				},
 				"git-graph.toolbarButtonVisibility": {
 					"type": "object",
 					"properties": {
 						"Remotes": {
 							"type": "boolean",
-							"title": "Visibility of the Remotes checkbox"
+							"title": "%configuration.toolbarButtonVisibility.Remotes%"
 						},
 						"Simplify": {
 							"type": "boolean",
-							"title": "Visibility of the Simplify checkbox"
+							"title": "%configuration.toolbarButtonVisibility.Simplify%"
 						}
 					},
 					"default": {
 						"Remotes": true,
 						"Simplify": true
 					},
-					"description": "An object specifying the default visibility of the items of the tool bar. Example: {\"Remotes\": true\", Simplify\": true}"
+					"description": "%configuration.toolbarButtonVisibility%"
 				},
 				"git-graph.dialog.addTag.pushToRemote": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the field indicating whether the tag should be pushed to a remote once it is added."
+					"description": "%configuration.dialog.addTag.pushToRemote%"
 				},
 				"git-graph.dialog.addTag.type": {
 					"type": "string",
 					"enum": [
-						"Annotated",
-						"Lightweight"
+						"%configuration.dialog.addTag.type.enum.annotated%",
+						"%configuration.dialog.addTag.type.enum.lightweight%"
 					],
-					"default": "Annotated",
-					"description": "Default type of the tag being added."
+					"default": "%configuration.dialog.addTag.type.enum.annotated%",
+					"description": "%configuration.dialog.addTag.type%"
 				},
 				"git-graph.dialog.applyStash.reinstateIndex": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Reinstate Index\" checkbox."
+					"description": "%configuration.dialog.applyStash.reinstateIndex%"
 				},
 				"git-graph.dialog.cherryPick.noCommit": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"No Commit\" checkbox."
+					"description": "%configuration.dialog.cherryPick.noCommit%"
 				},
 				"git-graph.dialog.cherryPick.recordOrigin": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Record Origin\" checkbox."
+					"description": "%configuration.dialog.cherryPick.recordOrigin%"
 				},
 				"git-graph.dialog.createBranch.checkOut": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Check out\" checkbox."
+					"description": "%configuration.dialog.createBranch.checkOut%"
 				},
 				"git-graph.dialog.deleteBranch.forceDelete": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Force Delete\" checkbox."
+					"description": "%configuration.dialog.deleteBranch.forceDelete%"
 				},
 				"git-graph.dialog.fetchIntoLocalBranch.forceFetch": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Force Fetch\" checkbox."
+					"description": "%configuration.dialog.fetchIntoLocalBranch.forceFetch%"
 				},
 				"git-graph.dialog.fetchRemote.prune": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Prune\" checkbox."
+					"description": "%configuration.dialog.fetchRemote.prune%"
 				},
 				"git-graph.dialog.fetchRemote.pruneTags": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Prune Tags\" checkbox."
+					"description": "%configuration.dialog.fetchRemote.pruneTags%"
 				},
 				"git-graph.dialog.general.referenceInputSpaceSubstitution": {
 					"type": "string",
 					"enum": [
-						"None",
-						"Hyphen",
-						"Underscore"
+						"%configuration.dialog.general.referenceInputSpaceSubstitution.enum.none%",
+						"%configuration.dialog.general.referenceInputSpaceSubstitution.enum.hyphen%",
+						"%configuration.dialog.general.referenceInputSpaceSubstitution.enum.underscore%"
 					],
 					"enumDescriptions": [
-						"Don't replace spaces.",
-						"Replace space characters with hyphens, for example: \"new branch\" -> \"new-branch\".",
-						"Replace space characters with underscores, for example: \"new branch\" -> \"new_branch\"."
+						"%configuration.dialog.general.referenceInputSpaceSubstitution.enumDescription.none%",
+						"%configuration.dialog.general.referenceInputSpaceSubstitution.enumDescription.hyphen%",
+						"%configuration.dialog.general.referenceInputSpaceSubstitution.enumDescription.underscore%"
 					],
-					"default": "None",
-					"description": "Specifies a substitution that is automatically performed when space characters are entered or pasted into reference inputs on dialogs (e.g. Create Branch, Add Tag, etc.)."
+					"default": "%configuration.dialog.general.referenceInputSpaceSubstitution.enum.none%",
+					"description": "%configuration.dialog.general.referenceInputSpaceSubstitution%"
 				},
 				"git-graph.dialog.merge.noCommit": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"No Commit\" checkbox."
+					"description": "%configuration.dialog.merge.noCommit%"
 				},
 				"git-graph.dialog.merge.noFastForward": {
 					"type": "boolean",
 					"default": true,
-					"description": "Default state of the \"Create a new commit even if fast-forward is possible\" checkbox."
+					"description": "%configuration.dialog.merge.noFastForward%"
 				},
 				"git-graph.dialog.merge.allowUnrelatedHistories": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Allow unrelated histories\" checkbox."
+					"description": "%configuration.dialog.merge.allowUnrelatedHistories%"
 				},
 				"git-graph.dialog.merge.squashCommits": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Squash Commits\" checkbox."
+					"description": "%configuration.dialog.merge.squashCommits%"
 				},
 				"git-graph.dialog.merge.squashMessageFormat": {
 					"type": "string",
 					"enum": [
-						"Default",
-						"Git SQUASH_MSG"
+						"%configuration.dialog.merge.squashMessageFormat.enum.default%",
+						"%configuration.dialog.merge.squashMessageFormat.enum.gitSquashMsg%"
 					],
 					"enumDescriptions": [
-						"Use the squash message generated by Git Graph.",
-						"Use the detailed squash message generated by Git (stored in .git/SQUASH_MSG)."
+						"%configuration.dialog.merge.squashMessageFormat.enumDescription.default%",
+						"%configuration.dialog.merge.squashMessageFormat.enumDescription.gitSquashMsg%"
 					],
-					"default": "Default",
-					"description": "Specifies the message format used for the squashed commit (when the \"Squash Commits\" option is selected)."
+					"default": "%configuration.dialog.merge.squashMessageFormat.enum.default%",
+					"description": "%configuration.dialog.merge.squashMessageFormat%"
 				},
 				"git-graph.dialog.popStash.reinstateIndex": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Reinstate Index\" checkbox."
+					"description": "%configuration.dialog.popStash.reinstateIndex%"
 				},
 				"git-graph.dialog.pullBranch.noFastForward": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Create a new commit even if fast-forward is possible\" checkbox."
+					"description": "%configuration.dialog.pullBranch.noFastForward%"
 				},
 				"git-graph.dialog.pullBranch.squashCommits": {
 					"type": "boolean",
 					"default": false,
-					"description": "Default state of the \"Squash Commits\" checkbox."
+					"description": "%configuration.dialog.pullBranch.squashCommits%"
 				},
 				"git-graph.dialog.pullBranch.squashMessageFormat": {
 					"type": "string",
 					"enum": [
-						"Default",
-						"Git SQUASH_MSG"
+						"%configuration.dialog.pullBranch.squashMessageFormat.enum.default%",
+						"%configuration.dialog.pullBranch.squashMessageFormat.enum.gitSquashMsg%"
 					],
 					"enumDescriptions": [
-						"Use the squash message generated by Git Graph.",
-						"Use the detailed squash message generated by Git (stored in .git/SQUASH_MSG)."
+						"%configuration.dialog.pullBranch.squashMessageFormat.enumDescription.default%",
+						"%configuration.dialog.pullBranch.squashMessageFormat.enumDescription.gitSquashMsg%"
 					],
-					"default": "Default",
-					"description": "Specifies the message format used for the squashed commit (when the \"Squash Commits\" option is selected)."
+					"default": "%configuration.dialog.pullBranch.squashMessageFormat.enum.default%",
+					"description": "%configuration.dialog.pullBranch.squashMessageFormat%"
 				},
 				"git-graph.dialog.rebase.ignoreDate": {
 					"type": "boolean",
 					"default": true,
-					"description": "Checkbox \"Ignore Date (non-interactive rebase only)\" active by default."
+					"description": "%configuration.dialog.rebase.ignoreDate%"
 				},
 				"git-graph.dialog.rebase.launchInteractiveRebase": {
 					"type": "boolean",
 					"default": false,
-					"description": "Checkbox \"Interactive Rebase (launch in new Terminal)\" active by default."
+					"description": "%configuration.dialog.rebase.launchInteractiveRebase%"
 				},
 				"git-graph.dialog.resetCurrentBranchToCommit.mode": {
 					"type": "string",
 					"enum": [
-						"Soft",
-						"Mixed",
-						"Hard"
+						"%configuration.dialog.resetCurrentBranchToCommit.mode.enum.soft%",
+						"%configuration.dialog.resetCurrentBranchToCommit.mode.enum.mixed%",
+						"%configuration.dialog.resetCurrentBranchToCommit.mode.enum.hard%"
 					],
 					"enumDescriptions": [
-						"Soft - Keep all changes, but reset head",
-						"Mixed - Keep working tree, but reset index",
-						"Hard - Discard all changes"
+						"%configuration.dialog.resetCurrentBranchToCommit.mode.enumDescription.soft%",
+						"%configuration.dialog.resetCurrentBranchToCommit.mode.enumDescription.mixed%",
+						"%configuration.dialog.resetCurrentBranchToCommit.mode.enumDescription.hard%"
 					],
-					"default": "Mixed",
-					"description": "Default mode to be used for the reset action."
+					"default": "%configuration.dialog.resetCurrentBranchToCommit.mode.enum.mixed%",
+					"description": "%configuration.dialog.resetCurrentBranchToCommit.mode%"
 				},
 				"git-graph.dialog.resetUncommittedChanges.mode": {
 					"type": "string",
 					"enum": [
-						"Mixed",
-						"Hard"
+						"%configuration.dialog.resetUncommittedChanges.mode.enum.mixed%",
+						"%configuration.dialog.resetUncommittedChanges.mode.enum.hard%"
 					],
 					"enumDescriptions": [
-						"Mixed - Keep working tree, but reset index",
-						"Hard - Discard all changes"
+						"%configuration.dialog.resetUncommittedChanges.mode.enumDescription.mixed%",
+						"%configuration.dialog.resetUncommittedChanges.mode.enumDescription.hard%"
 					],
-					"default": "Mixed",
-					"description": "Default mode to be used for the reset action."
+					"default": "%configuration.dialog.resetUncommittedChanges.mode.enum.mixed%",
+					"description": "%configuration.dialog.resetUncommittedChanges.mode%"
 				},
 				"git-graph.dialog.stashUncommittedChanges.includeUntracked": {
 					"type": "boolean",
 					"default": true,
-					"description": "Default state of the \"Include Untracked\" checkbox."
+					"description": "%configuration.dialog.stashUncommittedChanges.includeUntracked%"
 				},
 				"git-graph.enhancedAccessibility": {
 					"type": "boolean",
 					"default": false,
-					"description": "Visual file change A|M|D|R|U indicators in the Commit Details View for users with colour blindness. In the future, this setting will enable any additional accessibility related features of Git Graph that aren't enabled by default."
+					"description": "%configuration.enhancedAccessibility%"
 				},
 				"git-graph.fileEncoding": {
 					"type": "string",
 					"default": "utf8",
-					"markdownDescription": "The character set encoding used when retrieving a specific version of repository files (e.g. in the Diff View). A list of all supported encodings can be found [here](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings).",
+					"markdownDescription": "%configuration.fileEncoding%",
 					"scope": "resource"
 				},
 				"git-graph.graph.colours": {
 					"type": "array",
 					"items": {
 						"type": "string",
-						"description": "Colour (HEX or RGB)",
+						"description": "%configuration.graph.colours.item.description%",
 						"pattern": "^\\s*(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|rgb[a]?\\s*\\(\\d{1,3},\\s*\\d{1,3},\\s*\\d{1,3}\\))\\s*$"
 					},
 					"default": [
@@ -797,38 +815,38 @@
 						"#6f24d6",
 						"#ffcc00"
 					],
-					"description": "Specifies the colours used on the graph."
+					"description": "%configuration.graph.colours%"
 				},
 				"git-graph.graph.style": {
 					"type": "string",
 					"enum": [
-						"rounded",
-						"angular"
+						"%configuration.graph.style.enum.rounded%",
+						"%configuration.graph.style.enum.angular%"
 					],
 					"enumDescriptions": [
-						"Use smooth curves when transitioning between branches on the graph.",
-						"Use angular lines when transitioning between branches on the graph."
+						"%configuration.graph.style.enumDescription.rounded%",
+						"%configuration.graph.style.enumDescription.angular%"
 					],
-					"default": "rounded",
-					"description": "Specifies the style of the graph."
+					"default": "%configuration.graph.style.enum.rounded%",
+					"description": "%configuration.graph.style%"
 				},
 				"git-graph.graph.uncommittedChanges": {
 					"type": "string",
 					"enum": [
-						"Open Circle at the Uncommitted Changes",
-						"Open Circle at the Checked Out Commit"
+						"%configuration.graph.uncommittedChanges.enum.openCircleAtUncommittedChanges%",
+						"%configuration.graph.uncommittedChanges.enum.openCircleAtCheckedOutCommit%"
 					],
 					"enumDescriptions": [
-						"Display the Uncommitted Changes as a grey open circle, connected to the commit referenced by HEAD with a solid grey line. The current file system's state is therefore always displayed as an open circle.",
-						"Display the Uncommitted Changes as a grey closed circle, connected to the commit referenced by HEAD with a dotted grey line. The commit referenced by HEAD is therefore always displayed as an open circle."
+						"%configuration.graph.uncommittedChanges.enumDescription.openCircleAtUncommittedChanges%",
+						"%configuration.graph.uncommittedChanges.enumDescription.openCircleAtCheckedOutCommit%"
 					],
-					"default": "Open Circle at the Uncommitted Changes",
-					"description": "Specifies how the Uncommitted Changes are displayed on the graph."
+					"default": "%configuration.graph.uncommittedChanges.enum.openCircleAtUncommittedChanges%",
+					"description": "%configuration.graph.uncommittedChanges%"
 				},
 				"git-graph.integratedTerminalShell": {
 					"type": "string",
 					"default": "",
-					"description": "Specifies the path and filename of the Shell executable to be used by the Visual Studio Code Integrated Terminal, when it is opened by Git Graph. For example, to use Git Bash on Windows this setting would commonly be set to \"C:\\Program Files\\Git\\bin\\bash.exe\". If this setting is left blank, the default Shell is used.",
+					"description": "%configuration.integratedTerminalShell%",
 					"scope": "machine"
 				},
 				"git-graph.keyboardShortcut.find": {
@@ -863,7 +881,7 @@
 						"CTRL/CMD + Z"
 					],
 					"default": "CTRL/CMD + F",
-					"description": "The keybinding for the keyboard shortcut that opens the Find Widget in the Git Graph View."
+					"description": "%configuration.keyboardShortcut.find%"
 				},
 				"git-graph.keyboardShortcut.refresh": {
 					"type": "string",
@@ -897,7 +915,7 @@
 						"CTRL/CMD + Z"
 					],
 					"default": "CTRL/CMD + R",
-					"description": "The keybinding for the keyboard shortcut that refreshes the Git Graph View."
+					"description": "%configuration.keyboardShortcut.refresh%"
 				},
 				"git-graph.keyboardShortcut.scrollToHead": {
 					"type": "string",
@@ -931,7 +949,7 @@
 						"CTRL/CMD + Z"
 					],
 					"default": "CTRL/CMD + H",
-					"description": "The keybinding for the keyboard shortcut that scrolls the Git Graph View to be centered on the commit referenced by HEAD."
+					"description": "%configuration.keyboardShortcut.scrollToHead%"
 				},
 				"git-graph.keyboardShortcut.scrollToStash": {
 					"type": "string",
@@ -965,148 +983,148 @@
 						"CTRL/CMD + Z"
 					],
 					"default": "CTRL/CMD + S",
-					"description": "The keybinding for the keyboard shortcut that scrolls the Git Graph View to the first (or next) stash in the loaded commits. The Shift Key Modifier can be applied to this keybinding to scroll the Git Graph View to the last (or previous) stash in the loaded commits."
+					"description": "%configuration.keyboardShortcut.scrollToStash%"
 				},
 				"git-graph.markdown": {
 					"type": "boolean",
 					"default": true,
-					"description": "Parse and render a frequently used subset of inline Markdown formatting rules in commit messages and tag details (bold, italics, bold & italics, and inline code blocks)."
+					"description": "%configuration.markdown%"
 				},
 				"git-graph.maxDepthOfRepoSearch": {
 					"type": "number",
 					"default": 0,
-					"description": "Specifies the maximum depth of subfolders to search when discovering repositories in the workspace. Note: Sub-repos are not automatically detected when searching subfolders, however they can be manually added by running the command \"Git Graph: Add Git Repository\" in the Command Palette."
+					"description": "%configuration.maxDepthOfRepoSearch%"
 				},
 				"git-graph.openNewTabEditorGroup": {
 					"type": "string",
 					"enum": [
-						"Active",
-						"Beside",
-						"One",
-						"Two",
-						"Three",
-						"Four",
-						"Five",
-						"Six",
-						"Seven",
-						"Eight",
-						"Nine"
+						"%configuration.openNewTabEditorGroup.enum.active%",
+						"%configuration.openNewTabEditorGroup.enum.beside%",
+						"%configuration.openNewTabEditorGroup.enum.one%",
+						"%configuration.openNewTabEditorGroup.enum.two%",
+						"%configuration.openNewTabEditorGroup.enum.three%",
+						"%configuration.openNewTabEditorGroup.enum.four%",
+						"%configuration.openNewTabEditorGroup.enum.five%",
+						"%configuration.openNewTabEditorGroup.enum.six%",
+						"%configuration.openNewTabEditorGroup.enum.seven%",
+						"%configuration.openNewTabEditorGroup.enum.eight%",
+						"%configuration.openNewTabEditorGroup.enum.nine%"
 					],
 					"enumDescriptions": [
-						"Open the new tab in the Active Editor Group.",
-						"Open the new tab beside the Active Editor Group.",
-						"Open the new tab in the First Editor Group.",
-						"Open the new tab in the Second Editor Group.",
-						"Open the new tab in the Third Editor Group.",
-						"Open the new tab in the Fourth Editor Group.",
-						"Open the new tab in the Fifth Editor Group.",
-						"Open the new tab in the Sixth Editor Group.",
-						"Open the new tab in the Seventh Editor Group.",
-						"Open the new tab in the Eighth Editor Group.",
-						"Open the new tab in the Ninth Editor Group."
+						"%configuration.openNewTabEditorGroup.enumDescription.active%",
+						"%configuration.openNewTabEditorGroup.enumDescription.beside%",
+						"%configuration.openNewTabEditorGroup.enumDescription.one%",
+						"%configuration.openNewTabEditorGroup.enumDescription.two%",
+						"%configuration.openNewTabEditorGroup.enumDescription.three%",
+						"%configuration.openNewTabEditorGroup.enumDescription.four%",
+						"%configuration.openNewTabEditorGroup.enumDescription.five%",
+						"%configuration.openNewTabEditorGroup.enumDescription.six%",
+						"%configuration.openNewTabEditorGroup.enumDescription.seven%",
+						"%configuration.openNewTabEditorGroup.enumDescription.eight%",
+						"%configuration.openNewTabEditorGroup.enumDescription.nine%"
 					],
-					"default": "Active",
-					"description": "Specifies the Editor Group where Git Graph should open new tabs, when performing the following actions from the Git Graph View: Viewing the Visual Studio Code Diff View, Opening a File, Viewing a File at a Specific Revision."
+					"default": "%configuration.openNewTabEditorGroup.enum.active%",
+					"description": "%configuration.openNewTabEditorGroup%"
 				},
 				"git-graph.openToTheRepoOfTheActiveTextEditorDocument": {
 					"type": "boolean",
 					"default": false,
-					"description": "Open the Git Graph View to the repository containing the active Text Editor document."
+					"description": "%configuration.openToTheRepoOfTheActiveTextEditorDocument%"
 				},
 				"git-graph.referenceLabels.alignment": {
 					"type": "string",
 					"enum": [
-						"Normal",
-						"Branches (on the left) & Tags (on the right)",
-						"Branches (aligned to the graph) & Tags (on the right)"
+						"%configuration.referenceLabels.alignment.enum.normal%",
+						"%configuration.referenceLabels.alignment.enum.branchesLeftTagsRight%",
+						"%configuration.referenceLabels.alignment.enum.branchesAlignedToGraphTagsRight%"
 					],
 					"enumDescriptions": [
-						"Show branch & tag labels on the left of the commit message in the 'Description' column.",
-						"Show branch labels on the left of the commit message in the 'Description' column, and tag labels on the right.",
-						"Show branch labels aligned to the graph in the 'Graph' column, and tag labels on the right in the 'Description' column."
+						"%configuration.referenceLabels.alignment.enumDescription.normal%",
+						"%configuration.referenceLabels.alignment.enumDescription.branchesLeftTagsRight%",
+						"%configuration.referenceLabels.alignment.enumDescription.branchesAlignedToGraphTagsRight%"
 					],
-					"default": "Normal",
-					"description": "Specifies how branch and tag reference labels are aligned for each commit."
+					"default": "%configuration.referenceLabels.alignment.enum.normal%",
+					"description": "%configuration.referenceLabels.alignment%"
 				},
 				"git-graph.referenceLabels.combineLocalAndRemoteBranchLabels": {
 					"type": "boolean",
 					"default": true,
-					"description": "Combine local and remote branch labels if they refer to the same branch, and are on the same commit."
+					"description": "%configuration.referenceLabels.combineLocalAndRemoteBranchLabels%"
 				},
 				"git-graph.repository.commits.fetchAvatars": {
 					"type": "boolean",
 					"default": false,
-					"description": "Fetch avatars of commit authors and committers. By enabling this setting, you consent to commit author and committer email addresses being sent GitHub, GitLab or Gravatar, depending on the repositories remote origin."
+					"description": "%configuration.repository.commits.fetchAvatars%"
 				},
 				"git-graph.repository.commits.initialLoad": {
 					"type": "number",
 					"default": 300,
-					"description": "Specifies the number of commits to initially load."
+					"description": "%configuration.repository.commits.initialLoad%"
 				},
 				"git-graph.repository.commits.loadMore": {
 					"type": "number",
 					"default": 100,
-					"description": "Specifies the number of additional commits to load when the \"Load More Commits\" button is pressed, or more commits are automatically loaded."
+					"description": "%configuration.repository.commits.loadMore%"
 				},
 				"git-graph.repository.commits.loadMoreAutomatically": {
 					"type": "boolean",
 					"default": true,
-					"description": "When the view has been scrolled to the bottom, automatically load more commits if they exist (instead of having to press the \"Load More Commits\" button)."
+					"description": "%configuration.repository.commits.loadMoreAutomatically%"
 				},
 				"git-graph.repository.commits.mute.commitsThatAreNotAncestorsOfHead": {
 					"type": "boolean",
 					"default": false,
-					"description": "Display commits that aren't ancestors of the checked-out branch / commit with a muted text color. Muting will only occur if the commit referenced by HEAD is within the loaded commits on the Git Graph View."
+					"description": "%configuration.repository.commits.mute.commitsThatAreNotAncestorsOfHead%"
 				},
 				"git-graph.repository.commits.mute.mergeCommits": {
 					"type": "boolean",
 					"default": true,
-					"description": "Display merge commits with a muted text color."
+					"description": "%configuration.repository.commits.mute.mergeCommits%"
 				},
 				"git-graph.repository.commits.order": {
 					"type": "string",
 					"enum": [
-						"date",
-						"author-date",
-						"topo"
+						"%configuration.repository.commits.order.enum.date%",
+						"%configuration.repository.commits.order.enum.authorDate%",
+						"%configuration.repository.commits.order.enum.topo%"
 					],
 					"enumDescriptions": [
-						"Show commits in the commit timestamp order.",
-						"Show commits in the author timestamp order.",
-						"Avoid showing commits on multiple lines of history intermixed."
+						"%configuration.repository.commits.order.enumDescription.date%",
+						"%configuration.repository.commits.order.enumDescription.authorDate%",
+						"%configuration.repository.commits.order.enumDescription.topo%"
 					],
-					"default": "date",
-					"markdownDescription": "Specifies the order of commits on the Git Graph View. See [git log](https://git-scm.com/docs/git-log#_commit_ordering) for more information on each order option. This can be overridden per repository via the Git Graph View's Column Header Context Menu."
+					"default": "%configuration.repository.commits.order.enum.date%",
+					"markdownDescription": "%configuration.repository.commits.order%"
 				},
 				"git-graph.repository.commits.showSignatureStatus": {
 					"type": "boolean",
 					"default": false,
-					"description": "Show the commit's signature status to the right of the Committer in the Commit Details View (only for signed commits). Hovering over the signature icon displays a tooltip with the signature details. Requires Git (>= 2.4.0) & GPG (or equivalent) to be installed on the same machine that is running Visual Studio Code."
+					"description": "%configuration.repository.commits.showSignatureStatus%"
 				},
 				"git-graph.repository.fetchAndPrune": {
 					"type": "boolean",
 					"default": false,
-					"description": "Before fetching from remote(s) using the Fetch button on the Git Graph View Control Bar, remove any remote-tracking references that no longer exist on the remote(s)."
+					"description": "%configuration.repository.fetchAndPrune%"
 				},
 				"git-graph.repository.fetchAndPruneTags": {
 					"type": "boolean",
 					"default": false,
-					"description": "Before fetching from remote(s) using the Fetch button on the Git Graph View Control Bar, remove any local tags that no longer exist on the remote(s). Requires Git >= 2.17.0, and the \"Repository: Fetch And Prune\" setting to be enabled. Caution: If you work in repositories that have multiple remotes, it is not recommended to use this setting (instead you can prune tags for a specific remote via \"Fetch Remote\" Dialog from the Repository Settings Widget on the Git Graph View)."
+					"description": "%configuration.repository.fetchAndPruneTags%"
 				},
 				"git-graph.repository.includeCommitsMentionedByReflogs": {
 					"type": "boolean",
 					"default": false,
-					"description": "Include commits only mentioned by reflogs in the Git Graph View (only applies when showing all branches). This can be overridden per repository in the Git Graph View's Repository Settings Widget."
+					"description": "%configuration.repository.includeCommitsMentionedByReflogs%"
 				},
 				"git-graph.repository.onLoad.scrollToHead": {
 					"type": "boolean",
 					"default": false,
-					"description": "Automatically scroll the Git Graph View to be centered on the commit referenced by HEAD. This will only occur if the commit referenced by HEAD is within the loaded commits on the Git Graph View."
+					"description": "%configuration.repository.onLoad.scrollToHead%"
 				},
 				"git-graph.repository.onLoad.showCheckedOutBranch": {
 					"type": "boolean",
 					"default": false,
-					"description": "Show the checked out branch when a repository is loaded in the Git Graph View. This setting can be used in conjunction with \"Repository > On Load: Show Specific Branches\". Default: false (show all branches)"
+					"description": "%configuration.repository.onLoad.showCheckedOutBranch%"
 				},
 				"git-graph.repository.onLoad.showSpecificBranches": {
 					"type": "array",
@@ -1115,272 +1133,272 @@
 						"description": "A local branch name (e.g. \"master\"), a remote-tracking branch name prefixed with \"remotes/\" (e.g. \"remotes/origin/master\"), or a glob pattern defined in git-graph.customBranchGlobPatterns prefixed with \"--glob=\" (e.g. \"--glob=heads/feature/*\")."
 					},
 					"default": [],
-					"markdownDescription": "Show specific branches when a repository is loaded in the Git Graph View. Branches can be specified as follows: A local branch name (e.g. `master`), a remote-tracking branch name prefixed with \"remotes/\" (e.g. `remotes/origin/master`), or a glob pattern defined in `git-graph.customBranchGlobPatterns` prefixed with \"--glob=\" (e.g. `--glob=heads/feature/*`). This setting can be used in conjunction with \"Repository > On Load: Show Checked Out Branch\". Default: [] (show all branches)"
+					"markdownDescription": "%configuration.repository.onLoad.showSpecificBranches%"
 				},
 				"git-graph.repository.onlyFollowFirstParent": {
 					"type": "boolean",
 					"default": false,
-					"markdownDescription": "Only follow the first parent of commits when discovering the commits to load in the Git Graph View. See [--first-parent](https://git-scm.com/docs/git-log#Documentation/git-log.txt---first-parent) to find out more about this setting. This can be overridden per repository in the Git Graph View's Repository Settings Widget."
+					"markdownDescription": "%configuration.repository.onlyFollowFirstParent%"
 				},
 				"git-graph.repository.singleAuthorSelect": {
 					"type": "boolean",
 					"default": false,
-					"description": "Enables the selection of only a single author from the Authors dropdown. Multiple authors can be selected by 'Ctrl' (or 'Cmd' on macOS) + click."
+					"description": "%configuration.repository.singleAuthorSelect%"
 				},
 				"git-graph.repository.singleBranchSelect": {
 					"type": "boolean",
 					"default": false,
-					"description": "Enables the selection of only a single branch from the Branches dropdown. Multiple branches can be selected by 'Ctrl' (or 'Cmd' on macOS) + click."
+					"description": "%configuration.repository.singleBranchSelect%"
 				},
 				"git-graph.repository.showCommitsOnlyReferencedByTags": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show Commits that are only referenced by tags in Git Graph."
+					"description": "%configuration.repository.showCommitsOnlyReferencedByTags%"
 				},
 				"git-graph.repository.showRemoteBranches": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show Remote Branches in Git Graph by default. This can be overridden per repository from the Git Graph View's Control Bar."
+					"description": "%configuration.repository.showRemoteBranches%"
 				},
 				"git-graph.repository.simplifyByDecoration": {
 					"type": "boolean",
 					"default": false,
-					"description": "Show branch topology by omitting commits that are not referenced by tags. This can be overridden per repository from the Git Graph View's Control Bar."
+					"description": "%configuration.repository.simplifyByDecoration%"
 				},
 				"git-graph.repository.showRemoteHeads": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show Remote HEAD Symbolic References in Git Graph (e.g. \"origin/HEAD\")."
+					"description": "%configuration.repository.showRemoteHeads%"
 				},
 				"git-graph.repository.showStashes": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show Stashes in Git Graph by default. This can be overridden per repository in the Git Graph View's Repository Settings Widget."
+					"description": "%configuration.repository.showStashes%"
 				},
 				"git-graph.repository.showTags": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show Tags in Git Graph by default. This can be overridden per repository in the Git Graph View's Repository Settings Widget."
+					"description": "%configuration.repository.showTags%"
 				},
 				"git-graph.repository.showUncommittedChanges": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show uncommitted changes. If you work on large repositories, disabling this setting can reduce the load time of the Git Graph View."
+					"description": "%configuration.repository.showUncommittedChanges%"
 				},
 				"git-graph.repository.showUntrackedFiles": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show untracked files when viewing the uncommitted changes. If you work on large repositories, disabling this setting can reduce the load time of the Git Graph View."
+					"description": "%configuration.repository.showUntrackedFiles%"
 				},
 				"git-graph.repository.sign.commits": {
 					"type": "boolean",
 					"default": false,
-					"description": "Enables commit signing with GPG or X.509."
+					"description": "%configuration.repository.sign.commits%"
 				},
 				"git-graph.repository.sign.tags": {
 					"type": "boolean",
 					"default": false,
-					"description": "Enables tag signing with GPG or X.509."
+					"description": "%configuration.repository.sign.tags%"
 				},
 				"git-graph.repository.useMailmap": {
 					"type": "boolean",
 					"default": false,
-					"markdownDescription": "Respect [.mailmap](https://git-scm.com/docs/git-check-mailmap#_mapping_authors) files when displaying author & committer names and email addresses."
+					"markdownDescription": "%configuration.repository.useMailmap%"
 				},
 				"git-graph.repositoryDropdownOrder": {
 					"type": "string",
 					"enum": [
-						"Full Path",
-						"Name",
-						"Workspace Full Path"
+						"%configuration.repositoryDropdownOrder.enum.fullPath%",
+						"%configuration.repositoryDropdownOrder.enum.name%",
+						"%configuration.repositoryDropdownOrder.enum.workspaceFullPath%"
 					],
 					"enumDescriptions": [
-						"Sort repositories alphabetically by the full path of the repository.",
-						"Sort repositories alphabetically by the name of the repository.",
-						"Sort repositories according to the Visual Studio Code Workspace Folder order, then alphabetically by the full path of the repository."
+						"%configuration.repositoryDropdownOrder.enumDescription.fullPath%",
+						"%configuration.repositoryDropdownOrder.enumDescription.name%",
+						"%configuration.repositoryDropdownOrder.enumDescription.workspaceFullPath%"
 					],
-					"default": "Workspace Full Path",
-					"description": "Specifies the order that repositories are sorted in the repository dropdown on the Git Graph View (only visible when more than one repository exists in the current Visual Studio Code Workspace)."
+					"default": "%configuration.repositoryDropdownOrder.enum.workspaceFullPath%",
+					"description": "%configuration.repositoryDropdownOrder%"
 				},
 				"git-graph.retainContextWhenHidden": {
 					"type": "boolean",
 					"default": true,
-					"description": "Specifies if the Git Graph View's Visual Studio Code context is kept when the panel is no longer visible (e.g. moved to background tab). Enabling this setting will make Git Graph load significantly faster when switching back to the Git Graph tab, however has a higher memory overhead."
+					"description": "%configuration.retainContextWhenHidden%"
 				},
 				"git-graph.showStatusBarItem": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show a Status Bar Item that opens the Git Graph View when clicked."
+					"description": "%configuration.showStatusBarItem%"
 				},
 				"git-graph.sourceCodeProviderIntegrationLocation": {
 					"type": "string",
 					"enum": [
-						"Inline",
-						"More Actions"
+						"%configuration.sourceCodeProviderIntegrationLocation.enum.inline%",
+						"%configuration.sourceCodeProviderIntegrationLocation.enum.moreActions%"
 					],
 					"enumDescriptions": [
-						"Show the 'View Git Graph' action on the title of SCM Providers",
-						"Show the 'View Git Graph' action in the 'More Actions...' menu on the title of SCM Providers"
+						"%configuration.sourceCodeProviderIntegrationLocation.enumDescription.inline%",
+						"%configuration.sourceCodeProviderIntegrationLocation.enumDescription.moreActions%"
 					],
-					"default": "Inline",
-					"description": "Specifies where the \"View Git Graph\" action appears on the title of SCM Providers."
+					"default": "%configuration.sourceCodeProviderIntegrationLocation.enum.inline%",
+					"description": "%configuration.sourceCodeProviderIntegrationLocation%"
 				},
 				"git-graph.stickyHeader": {
 					"type": "boolean",
 					"default": true,
-					"description": "Keeps the header visible when the view is scrolled"
+					"description": "%configuration.stickyHeader%"
 				},
 				"git-graph.tabIconColourTheme": {
 					"type": "string",
 					"enum": [
-						"colour",
-						"grey"
+						"%configuration.tabIconColourTheme.enum.colour%",
+						"%configuration.tabIconColourTheme.enum.grey%"
 					],
 					"enumDescriptions": [
-						"Show a colour icon which suits most Visual Studio Code colour themes",
-						"Show a grey icon which suits Visual Studio Code colour themes that are predominantly grayscale"
+						"%configuration.tabIconColourTheme.enumDescription.colour%",
+						"%configuration.tabIconColourTheme.enumDescription.grey%"
 					],
-					"default": "colour",
-					"description": "Specifies the colour theme of the icon displayed on the Git Graph tab."
+					"default": "%configuration.tabIconColourTheme.enum.colour%",
+					"description": "%configuration.tabIconColourTheme%"
 				},
 				"git-graph.viewLocation": {
 					"type": "string",
 					"enum": [
-						"editor",
-						"panel",
-						"both"
+						"%configuration.viewLocation.enum.editor%",
+						"%configuration.viewLocation.enum.panel%",
+						"%configuration.viewLocation.enum.both%"
 					],
 					"enumDescriptions": [
-						"Display Git Graph in the editor area (traditional view)",
-						"Display Git Graph in the panel area (bottom/side panel)",
-						"Allow both display modes (use specific commands to open in each location)"
+						"%configuration.viewLocation.enumDescription.editor%",
+						"%configuration.viewLocation.enumDescription.panel%",
+						"%configuration.viewLocation.enumDescription.both%"
 					],
-					"default": "editor",
-					"description": "Specifies where to display the Git Graph view by default."
+					"default": "%configuration.viewLocation.enum.editor%",
+					"description": "%configuration.viewLocation%"
 				},
 				"git-graph.autoCenterCommitDetailsView": {
 					"type": "boolean",
 					"default": true,
-					"description": "Automatically center the commit details view when it is opened.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.commitDetailsView.autoCenter",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.commitDetailsView.autoCenter#`"
+					"description": "%configuration.autoCenterCommitDetailsView%",
+					"deprecationMessage": "%configuration.autoCenterCommitDetailsView.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.autoCenterCommitDetailsView.deprecationMessage%"
 				},
 				"git-graph.combineLocalAndRemoteBranchLabels": {
 					"type": "boolean",
 					"default": true,
-					"description": "Combine local and remote branch labels if they refer to the same branch, and are on the same commit.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.referenceLabels.combineLocalAndRemoteBranchLabels",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.referenceLabels.combineLocalAndRemoteBranchLabels#`"
+					"description": "%configuration.combineLocalAndRemoteBranchLabels%",
+					"deprecationMessage": "%configuration.combineLocalAndRemoteBranchLabels.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.combineLocalAndRemoteBranchLabels.deprecationMessage%"
 				},
 				"git-graph.commitDetailsViewFileTreeCompactFolders": {
 					"type": "boolean",
 					"default": true,
-					"description": "Render the File Tree in the Commit Details / Comparison View in a compacted form, such that folders with a single child folder are compressed into a single combined folder element.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.commitDetailsView.fileView.fileTree.compactFolders",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.commitDetailsView.fileView.fileTree.compactFolders#`"
+					"description": "%configuration.commitDetailsViewFileTreeCompactFolders%",
+					"deprecationMessage": "%configuration.commitDetailsViewFileTreeCompactFolders.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.commitDetailsViewFileTreeCompactFolders.deprecationMessage%"
 				},
 				"git-graph.commitDetailsViewLocation": {
 					"type": "string",
 					"enum": [
-						"Inline",
-						"Docked to Bottom"
+						"%configuration.commitDetailsView.location.enum.inline%",
+						"%configuration.commitDetailsView.location.enum.dockedToBottom%"
 					],
 					"enumDescriptions": [
-						"Show the Commit Details View inline with the graph",
-						"Show the Commit Details View docked to the bottom of the Git Graph view"
+						"%configuration.commitDetailsView.location.enumDescription.inline%",
+						"%configuration.commitDetailsView.location.enumDescription.dockedToBottom%"
 					],
-					"default": "Inline",
-					"description": "Specifies where the Commit Details View is rendered in the Git Graph view.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.commitDetailsView.location",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.commitDetailsView.location#`"
+					"default": "%configuration.commitDetailsView.location.enum.inline%",
+					"description": "%configuration.commitDetailsViewLocation%",
+					"deprecationMessage": "%configuration.commitDetailsViewLocation.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.commitDetailsViewLocation.deprecationMessage%"
 				},
 				"git-graph.commitOrdering": {
 					"type": "string",
 					"enum": [
-						"date",
-						"author-date",
-						"topo"
+						"%configuration.repository.commits.order.enum.date%",
+						"%configuration.repository.commits.order.enum.authorDate%",
+						"%configuration.repository.commits.order.enum.topo%"
 					],
 					"enumDescriptions": [
-						"Show commits in the commit timestamp order.",
-						"Show commits in the author timestamp order.",
-						"Avoid showing commits on multiple lines of history intermixed."
+						"%configuration.repository.commits.order.enumDescription.date%",
+						"%configuration.repository.commits.order.enumDescription.authorDate%",
+						"%configuration.repository.commits.order.enumDescription.topo%"
 					],
-					"default": "date",
-					"markdownDescription": "Specifies the order of commits on the Git Graph view. See [git log](https://git-scm.com/docs/git-log#_commit_ordering) for more information on each order option.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.commits.order",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.commits.order#`"
+					"default": "%configuration.repository.commits.order.enum.date%",
+					"markdownDescription": "%configuration.commitOrdering%",
+					"deprecationMessage": "%configuration.commitOrdering.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.commitOrdering.deprecationMessage%"
 				},
 				"git-graph.dateFormat": {
 					"type": "string",
 					"enum": [
-						"Date & Time",
-						"Date Only",
-						"ISO Date & Time",
-						"ISO Date Only",
-						"Relative"
+						"%configuration.date.format.enum.dateAndTime%",
+						"%configuration.date.format.enum.dateOnly%",
+						"%configuration.date.format.enum.isoDateAndTime%",
+						"%configuration.date.format.enum.isoDateOnly%",
+						"%configuration.date.format.enum.relative%"
 					],
 					"enumDescriptions": [
-						"Show the date and time, for example \"24 Mar 2019 21:34\"",
-						"Show the date only, for example \"24 Mar 2019\"",
-						"Show the ISO date and time, for example \"2019-03-24 21:34\"",
-						"Show the ISO date only, for example \"2019-03-24\"",
-						"Show relative times, for example \"5 minutes ago\""
+						"%configuration.date.format.enumDescription.dateAndTime%",
+						"%configuration.date.format.enumDescription.dateOnly%",
+						"%configuration.date.format.enumDescription.isoDateAndTime%",
+						"%configuration.date.format.enumDescription.isoDateOnly%",
+						"%configuration.date.format.enumDescription.relative%"
 					],
-					"default": "Date & Time",
-					"description": "Specifies the date format to be used in the \"Date\" column on the Git Graph View.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.date.format",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.date.format#`"
+					"default": "%configuration.date.format.enum.dateAndTime%",
+					"description": "%configuration.dateFormat%",
+					"deprecationMessage": "%configuration.dateFormat.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.dateFormat.deprecationMessage%"
 				},
 				"git-graph.dateType": {
 					"type": "string",
 					"enum": [
-						"Author Date",
-						"Commit Date"
+						"%configuration.date.type.enum.authorDate%",
+						"%configuration.date.type.enum.commitDate%"
 					],
 					"enumDescriptions": [
-						"Use the author date of a commit",
-						"Use the committer date of a commit"
+						"%configuration.date.type.enumDescription.authorDate%",
+						"%configuration.date.type.enumDescription.commitDate%"
 					],
-					"default": "Author Date",
-					"description": "Specifies the date type to be displayed in the \"Date\" column on the Git Graph View.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.date.type",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.date.type#`"
+					"default": "%configuration.date.type.enum.authorDate%",
+					"description": "%configuration.dateType%",
+					"deprecationMessage": "%configuration.dateType.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.dateType.deprecationMessage%"
 				},
 				"git-graph.defaultFileViewType": {
 					"type": "string",
 					"enum": [
-						"File Tree",
-						"File List"
+						"%configuration.commitDetailsView.fileView.type.enum.fileTree%",
+						"%configuration.commitDetailsView.fileView.type.enum.fileList%"
 					],
 					"enumDescriptions": [
-						"Display files in a tree structure",
-						"Display files in a list (useful for repositories with deep folder structures)"
+						"%configuration.commitDetailsView.fileView.type.enumDescription.fileTree%",
+						"%configuration.commitDetailsView.fileView.type.enumDescription.fileList%"
 					],
-					"default": "File Tree",
-					"description": "Sets the default type of File View used in the Commit Details / Comparison Views. This can be overridden per repository using the controls on the right side of the Commit Details / Comparison Views.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.commitDetailsView.fileView.type",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.commitDetailsView.fileView.type#`"
+					"default": "%configuration.commitDetailsView.fileView.type.enum.fileTree%",
+					"description": "%configuration.defaultFileViewType%",
+					"deprecationMessage": "%configuration.defaultFileViewType.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.defaultFileViewType.deprecationMessage%"
 				},
 				"git-graph.fetchAndPrune": {
 					"type": "boolean",
 					"default": false,
-					"description": "Before fetching from remote(s) using the Fetch button on the Git Graph View Control Bar, remove any remote-tracking references that no longer exist on the remote(s).",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.fetchAndPrune",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.fetchAndPrune#`"
+					"description": "%configuration.fetchAndPrune%",
+					"deprecationMessage": "%configuration.fetchAndPrune.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.fetchAndPrune.deprecationMessage%"
 				},
 				"git-graph.fetchAvatars": {
 					"type": "boolean",
 					"default": false,
-					"description": "Fetch avatars of commit authors and committers. By enabling this setting, you consent to commit author and committer email addresses being sent GitHub, GitLab or Gravatar, depending on the repositories remote origin.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.commits.fetchAvatars",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.commits.fetchAvatars#`"
+					"description": "%configuration.fetchAvatars%",
+					"deprecationMessage": "%configuration.fetchAvatars.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.fetchAvatars.deprecationMessage%"
 				},
 				"git-graph.graphColours": {
 					"type": "array",
 					"items": {
 						"type": "string",
-						"description": "Colour (HEX or RGB)",
+						"description": "%configuration.graph.colours.item.description%",
 						"pattern": "^\\s*(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|rgb[a]?\\s*\\(\\d{1,3},\\s*\\d{1,3},\\s*\\d{1,3}\\))\\s*$"
 					},
 					"default": [
@@ -1397,179 +1415,179 @@
 						"#6f24d6",
 						"#ffcc00"
 					],
-					"description": "Specifies the colours used on the graph.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.graph.colours",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.graph.colours#`"
+					"description": "%configuration.graphColours%",
+					"deprecationMessage": "%configuration.graphColours.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.graphColours.deprecationMessage%"
 				},
 				"git-graph.graphStyle": {
 					"type": "string",
 					"enum": [
-						"rounded",
-						"angular"
+						"%configuration.graph.style.enum.rounded%",
+						"%configuration.graph.style.enum.angular%"
 					],
 					"enumDescriptions": [
-						"Use smooth curves when transitioning between branches on the graph",
-						"Use angular lines when transitioning between branches on the graph"
+						"%configuration.graph.style.enumDescription.rounded%",
+						"%configuration.graph.style.enumDescription.angular%"
 					],
-					"default": "rounded",
-					"description": "Specifies the style of the graph.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.graph.style",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.graph.style#`"
+					"default": "%configuration.graph.style.enum.rounded%",
+					"description": "%configuration.graphStyle%",
+					"deprecationMessage": "%configuration.graphStyle.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.graphStyle.deprecationMessage%"
 				},
 				"git-graph.includeCommitsMentionedByReflogs": {
 					"type": "boolean",
 					"default": false,
-					"description": "Include commits only mentioned by reflogs in the Git Graph View (only applies when showing all branches). This can be overridden per repository in the Git Graph View's Repository Settings Widget.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.includeCommitsMentionedByReflogs",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.includeCommitsMentionedByReflogs#`"
+					"description": "%configuration.includeCommitsMentionedByReflogs%",
+					"deprecationMessage": "%configuration.includeCommitsMentionedByReflogs.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.includeCommitsMentionedByReflogs.deprecationMessage%"
 				},
 				"git-graph.initialLoadCommits": {
 					"type": "number",
 					"default": 300,
-					"description": "Specifies the number of commits to initially load.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.commits.initialLoad",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.commits.initialLoad#`"
+					"description": "%configuration.initialLoadCommits%",
+					"deprecationMessage": "%configuration.initialLoadCommits.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.initialLoadCommits.deprecationMessage%"
 				},
 				"git-graph.loadMoreCommits": {
 					"type": "number",
 					"default": 100,
-					"description": "Specifies the number of additional commits to load when the \"Load More Commits\" button is pressed, or more commits are automatically loaded.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.commits.loadMore",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.commits.loadMore#`"
+					"description": "%configuration.loadMoreCommits%",
+					"deprecationMessage": "%configuration.loadMoreCommits.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.loadMoreCommits.deprecationMessage%"
 				},
 				"git-graph.loadMoreCommitsAutomatically": {
 					"type": "boolean",
 					"default": true,
-					"description": "When the view has been scrolled to the bottom, automatically load more commits if they exist (instead of having to press the \"Load More Commits\" button).",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.commits.loadMoreAutomatically",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.commits.loadMoreAutomatically#`"
+					"description": "%configuration.loadMoreCommitsAutomatically%",
+					"deprecationMessage": "%configuration.loadMoreCommitsAutomatically.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.loadMoreCommitsAutomatically.deprecationMessage%"
 				},
 				"git-graph.muteCommitsThatAreNotAncestorsOfHead": {
 					"type": "boolean",
 					"default": false,
-					"description": "Display commits that aren't ancestors of the checked-out branch / commit with a muted text color. Muting will only occur if the commit referenced by HEAD is within the loaded commits on the Git Graph View.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.commits.mute.commitsThatAreNotAncestorsOfHead",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.commits.mute.commitsThatAreNotAncestorsOfHead#`"
+					"description": "%configuration.muteCommitsThatAreNotAncestorsOfHead%",
+					"deprecationMessage": "%configuration.muteCommitsThatAreNotAncestorsOfHead.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.muteCommitsThatAreNotAncestorsOfHead.deprecationMessage%"
 				},
 				"git-graph.muteMergeCommits": {
 					"type": "boolean",
 					"default": true,
-					"description": "Display merge commits with a muted text color.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.commits.mute.mergeCommits",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.commits.mute.mergeCommits#`"
+					"description": "%configuration.muteMergeCommits%",
+					"deprecationMessage": "%configuration.muteMergeCommits.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.muteMergeCommits.deprecationMessage%"
 				},
 				"git-graph.onlyFollowFirstParent": {
 					"type": "boolean",
 					"default": false,
-					"markdownDescription": "Only follow the first parent of commits when discovering the commits to load in the Git Graph View. See [--first-parent](https://git-scm.com/docs/git-log#Documentation/git-log.txt---first-parent) to find out more about this setting.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.onlyFollowFirstParent",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.onlyFollowFirstParent#`"
+					"markdownDescription": "%configuration.onlyFollowFirstParent%",
+					"deprecationMessage": "%configuration.onlyFollowFirstParent.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.onlyFollowFirstParent.deprecationMessage%"
 				},
 				"git-graph.openDiffTabLocation": {
 					"type": "string",
 					"enum": [
-						"Active",
-						"Beside",
-						"One",
-						"Two",
-						"Three",
-						"Four",
-						"Five",
-						"Six",
-						"Seven",
-						"Eight",
-						"Nine"
+						"%configuration.openNewTabEditorGroup.enum.active%",
+						"%configuration.openNewTabEditorGroup.enum.beside%",
+						"%configuration.openNewTabEditorGroup.enum.one%",
+						"%configuration.openNewTabEditorGroup.enum.two%",
+						"%configuration.openNewTabEditorGroup.enum.three%",
+						"%configuration.openNewTabEditorGroup.enum.four%",
+						"%configuration.openNewTabEditorGroup.enum.five%",
+						"%configuration.openNewTabEditorGroup.enum.six%",
+						"%configuration.openNewTabEditorGroup.enum.seven%",
+						"%configuration.openNewTabEditorGroup.enum.eight%",
+						"%configuration.openNewTabEditorGroup.enum.nine%"
 					],
 					"enumDescriptions": [
-						"Open the Visual Studio Code Diff View in the Active Editor Group.",
-						"Open the Visual Studio Code Diff View beside the Active Editor Group.",
-						"Open the Visual Studio Code Diff View in the First Editor Group.",
-						"Open the Visual Studio Code Diff View in the Second Editor Group.",
-						"Open the Visual Studio Code Diff View in the Third Editor Group.",
-						"Open the Visual Studio Code Diff View in the Fourth Editor Group.",
-						"Open the Visual Studio Code Diff View in the Fifth Editor Group.",
-						"Open the Visual Studio Code Diff View in the Sixth Editor Group.",
-						"Open the Visual Studio Code Diff View in the Seventh Editor Group.",
-						"Open the Visual Studio Code Diff View in the Eighth Editor Group.",
-						"Open the Visual Studio Code Diff View in the Ninth Editor Group."
+						"%configuration.openNewTabEditorGroup.enumDescription.active%",
+						"%configuration.openNewTabEditorGroup.enumDescription.beside%",
+						"%configuration.openNewTabEditorGroup.enumDescription.one%",
+						"%configuration.openNewTabEditorGroup.enumDescription.two%",
+						"%configuration.openNewTabEditorGroup.enumDescription.three%",
+						"%configuration.openNewTabEditorGroup.enumDescription.four%",
+						"%configuration.openNewTabEditorGroup.enumDescription.five%",
+						"%configuration.openNewTabEditorGroup.enumDescription.six%",
+						"%configuration.openNewTabEditorGroup.enumDescription.seven%",
+						"%configuration.openNewTabEditorGroup.enumDescription.eight%",
+						"%configuration.openNewTabEditorGroup.enumDescription.nine%"
 					],
-					"default": "Active",
-					"description": "Specifies which Editor Group the Visual Studio Code Diff View is opened in.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.openNewTabEditorGroup",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.openNewTabEditorGroup#`"
+					"default": "%configuration.openNewTabEditorGroup.enum.active%",
+					"description": "%configuration.openDiffTabLocation%",
+					"deprecationMessage": "%configuration.openDiffTabLocation.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.openDiffTabLocation.deprecationMessage%"
 				},
 				"git-graph.openRepoToHead": {
 					"type": "boolean",
 					"default": false,
-					"description": "When opening or switching repositories in the Git Graph View, automatically scroll the view to be centered on the commit referenced by HEAD. This will only occur if the commit referenced by HEAD is within the loaded commits on the Git Graph View.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.onLoad.scrollToHead",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.onLoad.scrollToHead#`"
+					"description": "%configuration.openRepoToHead%",
+					"deprecationMessage": "%configuration.openRepoToHead.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.openRepoToHead.deprecationMessage%"
 				},
 				"git-graph.referenceLabelAlignment": {
 					"type": "string",
 					"enum": [
-						"Normal",
-						"Branches (on the left) & Tags (on the right)",
-						"Branches (aligned to the graph) & Tags (on the right)"
+						"%configuration.referenceLabels.alignment.enum.normal%",
+						"%configuration.referenceLabels.alignment.enum.branchesLeftTagsRight%",
+						"%configuration.referenceLabels.alignment.enum.branchesAlignedToGraphTagsRight%"
 					],
 					"enumDescriptions": [
-						"Show branch & tag labels on the left of the commit message in the 'Description' column.",
-						"Show branch labels on the left of the commit message in the 'Description' column, and tag labels on the right.",
-						"Show branch labels aligned to the graph in the 'Graph' column, and tag labels on the right in the 'Description' column."
+						"%configuration.referenceLabels.alignment.enumDescription.normal%",
+						"%configuration.referenceLabels.alignment.enumDescription.branchesLeftTagsRight%",
+						"%configuration.referenceLabels.alignment.enumDescription.branchesAlignedToGraphTagsRight%"
 					],
-					"default": "Normal",
-					"description": "Specifies how branch and tag reference labels are aligned for each commit.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.referenceLabels.alignment",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.referenceLabels.alignment#`"
+					"default": "%configuration.referenceLabels.alignment.enum.normal%",
+					"description": "%configuration.referenceLabelAlignment%",
+					"deprecationMessage": "%configuration.referenceLabelAlignment.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.referenceLabelAlignment.deprecationMessage%"
 				},
 				"git-graph.showCommitsOnlyReferencedByTags": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show commits that are only referenced by tags in Git Graph.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.showCommitsOnlyReferencedByTags",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.showCommitsOnlyReferencedByTags#`"
+					"description": "%configuration.showCommitsOnlyReferencedByTags%",
+					"deprecationMessage": "%configuration.showCommitsOnlyReferencedByTags.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.showCommitsOnlyReferencedByTags.deprecationMessage%"
 				},
 				"git-graph.showCurrentBranchByDefault": {
 					"type": "boolean",
 					"default": false,
-					"description": "Show the current branch by default when Git Graph is opened. Default: false (show all branches)",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.onLoad.showCheckedOutBranch",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.onLoad.showCheckedOutBranch#`"
+					"description": "%configuration.showCurrentBranchByDefault%",
+					"deprecationMessage": "%configuration.showCurrentBranchByDefault.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.showCurrentBranchByDefault.deprecationMessage%"
 				},
 				"git-graph.showSignatureStatus": {
 					"type": "boolean",
 					"default": false,
-					"description": "Show the commit's signature status to the right of the Committer in the Commit Details View (only for signed commits). Hovering over the signature icon displays a tooltip with the signature details. Requires Git (>= 2.4.0) & GPG (or equivalent) to be installed on the same machine that is running Visual Studio Code.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.commits.showSignatureStatus",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.commits.showSignatureStatus#`"
+					"description": "%configuration.showSignatureStatus%",
+					"deprecationMessage": "%configuration.showSignatureStatus.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.showSignatureStatus.deprecationMessage%"
 				},
 				"git-graph.showTags": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show Tags in Git Graph by default. This can be overridden per repository in the Git Graph View's Repository Settings Widget.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.showTags",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.showTags#`"
+					"description": "%configuration.showTags%",
+					"deprecationMessage": "%configuration.showTags.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.showTags.deprecationMessage%"
 				},
 				"git-graph.showUncommittedChanges": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show uncommitted changes. If you work on large repositories, disabling this setting can reduce the load time of the Git Graph View.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.showUncommittedChanges",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.showUncommittedChanges#`"
+					"description": "%configuration.showUncommittedChanges%",
+					"deprecationMessage": "%configuration.showUncommittedChanges.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.showUncommittedChanges.deprecationMessage%"
 				},
 				"git-graph.showUntrackedFiles": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show untracked files when viewing the uncommitted changes. If you work on large repositories, disabling this setting can reduce the load time of the Git Graph View.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.showUntrackedFiles",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.showUntrackedFiles#`"
+					"description": "%configuration.showUntrackedFiles%",
+					"deprecationMessage": "%configuration.showUntrackedFiles.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.showUntrackedFiles.deprecationMessage%"
 				},
 				"git-graph.useMailmap": {
 					"type": "boolean",
 					"default": false,
-					"markdownDescription": "Respect [.mailmap](https://git-scm.com/docs/git-check-mailmap#_mapping_authors) files when displaying author & committer names and email addresses.",
-					"deprecationMessage": "Depreciated: This setting has been renamed to git-graph.repository.useMailmap",
-					"markdownDeprecationMessage": "Depreciated: This setting has been renamed to `#git-graph.repository.useMailmap#`"
+					"markdownDescription": "%configuration.useMailmap%",
+					"deprecationMessage": "%configuration.useMailmap.deprecationMessage%",
+					"markdownDeprecationMessage": "%configuration.useMailmap.deprecationMessage%"
 				}
 			}
 		},
@@ -1604,7 +1622,7 @@
 			"panel": [
 				{
 					"id": "git-graph-panel",
-					"title": "Git Graph",
+					"title": "%extension.name%",
 					"icon": "$(git-branch)"
 				}
 			]
@@ -1614,7 +1632,7 @@
 				{
 					"type": "webview",
 					"id": "git-graph.panel",
-					"name": "Git Graph"
+					"name": "%extension.name%"
 				}
 			]
 		}
@@ -1623,15 +1641,18 @@
 		"vscode:prepublish": "npm run compile",
 		"vscode:uninstall": "node ./out/life-cycle/uninstall.js",
 		"clean": "node ./.vscode/clean.js",
-		"compile": "npm run lint && npm run clean && npm run compile-src && npm run compile-web",
+		"compile": "npm run format:check && npm run lint && npm run clean && npm run compile-src && npm run compile-web",
 		"compile-src": "tsc -p ./src && node ./.vscode/package-src.js",
 		"compile-web": "tsc -p ./web && node ./.vscode/package-web.js",
 		"compile-web-debug": "tsc -p ./web && node ./.vscode/package-web.js debug",
+		"format": "oxfmt ./src ./tests ./web",
+		"format:check": "oxfmt --check ./src ./tests ./web",
 		"lint": "eslint --max-warnings 0 ./src ./tests ./web",
 		"package": "vsce package",
 		"package-and-install": "npm run package && node ./.vscode/install-package.js",
 		"test": "jest --verbose",
-		"test-and-report-coverage": "jest --verbose --coverage"
+		"test-and-report-coverage": "jest --verbose --coverage",
+		"prepare": "husky"
 	},
 	"dependencies": {
 		"iconv-lite": "0.5.0"
@@ -1642,14 +1663,20 @@
 		"@types/jest": "^29.5.0",
 		"@types/node": "^22.0.0",
 		"@types/prettier": "<2.6.0",
-		"@types/vscode": "1.50.0",
+		"@types/vscode": "^1.68.0",
 		"@typescript-eslint/eslint-plugin": "^8.20.0",
 		"@typescript-eslint/parser": "^8.20.0",
 		"@vscode/vsce": "^3.6.0",
 		"eslint": "^9.17.0",
+		"husky": "^9.1.7",
 		"jest": "^29.7.0",
+		"lint-staged": "^16.4.0",
+		"oxfmt": "^0.42.0",
 		"ts-jest": "^29.2.0",
 		"typescript": "^5.7.0",
 		"uglify-js": "^3.19.0"
+	},
+	"lint-staged": {
+		"{src,tests,web}/**/*.{ts,tsx,css,json}": "oxfmt"
 	}
 }

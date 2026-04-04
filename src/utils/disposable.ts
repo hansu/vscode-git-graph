@@ -12,7 +12,7 @@ export class Disposable implements vscode.Disposable {
 		this.disposables.forEach((disposable) => {
 			try {
 				disposable.dispose();
-			} catch (_) { }
+			} catch (_) {}
 		});
 		this.disposables = [];
 	}
@@ -42,6 +42,6 @@ export class Disposable implements vscode.Disposable {
 
 export function toDisposable(fn: () => void): vscode.Disposable {
 	return {
-		dispose: fn
+		dispose: fn,
 	};
 }

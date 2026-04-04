@@ -38,12 +38,12 @@ export class AskpassManager extends Disposable {
 		this.server = http.createServer((req, res) => this.onRequest(req, res));
 		try {
 			this.server.listen(this.ipcHandlePath);
-			this.server.on('error', () => { });
+			this.server.on('error', () => {});
 		} catch (err) {
 			this.enabled = false;
 		}
-		fs.chmod(path.join(__dirname, 'askpass.sh'), '755', () => { });
-		fs.chmod(path.join(__dirname, 'askpass-empty.sh'), '755', () => { });
+		fs.chmod(path.join(__dirname, 'askpass.sh'), '755', () => {});
+		fs.chmod(path.join(__dirname, 'askpass-empty.sh'), '755', () => {});
 
 		this.registerDisposable(
 			// Close the Askpass Server
@@ -53,39 +53,49 @@ export class AskpassManager extends Disposable {
 					if (process.platform !== 'win32') {
 						fs.unlinkSync(this.ipcHandlePath);
 					}
-				} catch (e) { }
-			})
+				} catch (e) {}
+			}),
 		);
 	}
 
 	private onRequest(req: http.IncomingMessage, res: http.ServerResponse): void {
 		let reqData = '';
 		req.setEncoding('utf8');
-		req.on('data', (d) => reqData += d);
+		req.on('data', (d) => (reqData += d));
 		req.on('end', () => {
 			let data = JSON.parse(reqData) as AskpassRequest;
-			vscode.window.showInputBox({ placeHolder: data.request, prompt: 'Git Graph: ' + data.host, password: /password/i.test(data.request), ignoreFocusOut: true }).then(result => {
-				res.writeHead(200);
-				res.end(JSON.stringify(result || ''));
-			}, () => {
-				res.writeHead(500);
-				res.end();
-			});
+			vscode.window
+				.showInputBox({
+					placeHolder: data.request,
+					prompt: 'Git Graph: ' + data.host,
+					password: /password/i.test(data.request),
+					ignoreFocusOut: true,
+				})
+				.then(
+					(result) => {
+						res.writeHead(200);
+						res.end(JSON.stringify(result || ''));
+					},
+					() => {
+						res.writeHead(500);
+						res.end();
+					},
+				);
 		});
 	}
 
 	public getEnv(): AskpassEnvironment {
 		return this.enabled
 			? {
-				ELECTRON_RUN_AS_NODE: '1',
-				GIT_ASKPASS: path.join(__dirname, 'askpass.sh'),
-				VSCODE_GIT_GRAPH_ASKPASS_NODE: process.execPath,
-				VSCODE_GIT_GRAPH_ASKPASS_MAIN: path.join(__dirname, 'askpassMain.js'),
-				VSCODE_GIT_GRAPH_ASKPASS_HANDLE: this.ipcHandlePath
-			}
+					ELECTRON_RUN_AS_NODE: '1',
+					GIT_ASKPASS: path.join(__dirname, 'askpass.sh'),
+					VSCODE_GIT_GRAPH_ASKPASS_NODE: process.execPath,
+					VSCODE_GIT_GRAPH_ASKPASS_MAIN: path.join(__dirname, 'askpassMain.js'),
+					VSCODE_GIT_GRAPH_ASKPASS_HANDLE: this.ipcHandlePath,
+				}
 			: {
-				GIT_ASKPASS: path.join(__dirname, 'askpass-empty.sh')
-			};
+					GIT_ASKPASS: path.join(__dirname, 'askpass-empty.sh'),
+				};
 	}
 }
 
@@ -93,7 +103,10 @@ function getIPCHandlePath(nonce: string): string {
 	if (process.platform === 'win32') {
 		return '\\\\.\\pipe\\git-graph-askpass-' + nonce + '-sock';
 	} else if (process.env['XDG_RUNTIME_DIR']) {
-		return path.join(process.env['XDG_RUNTIME_DIR'] as string, 'git-graph-askpass-' + nonce + '.sock');
+		return path.join(
+			process.env['XDG_RUNTIME_DIR'] as string,
+			'git-graph-askpass-' + nonce + '.sock',
+		);
 	} else {
 		return path.join(os.tmpdir(), 'git-graph-askpass-' + nonce + '.sock');
 	}
