@@ -509,15 +509,19 @@ export function openGitTerminal(cwd: string, gitPath: string, command: string | 
 	if (p !== '' && !p.endsWith(sep)) p += sep;
 	p += path.dirname(gitPath);
 
-	const options: vscode.TerminalOptions = {
-		cwd: cwd,
-		name: 'Git Graph: ' + name,
-		env: { 'PATH': p }
-	};
-	const shell = getConfig().integratedTerminalShell;
-	if (shell !== '') options.shellPath = shell;
+	let terminal = vscode.window.activeTerminal;
 
-	const terminal = vscode.window.createTerminal(options);
+	// Reuse only if you accept that cwd/env/shellPath can't be enforced.
+	if (!terminal) {
+		const options: vscode.TerminalOptions = {
+			cwd: cwd,
+			name: 'Git Graph: ' + name,
+			env: { 'PATH': p }
+		};
+		const shell = getConfig().integratedTerminalShell;
+		if (shell !== '') options.shellPath = shell;
+		terminal = vscode.window.createTerminal(options);
+	}
 	if (command !== null) {
 		terminal.sendText('git ' + command);
 	}
