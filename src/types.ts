@@ -519,7 +519,8 @@ export interface DialogDefaults {
 	};
 	readonly rebase: {
 		readonly ignoreDate: boolean,
-		readonly interactive: boolean
+		readonly interactive: boolean,
+		readonly reuseTerminal: boolean
 	};
 	readonly resetCommit: {
 		readonly mode: GitResetMode
@@ -1145,11 +1146,13 @@ export interface RequestRebase extends RepoRequest {
 	readonly actionOn: RebaseActionOn;
 	readonly ignoreDate: boolean;
 	readonly interactive: boolean;
+	readonly reuseTerminal: boolean;
 }
 export interface ResponseRebase extends ResponseWithErrorInfo {
 	readonly command: 'rebase';
 	readonly actionOn: RebaseActionOn;
 	readonly interactive: boolean;
+	// ??
 }
 
 export interface ResponseRefresh extends BaseMessage {

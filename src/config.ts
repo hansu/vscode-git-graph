@@ -233,7 +233,8 @@ class Config {
 			},
 			rebase: {
 				ignoreDate: !!this.config.get('dialog.rebase.ignoreDate', true),
-				interactive: !!this.config.get('dialog.rebase.launchInteractiveRebase', false)
+				interactive: !!this.config.get('dialog.rebase.launchInteractiveRebase', false),
+				reuseTerminal: !!this.config.get('dialog.rebase.reuseCurrentTerminal', false)
 			},
 			resetCommit: {
 				mode: resetCommitMode === 'Soft' ? GitResetMode.Soft : (resetCommitMode === 'Hard' ? GitResetMode.Hard : GitResetMode.Mixed)

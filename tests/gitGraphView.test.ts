@@ -3033,7 +3033,8 @@ describe('GitGraphView', () => {
 					obj: 'feature',
 					actionOn: RebaseActionOn.Branch,
 					ignoreDate: true,
-					interactive: false
+					interactive: false,
+					reuseTerminal: false
 				});
 
 				// Assert

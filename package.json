@@ -732,6 +732,11 @@
 					"default": false,
 					"description": "Checkbox \"Interactive Rebase (launch in new Terminal)\" active by default."
 				},
+				"git-graph.dialog.rebase.reuseCurrentTerminal": {
+					"type": "boolean",
+					"default": false,
+					"description": "Use current terminal for interactive rebase. Attention: This fails when the path in the current terminal is not inside the git directory!"
+				},
 				"git-graph.dialog.resetCurrentBranchToCommit.mode": {
 					"type": "string",
 					"enum": [
