@@ -4258,7 +4258,11 @@ window.addEventListener('load', () => {
 				}
 				break;
 			case 'rebaseInteractive':
-				gitGraph.refresh(false);
+				if (msg.error === null) {
+					gitGraph.refresh(false);
+				} else {
+					dialog.showError('Interactive Rebase', msg.error, null, null);
+				}
 				break;
 			case 'refresh':
 				gitGraph.refresh(false);
