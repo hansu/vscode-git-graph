@@ -190,6 +190,154 @@ body.vscode-high-contrast .dialog{
 }
 
 
+/* Rebase Todo Editor */
+
+.rebaseTodoEditor{
+	width:100%;
+	border-collapse:separate;
+	border-spacing:0;
+	text-align:left;
+	-webkit-user-select:none;
+	user-select:none;
+}
+
+.dialogContent:has(.rebaseTodoEditor){
+	max-width:80vw;
+	width:max-content;
+}
+.dialogContent:has(.rebaseTodoEditor) .rebaseTodoEditor{
+	max-height:50vh;
+	overflow-y:auto;
+	display:block;
+}
+.dialog:has(.rebaseTodoEditor){
+	cursor:default;
+}
+.dialog:has(.rebaseTodoEditor)>.dialogContent>b{
+	cursor:move;
+	display:block;
+	padding-bottom:8px;
+}
+
+.rebaseTodoEditor td{
+	padding:5px 6px;
+	white-space:nowrap;
+	vertical-align:middle;
+}
+.rebaseTodoEditor td:first-child{
+	border-left:3px solid transparent;
+}
+
+.rebaseTodoEditor .dragHandle{
+	cursor:grab;
+	opacity:0.4;
+	font-size:14px;
+	width:40px;
+	position:relative;
+}
+.rebaseTodoEditor .dragHandle:hover{
+	opacity:0.8;
+}
+.rebaseTodoEditor .dragHandle::before{
+	content:'\21B3';
+	margin-right:4px;
+	visibility:hidden;
+}
+
+.rebaseTodoEditor .todoHash{
+	font-family:var(--vscode-editor-font-family, monospace);
+	font-size:12px;
+	opacity:0.7;
+}
+
+.rebaseTodoEditor .todoAction select{
+	background-color:rgba(128,128,128,0.1);
+	border:1px solid rgba(128,128,128,0.5);
+	border-radius:4px;
+	color:var(--vscode-menu-foreground);
+	font-size:12px;
+	padding:2px 4px;
+	outline:none;
+	cursor:pointer;
+}
+.rebaseTodoEditor .todoAction select:focus{
+	border-color:var(--vscode-focusBorder);
+}
+
+.rebaseTodoEditor .todoSubject{
+	overflow:hidden;
+	text-overflow:ellipsis;
+	max-width:50vw;
+}
+
+/* Action-specific select coloring */
+.rebaseTodoEditor tr[data-action="reword"] .todoAction select{
+	background-color:rgba(226,185,61,0.2);
+	border-color:rgba(226,185,61,0.6);
+}
+.rebaseTodoEditor tr[data-action="edit"] .todoAction select{
+	background-color:rgba(226,135,67,0.2);
+	border-color:rgba(226,135,67,0.6);
+}
+.rebaseTodoEditor tr[data-action="squash"] .todoAction select{
+	background-color:rgba(33,150,243,0.2);
+	border-color:rgba(33,150,243,0.6);
+}
+.rebaseTodoEditor tr[data-action="fixup"] .todoAction select{
+	background-color:rgba(156,39,176,0.2);
+	border-color:rgba(156,39,176,0.6);
+}
+.rebaseTodoEditor tr[data-action="drop"] .todoAction select{
+	background-color:rgba(244,67,54,0.2);
+	border-color:rgba(244,67,54,0.6);
+}
+
+/* Drop row styling */
+.rebaseTodoEditor tr[data-action="drop"]{
+	opacity:0.45;
+}
+.rebaseTodoEditor tr[data-action="drop"] .todoHash,
+.rebaseTodoEditor tr[data-action="drop"] .todoSubject{
+	text-decoration:line-through;
+}
+
+/* Squash/Fixup grouping */
+.rebaseTodoEditor tr.groupStart td,
+.rebaseTodoEditor tr.groupMember td{
+	background-color:rgba(33,150,243,0.08);
+}
+.rebaseTodoEditor tr.groupStart td:first-child,
+.rebaseTodoEditor tr.groupMember td:first-child{
+	border-left-color:rgba(33,150,243,0.7);
+}
+.rebaseTodoEditor tr.groupMember .dragHandle::before{
+	visibility:visible;
+	opacity:0.5;
+}
+.rebaseTodoEditor tr.groupLast td{
+	border-bottom:1px solid rgba(128,128,128,0.15);
+}
+
+/* Error state — orphaned squash/fixup */
+.rebaseTodoEditor tr.todoError td{
+	background-color:rgba(244,67,54,0.1);
+}
+.rebaseTodoEditor tr.todoError td:first-child{
+	border-left-color:#f44336;
+}
+.dialog #dialogAction.disabled{
+	opacity:0.4;
+	cursor:not-allowed;
+	pointer-events:none;
+}
+
+/* Drag and drop */
+.rebaseTodoEditor tr.dragging td{
+	background-color:rgba(33,150,243,0.15);
+	opacity:0.85;
+}
+
+
 /* Custom Select Input */
 
 .customSelectContainer{

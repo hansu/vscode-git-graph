@@ -43,6 +43,13 @@ class GitGraphView {
 		hash: string | null
 	} = { time: 0, hash: null };
 
+	private pendingRebaseTodo: {
+		repo: string;
+		obj: string;
+		actionOn: GG.RebaseActionOn;
+		signoff: boolean;
+	} | null = null;
+
 	private readonly findWidget: FindWidget;
 	private readonly settingsWidget: SettingsWidget;
 	private readonly repoDropdown: Dropdown;
@@ -2180,12 +2187,225 @@ class GitGraphView {
 	private rebaseAction(obj: string, name: string, actionOn: GG.RebaseActionOn, target: DialogTarget & (CommitTarget | RefTarget)) {
 		dialog.showForm('Are you sure you want to rebase ' + (this.gitBranchHead !== null ? '<b><i>' + escapeHtml(this.gitBranchHead) + '</i></b> (the current branch)' : 'the current branch') + ' on ' + actionOn.toLowerCase() + ' <b><i>' + escapeHtml(name) + '</i></b>?', [
 			{ type: DialogInputType.Checkbox, name: 'Interactive Rebase (launch in new Terminal)', value: this.config.dialogDefaults.rebase.interactive },
-			{ type: DialogInputType.Checkbox, name: 'Ignore Date', value: this.config.dialogDefaults.rebase.ignoreDate, info: 'Only applicable to a non-interactive rebase.' }
+			{ type: DialogInputType.Checkbox, name: 'Edit Todo in Extension', value: false, info: 'Edit the rebase todo list in the extension instead of a terminal editor.' },
+			{ type: DialogInputType.Checkbox, name: 'Ignore Date', value: this.config.dialogDefaults.rebase.ignoreDate, info: 'Only applicable to a non-interactive rebase.' },
+			{ type: DialogInputType.Checkbox, name: 'Signed-off-by', value: false, info: 'Add Signed-off-by trailer to rebased commits (--signoff).' }
 		], 'Yes, rebase', (values) => {
 			let interactive = <boolean>values[0];
-			runAction({ command: 'rebase', repo: this.currentRepo, obj: obj, actionOn: actionOn, ignoreDate: <boolean>values[1], interactive: interactive }, interactive ? 'Launching Interactive Rebase' : 'Rebasing on ' + actionOn);
+			let editTodo = <boolean>values[1];
+			let signoff = <boolean>values[3];
+			if (editTodo) {
+				this.pendingRebaseTodo = { repo: this.currentRepo, obj: obj, actionOn: actionOn, signoff: signoff };
+				dialog.showActionRunning('Loading Rebase Todo List');
+				sendMessage({ command: 'getRebaseTodoList', repo: this.currentRepo, obj: obj, actionOn: actionOn });
+			} else {
+				runAction({ command: 'rebase', repo: this.currentRepo, obj: obj, actionOn: actionOn, ignoreDate: <boolean>values[2], interactive: interactive, signoff: signoff }, interactive ? 'Launching Interactive Rebase' : 'Rebasing on ' + actionOn);
+			}
 		}, target);
 	}
+
+	public showRebaseTodoEditor(items: ReadonlyArray<GG.RebaseTodoItem>) {
+		if (this.pendingRebaseTodo === null) return;
+		const ctx = this.pendingRebaseTodo;
+
+		if (items.length === 0) {
+			dialog.showError('Nothing to rebase', 'There are no commits in the rebase range.', null, null);
+			this.pendingRebaseTodo = null;
+			return;
+		}
+
+		let html = '<b>Interactive Rebase Todo</b><br><br>';
+		html += '<table class="rebaseTodoEditor"><tbody>';
+		for (let i = 0; i < items.length; i++) {
+			const item = items[i];
+			html += '<tr data-index="' + i + '" data-hash="' + escapeHtml(item.hash) + '" data-action="pick">'
+				+ '<td class="dragHandle" title="Drag to reorder">&#x2630;</td>'
+				+ '<td class="todoHash">' + escapeHtml(item.hash) + '</td>'
+				+ '<td class="todoAction"><select>'
+				+ '<option value="pick" selected>pick</option>'
+				+ '<option value="reword">reword</option>'
+				+ '<option value="edit">edit</option>'
+				+ '<option value="squash">squash</option>'
+				+ '<option value="fixup">fixup</option>'
+				+ '<option value="drop">drop</option>'
+				+ '</select></td>'
+				+ '<td class="todoSubject">' + escapeHtml(item.subject) + '</td>'
+				+ '</tr>';
+		}
+		html += '</tbody></table>';
+
+		const cleanup = () => {
+			this.pendingRebaseTodo = null;
+			if (this.todoDialogDragAbort) {
+				this.todoDialogDragAbort.abort();
+				this.todoDialogDragAbort = null;
+			}
+		};
+
+		dialog.showCustom(html, 'Rebase', () => {
+			const actionBtn = document.getElementById('dialogAction');
+			if (actionBtn && actionBtn.classList.contains('disabled')) return;
+			const rows = document.querySelectorAll('.rebaseTodoEditor tbody tr');
+			const entries: GG.RebaseTodoEntry[] = [];
+			rows.forEach((row) => {
+				const hash = (<HTMLElement>row).dataset.hash!;
+				const action = (<HTMLSelectElement>row.querySelector('.todoAction select')!).value as GG.RebaseTodoAction;
+				entries.push({ hash: hash, action: action });
+			});
+			sendMessage({ command: 'rebaseInteractive', repo: ctx.repo, obj: ctx.obj, actionOn: ctx.actionOn, entries: entries, signoff: ctx.signoff });
+			dialog.close();
+			cleanup();
+		}, 'Cancel', () => {
+			dialog.close();
+		}, cleanup);
+
+		this.setupTodoDragAndDrop();
+		this.setupTodoActionStyling();
+		this.setupTodoDialogDrag();
+	}
+
+	private setupTodoDragAndDrop() {
+		const tbody = document.querySelector('.rebaseTodoEditor tbody');
+		if (tbody === null) return;
+		let dragRow: HTMLElement | null = null;
+
+		const handles = tbody.querySelectorAll('.dragHandle');
+		handles.forEach((handle) => {
+			handle.addEventListener('mousedown', (e: Event) => {
+				const evt = e as MouseEvent;
+				dragRow = (handle as HTMLElement).closest('tr');
+				if (!dragRow) return;
+				dragRow.classList.add('dragging');
+				evt.preventDefault();
+				let lastInsertRef: Node | null = dragRow.nextSibling;
+
+				const onMouseMove = (me: MouseEvent) => {
+					if (!dragRow) return;
+					const rows = Array.from(tbody.querySelectorAll('tr')) as HTMLElement[];
+					let newRef: Node | null = null;
+					for (let i = 0; i < rows.length; i++) {
+						if (rows[i] === dragRow) continue;
+						const rect = rows[i].getBoundingClientRect();
+						if (me.clientY < rect.top + rect.height / 2) {
+							newRef = rows[i];
+							break;
+						}
+					}
+					if (newRef === lastInsertRef) return;
+					if (newRef) {
+						tbody.insertBefore(dragRow, newRef);
+					} else {
+						tbody.appendChild(dragRow);
+					}
+					lastInsertRef = newRef;
+					this.updateTodoGrouping();
+				};
+
+				const onMouseUp = () => {
+					document.removeEventListener('mousemove', onMouseMove);
+					document.removeEventListener('mouseup', onMouseUp);
+					if (dragRow) {
+						dragRow.classList.remove('dragging');
+						dragRow = null;
+					}
+					this.updateTodoGrouping();
+				};
+
+				document.addEventListener('mousemove', onMouseMove);
+				document.addEventListener('mouseup', onMouseUp);
+			});
+		});
+	}
+
+	private setupTodoActionStyling() {
+		const selects = document.querySelectorAll('.rebaseTodoEditor .todoAction select');
+		selects.forEach((select) => {
+			select.addEventListener('change', () => {
+				const row = (select as HTMLElement).closest('tr');
+				if (row) {
+					(<HTMLElement>row).dataset.action = (<HTMLSelectElement>select).value;
+				}
+				this.updateTodoGrouping();
+			});
+		});
+	}
+
+	private updateTodoGrouping() {
+		const rows = document.querySelectorAll('.rebaseTodoEditor tbody tr');
+		let hasError = false;
+		rows.forEach((row) => {
+			row.classList.remove('groupStart', 'groupMember', 'groupLast', 'todoError');
+		});
+		for (let i = 0; i < rows.length; i++) {
+			const action = (<HTMLElement>rows[i]).dataset.action;
+			if (action === 'squash' || action === 'fixup') {
+				// Check if there's a non-squash/fixup row above
+				let hasParent = false;
+				for (let j = i - 1; j >= 0; j--) {
+					const prevAction = (<HTMLElement>rows[j]).dataset.action;
+					if (prevAction !== 'squash' && prevAction !== 'fixup') {
+						hasParent = true;
+						rows[j].classList.add('groupStart');
+						break;
+					}
+				}
+				if (!hasParent) {
+					rows[i].classList.add('todoError');
+					hasError = true;
+				} else {
+					rows[i].classList.add('groupMember');
+				}
+				const nextAction = i + 1 < rows.length ? (<HTMLElement>rows[i + 1]).dataset.action : null;
+				if (nextAction !== 'squash' && nextAction !== 'fixup') {
+					rows[i].classList.add('groupLast');
+				}
+			}
+		}
+		const actionBtn = document.getElementById('dialogAction');
+		if (actionBtn) {
+			if (hasError) {
+				actionBtn.classList.add('disabled');
+				actionBtn.title = 'squash/fixup cannot be the first action — needs a preceding pick/reword/edit';
+			} else {
+				actionBtn.classList.remove('disabled');
+				actionBtn.title = '';
+			}
+		}
+	}
+
+	private setupTodoDialogDrag() {
+		const dialogElem = document.querySelector('.dialog:has(.rebaseTodoEditor)') as HTMLElement;
+		if (dialogElem === null) return;
+		let isDragging = false, offsetX = 0, offsetY = 0;
+		const ac = new AbortController();
+
+		const titleElem = dialogElem.querySelector('.dialogContent > b');
+		if (titleElem === null) return;
+		titleElem.addEventListener('mousedown', (e: Event) => {
+			const me = e as MouseEvent;
+			isDragging = true;
+			const rect = dialogElem.getBoundingClientRect();
+			offsetX = me.clientX - rect.left;
+			offsetY = me.clientY - rect.top;
+			dialogElem.style.transform = 'none';
+			dialogElem.style.left = rect.left + 'px';
+			dialogElem.style.top = rect.top + 'px';
+			me.preventDefault();
+		}, { signal: ac.signal });
+
+		document.addEventListener('mousemove', (e: MouseEvent) => {
+			if (!isDragging) return;
+			dialogElem.style.left = (e.clientX - offsetX) + 'px';
+			dialogElem.style.top = (e.clientY - offsetY) + 'px';
+		}, { signal: ac.signal });
+
+		document.addEventListener('mouseup', () => {
+			isDragging = false;
+		}, { signal: ac.signal });
+
+		this.todoDialogDragAbort = ac;
+	}
+	private todoDialogDragAbort: AbortController | null = null;
 
 
 	/* Table Utils */
@@ -4029,6 +4249,16 @@ window.addEventListener('load', () => {
 				} else {
 					dialog.showError('Unable to Rebase current branch on ' + msg.actionOn, msg.error, null, null);
 				}
+				break;
+			case 'getRebaseTodoList':
+				if (msg.error === null && msg.items !== null) {
+					gitGraph.showRebaseTodoEditor(msg.items);
+				} else {
+					dialog.showError('Unable to get Rebase Todo List', msg.error, null, null);
+				}
+				break;
+			case 'rebaseInteractive':
+				gitGraph.refresh(false);
 				break;
 			case 'refresh':
 				gitGraph.refresh(false);
