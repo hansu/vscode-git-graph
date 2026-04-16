@@ -1209,7 +1209,17 @@ export class DataSource extends Disposable {
 	 */
 	public async getRebaseTodoList(repo: string, obj: string, _actionOn: RebaseActionOn): Promise<{ items: RebaseTodoItem[] | null, error: ErrorInfo }> {
 		try {
-			const items = await this.spawnGit(['log', '--oneline', '--reverse', obj + '..HEAD', '--'], repo, (stdout) => {
+			const gitDir = path.join(repo, '.git');
+			if (fs.existsSync(path.join(gitDir, 'rebase-merge')) || fs.existsSync(path.join(gitDir, 'rebase-apply'))) {
+				return { items: null, error: 'A rebase is already in progress. Please complete or abort it first (git rebase --continue / --abort).' };
+			}
+			if (fs.existsSync(path.join(gitDir, 'MERGE_HEAD'))) {
+				return { items: null, error: 'A merge is in progress. Please complete or abort it first (git merge --continue / --abort).' };
+			}
+			if (fs.existsSync(path.join(gitDir, 'CHERRY_PICK_HEAD'))) {
+				return { items: null, error: 'A cherry-pick is in progress. Please complete or abort it first (git cherry-pick --continue / --abort).' };
+			}
+			const items = await this.spawnGit(['log', '--oneline', '--reverse', '--no-merges', obj + '..HEAD', '--'], repo, (stdout) => {
 				const lines = stdout.split('\n').filter((line) => line.length > 0);
 				return lines.map((line) => {
 					const spaceIndex = line.indexOf(' ');
