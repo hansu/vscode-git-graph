@@ -527,7 +527,22 @@ export abstract class BaseGitGraphView extends Disposable {
 					command: 'rebase',
 					actionOn: msg.actionOn,
 					interactive: msg.interactive,
-					error: await this.dataSource.rebase(msg.repo, msg.obj, msg.actionOn, msg.ignoreDate, msg.interactive)
+					error: await this.dataSource.rebase(msg.repo, msg.obj, msg.actionOn, msg.ignoreDate, msg.interactive, msg.signoff)
+				});
+				break;
+			case 'getRebaseTodoList': {
+				const todoResult = await this.dataSource.getRebaseTodoList(msg.repo, msg.obj, msg.actionOn);
+				this.sendMessage({
+					command: 'getRebaseTodoList',
+					items: todoResult.items,
+					error: todoResult.error
+				});
+				break;
+			}
+			case 'rebaseInteractive':
+				this.sendMessage({
+					command: 'rebaseInteractive',
+					error: await this.dataSource.rebaseInteractiveWithTodo(msg.repo, msg.obj, msg.actionOn, msg.entries, msg.signoff)
 				});
 				break;
 			case 'renameBranch':
