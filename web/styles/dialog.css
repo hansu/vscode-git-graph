@@ -251,10 +251,10 @@ body.vscode-high-contrast .dialog{
 }
 
 .rebaseTodoEditor .todoAction select{
-	background-color:rgba(128,128,128,0.1);
-	border:1px solid rgba(128,128,128,0.5);
+	background-color:var(--vscode-dropdown-background);
+	border:1px solid var(--vscode-dropdown-border);
 	border-radius:4px;
-	color:var(--vscode-menu-foreground);
+	color:var(--vscode-dropdown-foreground);
 	font-size:12px;
 	padding:2px 4px;
 	outline:none;
