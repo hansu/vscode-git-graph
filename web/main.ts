@@ -2186,20 +2186,25 @@ class GitGraphView {
 
 	private rebaseAction(obj: string, name: string, actionOn: GG.RebaseActionOn, target: DialogTarget & (CommitTarget | RefTarget)) {
 		dialog.showForm('Are you sure you want to rebase ' + (this.gitBranchHead !== null ? '<b><i>' + escapeHtml(this.gitBranchHead) + '</i></b> (the current branch)' : 'the current branch') + ' on ' + actionOn.toLowerCase() + ' <b><i>' + escapeHtml(name) + '</i></b>?', [
-			{ type: DialogInputType.Checkbox, name: 'Interactive Rebase (launch in new Terminal)', value: this.config.dialogDefaults.rebase.interactive },
-			{ type: DialogInputType.Checkbox, name: 'Edit Todo in Extension', value: false, info: 'Edit the rebase todo list in the extension instead of a terminal editor.' },
+			{
+				type: DialogInputType.Radio, name: 'Rebase Mode', options: [
+					{ name: 'Rebase', value: 'standard' },
+					{ name: 'Interactive Rebase (in Todo Edit)', value: 'interactive-extension' },
+					{ name: 'Interactive Rebase (in Terminal)', value: 'interactive-terminal' }
+				], default: this.config.dialogDefaults.rebase.interactive ? 'interactive-extension' : 'standard'
+			},
 			{ type: DialogInputType.Checkbox, name: 'Ignore Date', value: this.config.dialogDefaults.rebase.ignoreDate, info: 'Only applicable to a non-interactive rebase.' },
 			{ type: DialogInputType.Checkbox, name: 'Signed-off-by', value: false, info: 'Add Signed-off-by trailer to rebased commits (--signoff).' }
 		], 'Yes, rebase', (values) => {
-			let interactive = <boolean>values[0];
-			let editTodo = <boolean>values[1];
-			let signoff = <boolean>values[3];
-			if (editTodo) {
+			const mode = <string>values[0];
+			const signoff = <boolean>values[2];
+			if (mode === 'interactive-extension') {
 				this.pendingRebaseTodo = { repo: this.currentRepo, obj: obj, actionOn: actionOn, signoff: signoff };
 				dialog.showActionRunning('Loading Rebase Todo List');
 				sendMessage({ command: 'getRebaseTodoList', repo: this.currentRepo, obj: obj, actionOn: actionOn });
 			} else {
-				runAction({ command: 'rebase', repo: this.currentRepo, obj: obj, actionOn: actionOn, ignoreDate: <boolean>values[2], interactive: interactive, signoff: signoff }, interactive ? 'Launching Interactive Rebase' : 'Rebasing on ' + actionOn);
+				const interactive = mode === 'interactive-terminal';
+				runAction({ command: 'rebase', repo: this.currentRepo, obj: obj, actionOn: actionOn, ignoreDate: <boolean>values[1], interactive: interactive, signoff: signoff }, interactive ? 'Launching Interactive Rebase' : 'Rebasing on ' + actionOn);
 			}
 		}, target);
 	}
