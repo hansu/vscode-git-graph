@@ -39,6 +39,7 @@ body.vscode-high-contrast .dialog{
 
 .dialogContent > table.dialogForm tr.mediumField td{
 	line-height:22px;
+	vertical-align:top;
 }
 .dialogContent > table.dialogForm tr.largeField td{
 	line-height:27px;

@@ -1693,7 +1693,7 @@ class GitGraphView {
 				visible: visibility.merge,
 				onClick: () => this.mergeAction(hash, abbrevCommit(hash), GG.MergeActionOn.Commit, target)
 			}, {
-				title: 'Rebase current Branch on this Commit' + ELLIPSIS,
+				title: 'Rebase' + ELLIPSIS,
 				visible: visibility.rebase,
 				onClick: () => this.rebaseAction(hash, abbrevCommit(hash), GG.RebaseActionOn.Commit, target)
 			}, {
@@ -2189,8 +2189,8 @@ class GitGraphView {
 			{
 				type: DialogInputType.Radio, name: 'Rebase Mode', options: [
 					{ name: 'Rebase', value: 'standard' },
-					{ name: 'Interactive Rebase (in Todo Edit)', value: 'interactive-extension' },
-					{ name: 'Interactive Rebase (in Terminal)', value: 'interactive-terminal' }
+					{ name: 'Interactive Rebase (Todo Editor)', value: 'interactive-extension' },
+					{ name: 'Interactive Rebase (New Terminal)', value: 'interactive-terminal' }
 				], default: this.config.dialogDefaults.rebase.interactive ? 'interactive-extension' : 'standard'
 			},
 			{ type: DialogInputType.Checkbox, name: 'Ignore Date', value: this.config.dialogDefaults.rebase.ignoreDate, info: 'Only applicable to a non-interactive rebase.' },

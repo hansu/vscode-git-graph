@@ -261,7 +261,7 @@
 								},
 								"rebase": {
 									"type": "boolean",
-									"title": "Rebase current Branch on this Commit..."
+									"title": "Rebase..."
 								},
 								"reset": {
 									"type": "boolean",
