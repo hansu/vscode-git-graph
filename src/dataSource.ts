@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { AskpassEnvironment, AskpassManager } from './askpass/askpassManager';
 import { getConfig } from './config';
 import { Logger } from './logger';
-import { ActionedUser, CommitOrdering, DateType, DeepWriteable, ErrorInfo, ErrorInfoExtensionPrefix, GitCommit, GitCommitDetails, GitCommitStash, GitConfigLocation, GitFileChange, GitFileStatus, GitPushBranchMode, GitRepoConfig, GitRepoConfigBranches, GitResetMode, GitSignature, GitSignatureStatus, GitStash, GitTagDetails, MergeActionOn, RebaseActionOn, SquashMessageFormat, TagType, Writeable } from './types';
+import { ActionedUser, CommitOrdering, DateType, DeepWriteable, ErrorInfo, ErrorInfoExtensionPrefix, GitCommit, GitCommitDetails, GitCommitStash, GitConfigLocation, GitFileChange, GitFileStatus, GitPushBranchMode, GitRepoConfig, GitRepoConfigBranches, GitResetMode, GitSignature, GitSignatureStatus, GitStash, GitTagDetails, MergeActionOn, RebaseActionOn, RebaseTodoEntry, RebaseTodoItem, SquashMessageFormat, TagType, Writeable } from './types';
 import { GitExecutable, GitVersionRequirement, UNABLE_TO_FIND_GIT_MSG, UNCOMMITTED, abbrevCommit, constructIncompatibleGitVersionMessage, doesVersionMeetRequirement, getPathFromStr, getPathFromUri, openGitTerminal, pathWithTrailingSlash, realpath, resolveSpawnOutput, showErrorMessage } from './utils';
 import { Disposable } from './utils/disposable';
 import { Event } from './utils/event';
@@ -1177,11 +1177,11 @@ export class DataSource extends Disposable {
 	 * @param interactive Should the rebase be performed interactively.
 	 * @returns The ErrorInfo from the executed command.
 	 */
-	public rebase(repo: string, obj: string, actionOn: RebaseActionOn, ignoreDate: boolean, interactive: boolean) {
+	public rebase(repo: string, obj: string, actionOn: RebaseActionOn, ignoreDate: boolean, interactive: boolean, signoff: boolean = false) {
 		if (interactive) {
 			return this.openGitTerminal(
 				repo,
-				'rebase --interactive ' + (getConfig().signCommits ? '-S ' : '') + (actionOn === RebaseActionOn.Branch ? obj.replace(/'/g, '"\'"') : obj),
+				'rebase --interactive ' + (signoff ? '--signoff ' : '') + (getConfig().signCommits ? '-S ' : '') + (actionOn === RebaseActionOn.Branch ? obj.replace(/'/g, '"\'"') : obj),
 				'Rebase on "' + (actionOn === RebaseActionOn.Branch ? obj : abbrevCommit(obj)) + '"'
 			);
 		} else {
@@ -1189,11 +1189,82 @@ export class DataSource extends Disposable {
 			if (ignoreDate) {
 				args.push('--ignore-date');
 			}
+			if (signoff) {
+				args.push('--signoff');
+			}
 			if (getConfig().signCommits) {
 				args.push('-S');
 			}
 			return this.runGitCommand(args, repo);
 		}
+	}
+
+
+	/**
+	 * Get the list of commits that would be included in an interactive rebase.
+	 * @param repo The path of the repository.
+	 * @param obj The object the current branch will be rebased onto.
+	 * @param actionOn Is the rebase on a branch or commit.
+	 * @returns The list of commits and any error info.
+	 */
+	public async getRebaseTodoList(repo: string, obj: string, _actionOn: RebaseActionOn): Promise<{ items: RebaseTodoItem[] | null, error: ErrorInfo }> {
+		try {
+			const items = await this.spawnGit(['log', '--oneline', '--reverse', obj + '..HEAD', '--'], repo, (stdout) => {
+				const lines = stdout.split('\n').filter((line) => line.length > 0);
+				return lines.map((line) => {
+					const spaceIndex = line.indexOf(' ');
+					return {
+						hash: line.substring(0, spaceIndex),
+						subject: line.substring(spaceIndex + 1)
+					};
+				});
+			});
+			return { items: items, error: null };
+		} catch (error) {
+			return { items: null, error: error as ErrorInfo };
+		}
+	}
+
+	/**
+	 * Perform an interactive rebase with a user-edited todo list.
+	 * @param repo The path of the repository.
+	 * @param obj The object the current branch will be rebased onto.
+	 * @param actionOn Is the rebase on a branch or commit.
+	 * @param entries The rebase todo entries with actions and order.
+	 * @returns The ErrorInfo from the executed command.
+	 */
+	public rebaseInteractiveWithTodo(repo: string, obj: string, _actionOn: RebaseActionOn, entries: ReadonlyArray<RebaseTodoEntry>, signoff: boolean): Promise<ErrorInfo> {
+		return new Promise<ErrorInfo>((resolve) => {
+			if (this.gitExecutable === null) {
+				return resolve(UNABLE_TO_FIND_GIT_MSG);
+			}
+
+			const args = ['rebase', '-i', obj];
+			if (signoff) {
+				args.push('--signoff');
+			}
+			if (getConfig().signCommits) {
+				args.push('-S');
+			}
+
+			const allowedActions = new Set(['pick', 'reword', 'edit', 'squash', 'fixup', 'drop']);
+			const todoContent = entries.map((entry) => {
+				const action = allowedActions.has(entry.action) ? entry.action : 'pick';
+				return action + ' ' + entry.hash;
+			}).join('\\n');
+
+			const env = Object.assign({}, process.env, this.askpassEnv, {
+				GIT_SEQUENCE_EDITOR: 'printf \'' + todoContent + '\\n\' > "$1"'
+			});
+
+			resolveSpawnOutput(cp.spawn(this.gitExecutable.path, args, { cwd: repo, env }))
+				.then(([status, stdout, stderr]) => {
+					resolve(status.code !== 0 ? getErrorMessage(status.error, stdout, stderr) : null);
+				})
+				.catch((errorMessage) => {
+					resolve(errorMessage);
+				});
+		});
 	}
 
 
