@@ -298,6 +298,7 @@ export interface GraphConfig {
 	readonly style: GraphStyle;
 	readonly grid: { x: number, y: number, offsetX: number, offsetY: number, expandY: number };
 	readonly uncommittedChanges: GraphUncommittedChangesStyle;
+	readonly headOnLeft: boolean;
 }
 
 export interface KeybindingConfig {

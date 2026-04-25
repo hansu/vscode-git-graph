@@ -1063,6 +1063,11 @@
 					"default": true,
 					"description": "Display merge commits with a muted text color."
 				},
+				"git-graph.repository.commits.headOnLeft": {
+					"type": "boolean",
+					"default": false,
+					"description": "Draw the graph line for the branch containing HEAD (the checked-out commit) in the leftmost column."
+				},
 				"git-graph.repository.commits.order": {
 					"type": "string",
 					"enum": [

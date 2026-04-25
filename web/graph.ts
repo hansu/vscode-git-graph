@@ -32,6 +32,38 @@ interface UnavailablePoint {
 
 type VertexOrNull = Vertex | null;
 
+function remapColumnSwap(x: number, a: number, b: number): number {
+	if (a === b) return x;
+	return x === a ? b : x === b ? a : x;
+}
+
+function swapSparsePair<T>(arr: T[], a: number, b: number): void {
+	if (a === b) return;
+	const ca = arr[a];
+	const cb = arr[b];
+	if (typeof ca !== 'undefined') {
+		arr[b] = ca;
+	} else {
+		delete arr[b];
+	}
+	if (typeof cb !== 'undefined') {
+		arr[a] = cb;
+	} else {
+		delete arr[a];
+	}
+}
+
+function swapGraphColumnCoords(branches: Branch[], vertices: Vertex[], a: number, b: number): void {
+	if (a === b) return;
+	let i;
+	for (i = 0; i < branches.length; i++) {
+		branches[i].remapColumnCoordsInLines(a, b);
+	}
+	for (i = 0; i < vertices.length; i++) {
+		vertices[i].remapColumnCoordsInVertex(a, b);
+	}
+}
+
 
 /* Branch Class */
 
@@ -67,6 +99,28 @@ class Branch {
 
 	public setEnd(end: number) {
 		this.end = end;
+	}
+
+	public getMinX() {
+		let m = Infinity, i;
+		for (i = 0; i < this.lines.length; i++) {
+			m = Math.min(m, this.lines[i].p1.x, this.lines[i].p2.x);
+		}
+		return m;
+	}
+
+	/** Remap column indices on this branch's line segments (graph edges). */
+	public remapColumnCoordsInLines(a: number, b: number) {
+		if (a === b) return;
+		let i;
+		for (i = 0; i < this.lines.length; i++) {
+			const line = this.lines[i];
+			this.lines[i] = {
+				p1: { x: remapColumnSwap(line.p1.x, a, b), y: line.p1.y },
+				p2: { x: remapColumnSwap(line.p2.x, a, b), y: line.p2.y },
+				lockedFirst: line.lockedFirst
+			};
+		}
 	}
 
 
@@ -273,6 +327,29 @@ class Vertex {
 		}
 	}
 
+	/** Remap column index for the commit dot and merge-connection slots on this row. */
+	public remapColumnCoordsInVertex(a: number, b: number) {
+		if (a === b) return;
+		this.x = remapColumnSwap(this.x, a, b);
+		swapSparsePair(this.connections, a, b);
+		this.recomputeNextX();
+	}
+
+	private recomputeNextX() {
+		let maxX = this.x, i;
+		for (i = 0; i < this.connections.length; i++) {
+			if (this.connections[i]) maxX = Math.max(maxX, i);
+		}
+		this.nextX = maxX + 1;
+	}
+
+	public swapColumnCoords(a: number, b: number) {
+		if (a === b) return;
+		this.x = remapColumnSwap(this.x, a, b);
+		swapSparsePair(this.connections, a, b);
+		this.recomputeNextX();
+	}
+
 
 	/* Get / Set State */
 
@@ -437,6 +514,44 @@ class Graph {
 				i++;
 			}
 		}
+
+		this.alignHeadBranchLeft();
+	}
+
+	private getGlobalMinX() {
+		let m = Infinity, i;
+		for (i = 0; i < this.branches.length; i++) {
+			m = Math.min(m, this.branches[i].getMinX());
+		}
+		for (i = 0; i < this.vertices.length; i++) {
+			if (!this.vertices[i].isNotOnBranch()) {
+				m = Math.min(m, this.vertices[i].getPoint().x);
+			}
+		}
+		return m;
+	}
+
+	/**
+	 * When headOnLeft is enabled, swap graph columns so the branch containing HEAD uses the leftmost column.
+	 * Uses the HEAD commit's column (dot position), not the minimum x over the whole branch: merge connectors
+	 * often use a smaller x than the checked-out commit row, which would otherwise skip the swap incorrectly.
+	 */
+	private alignHeadBranchLeft() {
+		if (!this.config.headOnLeft || this.commitHead === null) return;
+		const headIdx = this.commitLookup[this.commitHead];
+		if (typeof headIdx !== 'number') return;
+		const headVertex = this.vertices[headIdx];
+		const headBranch = headVertex.getBranch();
+		if (headBranch === null) return;
+
+		const headColumn = headVertex.getPoint().x;
+		const globalMinX = this.getGlobalMinX();
+
+		if (globalMinX === Infinity || headColumn === globalMinX) {
+			return;
+		}
+
+		swapGraphColumnCoords(this.branches, this.vertices, headColumn, globalMinX);
 	}
 
 	public render(expandedCommit: ExpandedCommit | null) {
