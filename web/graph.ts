@@ -523,24 +523,35 @@ class Graph {
 		for (i = 0; i < this.branches.length; i++) {
 			m = Math.min(m, this.branches[i].getMinX());
 		}
+		for (i = 0; i < this.vertices.length; i++) {
+			if (!this.vertices[i].isNotOnBranch()) {
+				m = Math.min(m, this.vertices[i].getPoint().x);
+			}
+		}
 		return m;
 	}
 
 	/**
 	 * When headOnLeft is enabled, swap graph columns so the branch containing HEAD uses the leftmost column.
+	 * Uses the HEAD commit's column (dot position), not the minimum x over the whole branch: merge connectors
+	 * often use a smaller x than the checked-out commit row, which would otherwise skip the swap incorrectly.
 	 */
 	private alignHeadBranchLeft() {
 		if (!this.config.headOnLeft || this.commitHead === null) return;
 		const headIdx = this.commitLookup[this.commitHead];
 		if (typeof headIdx !== 'number') return;
-		const headBranch = this.vertices[headIdx].getBranch();
+		const headVertex = this.vertices[headIdx];
+		const headBranch = headVertex.getBranch();
 		if (headBranch === null) return;
 
-		const headMinX = headBranch.getMinX();
+		const headColumn = headVertex.getPoint().x;
 		const globalMinX = this.getGlobalMinX();
-		if (headMinX === Infinity || globalMinX === Infinity || headMinX === globalMinX) return;
 
-		swapGraphColumnCoords(this.branches, this.vertices, headMinX, globalMinX);
+		if (globalMinX === Infinity || headColumn === globalMinX) {
+			return;
+		}
+
+		swapGraphColumnCoords(this.branches, this.vertices, headColumn, globalMinX);
 	}
 
 	public render(expandedCommit: ExpandedCommit | null) {
