@@ -1,137 +1,154 @@
-.findWidget{
-	display:block;
-	position:fixed;
-	top:-42px;
-	right:28px;
-	height:34px;
-	padding:0 10px;
-	z-index:21;
-	background-color:var(--vscode-editorWidget-background);
-	box-shadow:0 2px 8px var(--vscode-widget-shadow);
-	line-height:34px;
-	font-size:13px;
-	color:var(--vscode-editorSuggestWidget-foreground);
-	fill:var(--vscode-editorSuggestWidget-foreground);
-	fill-opacity:0.7;
-	white-space:nowrap;
+.findWidget {
+	display: block;
+	position: fixed;
+	top: -42px;
+	right: 28px;
+	height: 34px;
+	padding: 0 10px;
+	z-index: 21;
+	background-color: var(--vscode-editorWidget-background);
+	box-shadow: 0 2px 8px var(--vscode-widget-shadow);
+	line-height: 34px;
+	font-size: 13px;
+	color: var(--vscode-editorSuggestWidget-foreground);
+	fill: var(--vscode-editorSuggestWidget-foreground);
+	fill-opacity: 0.7;
+	white-space: nowrap;
 }
-.findWidget.active{
-	top:0;
+.findWidget.active {
+	top: 0;
 }
-.findWidget.transition{
-	transition:top .2s linear;
+.findWidget.transition {
+	transition: top 0.2s linear;
 }
-.findWidget[data-error] #findInput, .findWidget[data-error]:after{
-	outline:1px solid var(--vscode-inputValidation-errorBorder) !important;
+.findWidget[data-error] #findInput,
+.findWidget[data-error]:after {
+	outline: 1px solid var(--vscode-inputValidation-errorBorder) !important;
 }
-.findWidget[data-error]:after{
-	content:attr(data-error);
-	position:relative;
-	display:block;
-	top:-5px;
-	left:0;
-	width:201px;
-	padding:5px;
-	font-size:12px;
-	line-height:16px;
-	background-color:var(--vscode-inputValidation-errorBackground);
-	outline-offset:-1px !important;
-	white-space:normal;
-}
-
-#findInput{
-	display:inline-block;
-	vertical-align:top;
-	margin-top:4px;
-	padding:5px 47px 5px 5px;
-	border:0;
-	height:16px;
-	width:159px;
-	background-color:var(--vscode-input-background);
-	color:var(--vscode-input-foreground);
-	font-size:13px;
-	outline-offset:-1px !important;
-}
-#findInput:focus{
-	outline:1px solid var(--vscode-focusBorder);
-}
-#findInput::placeholder{
-	color:var(--vscode-input-placeholderForeground);
+.findWidget[data-error]:after {
+	content: attr(data-error);
+	position: relative;
+	display: block;
+	top: -5px;
+	left: 0;
+	width: 201px;
+	padding: 5px;
+	font-size: 12px;
+	line-height: 16px;
+	background-color: var(--vscode-inputValidation-errorBackground);
+	outline-offset: -1px !important;
+	white-space: normal;
 }
 
-.findModifier{
-	display:block;
-	position:absolute;
-	top:7px;
-	height:20px;
-	width:20px;
-	line-height:20px;
-	font-size:11px;
-	cursor:pointer;
-	-webkit-user-select:none;
-	user-select:none;
-	text-align:center;
-	color:var(--vscode-input-foreground);
-	opacity:0.7;
+#findInput {
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 4px;
+	padding: 5px 47px 5px 5px;
+	border: 0;
+	height: 16px;
+	width: 159px;
+	background-color: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+	font-size: 13px;
+	outline-offset: -1px !important;
 }
-.findModifier.active, #findOpenCdv.active{
-	outline:1px solid var(--vscode-inputOption-activeBorder);
-	outline-offset:-1px;
-	background-color:var(--vscode-inputOption-activeBackground);
+#findInput:focus {
+	outline: 1px solid var(--vscode-focusBorder);
 }
-.findModifier:hover, .findModifier.active{
-	opacity:1;
-}
-#findCaseSensitive{
-	left:176px;
-}
-#findRegex{
-	left:198px;
-	font-size:12px;
+#findInput::placeholder {
+	color: var(--vscode-input-placeholderForeground);
 }
 
-#findPosition, #findPrev, #findNext, #findOpenCdv, #findClose{
-	display:inline-block;
-	-webkit-user-select:none;
-	user-select:none;
+.findModifier {
+	display: block;
+	position: absolute;
+	top: 7px;
+	height: 20px;
+	width: 20px;
+	line-height: 20px;
+	font-size: 11px;
+	cursor: pointer;
+	-webkit-user-select: none;
+	user-select: none;
+	text-align: center;
+	color: var(--vscode-input-foreground);
+	opacity: 0.7;
 }
-#findPosition{
-	min-width:75px;
-	margin-left:10px;
+.findModifier.active,
+#findOpenCdv.active {
+	outline: 1px solid var(--vscode-inputOption-activeBorder);
+	outline-offset: -1px;
+	background-color: var(--vscode-inputOption-activeBackground);
 }
-#findPrev, #findNext, #findOpenCdv, #findClose{
-	position:relative;
-	width:20px;
-	height:20px;
-	vertical-align:top;
-	margin:7px 0 0 6px;
-	cursor:pointer;
+.findModifier:hover,
+.findModifier.active {
+	opacity: 1;
 }
-#findPrev svg, #findNext svg, #findOpenCdv svg{
-	position:absolute;
-	left:3px;
-	top:3px;
+#findCaseSensitive {
+	left: 176px;
 }
-#findClose svg{
-	position:absolute;
-	left:2px;
-	top:2px;
-	width:16px !important;
-	height:16px !important;
-}
-#findPrev:hover, #findNext:hover, #findOpenCdv:hover, #findOpenCdv.active, #findClose:hover{
-	fill-opacity:1;
-}
-#findPrev.disabled, #findNext.disabled{
-	fill-opacity:0.3;
-	cursor:default;
+#findRegex {
+	left: 198px;
+	font-size: 12px;
 }
 
-.findMatch{
-	background-color:var(--git-graph-findMatch, transparent);
-	outline:1px solid var(--vscode-editor-findMatchHighlightBorder, transparent);
-	outline-offset:-1px;
+#findPosition,
+#findPrev,
+#findNext,
+#findOpenCdv,
+#findClose {
+	display: inline-block;
+	-webkit-user-select: none;
+	user-select: none;
 }
-body.vscode-high-contrast .findMatch{
-	outline-style:dotted;
+#findPosition {
+	min-width: 75px;
+	margin-left: 10px;
+}
+#findPrev,
+#findNext,
+#findOpenCdv,
+#findClose {
+	position: relative;
+	width: 20px;
+	height: 20px;
+	vertical-align: top;
+	margin: 7px 0 0 6px;
+	cursor: pointer;
+}
+#findPrev svg,
+#findNext svg,
+#findOpenCdv svg {
+	position: absolute;
+	left: 3px;
+	top: 3px;
+}
+#findClose svg {
+	position: absolute;
+	left: 2px;
+	top: 2px;
+	width: 16px !important;
+	height: 16px !important;
+}
+#findPrev:hover,
+#findNext:hover,
+#findOpenCdv:hover,
+#findOpenCdv.active,
+#findClose:hover {
+	fill-opacity: 1;
+}
+#findPrev.disabled,
+#findNext.disabled {
+	fill-opacity: 0.3;
+	cursor: default;
+}
+
+.findMatch {
+	background-color: var(--git-graph-findMatch, transparent);
+	outline: 1px solid var(--vscode-editor-findMatchHighlightBorder, transparent);
+	outline-offset: -1px;
+}
+body.vscode-high-contrast .findMatch {
+	outline-style: dotted;
 }

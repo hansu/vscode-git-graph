@@ -14,7 +14,24 @@ import { ExtensionState } from '../src/extensionState';
 import { GitGraphView, standardiseCspSource } from '../src/gitGraphView';
 import { Logger } from '../src/logger';
 import { RepoChangeEvent, RepoManager } from '../src/repoManager';
-import { CodeReview, CommitOrdering, GitCommitStash, GitConfigLocation, GitFileStatus, GitGraphViewGlobalState, GitGraphViewWorkspaceState, GitPushBranchMode, GitResetMode, MergeActionOn, PullRequestConfig, PullRequestProvider, RebaseActionOn, RequestMessage, ResponseMessage, TagType } from '../src/types';
+import {
+	CodeReview,
+	CommitOrdering,
+	GitCommitStash,
+	GitConfigLocation,
+	GitFileStatus,
+	GitGraphViewGlobalState,
+	GitGraphViewWorkspaceState,
+	GitPushBranchMode,
+	GitResetMode,
+	MergeActionOn,
+	PullRequestConfig,
+	PullRequestProvider,
+	RebaseActionOn,
+	RequestMessage,
+	ResponseMessage,
+	TagType,
+} from '../src/types';
 import * as utils from '../src/utils';
 import { EventEmitter } from '../src/utils/event';
 
@@ -45,10 +62,23 @@ describe('GitGraphView', () => {
 		onAvatar = new EventEmitter<AvatarEvent>();
 
 		logger = new Logger();
-		dataSource = new DataSource({ path: '/path/to/git', version: '2.25.0' }, onDidChangeConfiguration.subscribe, onDidChangeGitExecutable.subscribe, logger);
-		extensionState = new ExtensionState(vscode.mocks.extensionContext, onDidChangeGitExecutable.subscribe);
+		dataSource = new DataSource(
+			{ path: '/path/to/git', version: '2.25.0' },
+			onDidChangeConfiguration.subscribe,
+			onDidChangeGitExecutable.subscribe,
+			logger,
+		);
+		extensionState = new ExtensionState(
+			vscode.mocks.extensionContext,
+			onDidChangeGitExecutable.subscribe,
+		);
 		avatarManager = new AvatarManager(dataSource, extensionState, logger);
-		repoManager = new RepoManager(dataSource, extensionState, onDidChangeConfiguration.subscribe, logger);
+		repoManager = new RepoManager(
+			dataSource,
+			extensionState,
+			onDidChangeConfiguration.subscribe,
+			logger,
+		);
 
 		spyOnLog = jest.spyOn(logger, 'log');
 		spyOnLogError = jest.spyOn(logger, 'logError');
@@ -58,10 +88,10 @@ describe('GitGraphView', () => {
 		spyOnGetRepos.mockReturnValue({ '/path/to/repo': mockRepoState() });
 		spyOnIsGitExecutableUnknown.mockReturnValue(false);
 		Object.defineProperty(repoManager, 'onDidChangeRepos', {
-			get: () => onDidChangeRepos.subscribe
+			get: () => onDidChangeRepos.subscribe,
 		});
 		Object.defineProperty(avatarManager, 'onAvatar', {
-			get: () => onAvatar.subscribe
+			get: () => onAvatar.subscribe,
 		});
 		jest.spyOn(extensionState, 'getLastActiveRepo').mockReturnValue(null);
 	});
@@ -89,29 +119,58 @@ describe('GitGraphView', () => {
 			// Setup
 			vscode.window.activeTextEditor = {
 				document: {
-					uri: vscode.Uri.file('/path/to/workspace-folder/active-file.txt')
+					uri: vscode.Uri.file('/path/to/workspace-folder/active-file.txt'),
 				},
-				viewColumn: vscode.ViewColumn.Two
+				viewColumn: vscode.ViewColumn.Two,
 			};
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
-			expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith('git-graph', 'Git Graph', vscode.ViewColumn.Two, {
-				enableScripts: true,
-				localResourceRoots: [vscode.Uri.file(path.join('/path/to/extension', 'media'))],
-				retainContextWhenHidden: true
-			});
+			expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
+				'git-graph',
+				'Git Graph',
+				vscode.ViewColumn.Two,
+				{
+					enableScripts: true,
+					localResourceRoots: [vscode.Uri.file(path.join('/path/to/extension', 'media'))],
+					retainContextWhenHidden: true,
+				},
+			);
 			expect(spyOnLog).toHaveBeenCalledWith('Created Git Graph View');
 		});
 
 		it('Should reveal the existing WebviewPanel (when one exists)', () => {
 			// Setup
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
@@ -119,14 +178,30 @@ describe('GitGraphView', () => {
 			expect(mockedWebviewPanel.panel.reveal).toHaveBeenCalledTimes(1);
 		});
 
-		it('Should reveal the existing WebviewPanel (when one exists, but it isn\'t visible)', () => {
+		it("Should reveal the existing WebviewPanel (when one exists, but it isn't visible)", () => {
 			// Setup
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, { repo: '/path/to/repo' });
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				{ repo: '/path/to/repo' },
+			);
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 			mockedWebviewPanel.mocks.panel.setVisibility(false);
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, { repo: '/path/to/repo' });
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				{ repo: '/path/to/repo' },
+			);
 
 			// Assert
 			expect(vscode.window.createWebviewPanel).toHaveBeenCalledTimes(1);
@@ -136,10 +211,26 @@ describe('GitGraphView', () => {
 
 		it('Should reveal the existing WebviewPanel (when one exists), and send loadViewTo', () => {
 			// Setup
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, { repo: '/path/to/repo' });
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				{ repo: '/path/to/repo' },
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
@@ -151,20 +242,30 @@ describe('GitGraphView', () => {
 					lastActiveRepo: null,
 					loadViewTo: { repo: '/path/to/repo' },
 					repos: {
-						'/path/to/repo': mockRepoState()
-					}
-				}
+						'/path/to/repo': mockRepoState(),
+					},
+				},
 			]);
 		});
 
 		it('Should construct a new WebviewPanel, providing loadViewTo', () => {
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, { repo: '/path/to/repo' });
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				{ repo: '/path/to/repo' },
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 			expect(spyOnLog).toHaveBeenCalledWith('Created Git Graph View (active repo: /path/to/repo)');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('"loadViewTo":{"repo":"/path/to/repo"}');
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'"loadViewTo":{"repo":"/path/to/repo"}',
+			);
 		});
 
 		it('Should construct a new WebviewPanel (no active text editor)', () => {
@@ -172,14 +273,27 @@ describe('GitGraphView', () => {
 			vscode.window.activeTextEditor = undefined;
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
-			expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith('git-graph', 'Git Graph', vscode.ViewColumn.One, {
-				enableScripts: true,
-				localResourceRoots: [vscode.Uri.file(path.join('/path/to/extension', 'media'))],
-				retainContextWhenHidden: true
-			});
+			expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
+				'git-graph',
+				'Git Graph',
+				vscode.ViewColumn.One,
+				{
+					enableScripts: true,
+					localResourceRoots: [vscode.Uri.file(path.join('/path/to/extension', 'media'))],
+					retainContextWhenHidden: true,
+				},
+			);
 			expect(spyOnLog).toHaveBeenCalledWith('Created Git Graph View');
 		});
 
@@ -188,14 +302,27 @@ describe('GitGraphView', () => {
 			vscode.mockExtensionSettingReturnValue('retainContextWhenHidden', true);
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
-			expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith('git-graph', 'Git Graph', vscode.ViewColumn.One, {
-				enableScripts: true,
-				localResourceRoots: [vscode.Uri.file(path.join('/path/to/extension', 'media'))],
-				retainContextWhenHidden: true
-			});
+			expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
+				'git-graph',
+				'Git Graph',
+				vscode.ViewColumn.One,
+				{
+					enableScripts: true,
+					localResourceRoots: [vscode.Uri.file(path.join('/path/to/extension', 'media'))],
+					retainContextWhenHidden: true,
+				},
+			);
 			expect(spyOnLog).toHaveBeenCalledWith('Created Git Graph View');
 		});
 
@@ -204,14 +331,27 @@ describe('GitGraphView', () => {
 			vscode.mockExtensionSettingReturnValue('retainContextWhenHidden', false);
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
-			expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith('git-graph', 'Git Graph', vscode.ViewColumn.One, {
-				enableScripts: true,
-				localResourceRoots: [vscode.Uri.file(path.join('/path/to/extension', 'media'))],
-				retainContextWhenHidden: false
-			});
+			expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
+				'git-graph',
+				'Git Graph',
+				vscode.ViewColumn.One,
+				{
+					enableScripts: true,
+					localResourceRoots: [vscode.Uri.file(path.join('/path/to/extension', 'media'))],
+					retainContextWhenHidden: false,
+				},
+			);
 			expect(spyOnLog).toHaveBeenCalledWith('Created Git Graph View');
 		});
 
@@ -220,11 +360,21 @@ describe('GitGraphView', () => {
 			vscode.mockExtensionSettingReturnValue('tabIconColourTheme', 'colour');
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
-			expect(mockedWebviewPanel.panel.iconPath).toStrictEqual(vscode.Uri.file(path.join('/path/to/extension', 'resources', 'webview-icon.svg')));
+			expect(mockedWebviewPanel.panel.iconPath).toStrictEqual(
+				vscode.Uri.file(path.join('/path/to/extension', 'resources', 'webview-icon.svg')),
+			);
 		});
 
 		it('Should construct a WebviewPanel with a grey icon', () => {
@@ -232,20 +382,40 @@ describe('GitGraphView', () => {
 			vscode.mockExtensionSettingReturnValue('tabIconColourTheme', 'grey');
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 			expect(mockedWebviewPanel.panel.iconPath).toStrictEqual({
-				light: vscode.Uri.file(path.join('/path/to/extension', 'resources', 'webview-icon-light.svg')),
-				dark: vscode.Uri.file(path.join('/path/to/extension', 'resources', 'webview-icon-dark.svg'))
+				light: vscode.Uri.file(
+					path.join('/path/to/extension', 'resources', 'webview-icon-light.svg'),
+				),
+				dark: vscode.Uri.file(
+					path.join('/path/to/extension', 'resources', 'webview-icon-dark.svg'),
+				),
 			});
 		});
 
 		describe('WebviewPanel.onDidDispose', () => {
 			it('Should dispose the GitGraphView when the WebviewPanel is disposed', () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 
 				// Run
 				const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
@@ -259,9 +429,20 @@ describe('GitGraphView', () => {
 		describe('WebviewPanel.onDidChangeViewState', () => {
 			it('Should transition from visible to not-visible correctly', () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 				const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
-				const spyOnRepoFileWatcherStop = jest.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'stop');
+				const spyOnRepoFileWatcherStop = jest.spyOn(
+					GitGraphView.currentPanel!['repoFileWatcher'],
+					'stop',
+				);
 
 				// Run
 				mockedWebviewPanel.mocks.panel.setVisibility(false);
@@ -274,7 +455,15 @@ describe('GitGraphView', () => {
 
 			it('Should transition from not-visible to visible correctly', () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 				const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 				mockedWebviewPanel.mocks.panel.setVisibility(false);
 				GitGraphView.currentPanel!['panel']['webview'].html = '';
@@ -289,7 +478,15 @@ describe('GitGraphView', () => {
 
 			it('Should ignore events if they have no effect', () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 				const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 				GitGraphView.currentPanel!['panel']['webview'].html = '';
 
@@ -305,13 +502,21 @@ describe('GitGraphView', () => {
 		describe('RepoManager.onDidChangeRepos', () => {
 			it('Should send the updated repositories to the front-end when the view is already loaded', () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 
 				// Run
 				onDidChangeRepos.emit({
 					repos: { '/path/to/repo': mockRepoState() },
 					numRepos: 1,
-					loadRepo: null
+					loadRepo: null,
 				});
 
 				// Assert
@@ -322,21 +527,29 @@ describe('GitGraphView', () => {
 						lastActiveRepo: null,
 						loadViewTo: null,
 						repos: {
-							'/path/to/repo': mockRepoState()
-						}
-					}
+							'/path/to/repo': mockRepoState(),
+						},
+					},
 				]);
 			});
 
 			it('Should send the updated repositories to the front-end when the view is already loaded (with loadViewTo)', () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 
 				// Run
 				onDidChangeRepos.emit({
 					repos: { '/path/to/repo': mockRepoState() },
 					numRepos: 1,
-					loadRepo: '/path/to/repo'
+					loadRepo: '/path/to/repo',
 				});
 
 				// Assert
@@ -346,18 +559,26 @@ describe('GitGraphView', () => {
 						command: 'loadRepos',
 						lastActiveRepo: null,
 						loadViewTo: {
-							repo: '/path/to/repo'
+							repo: '/path/to/repo',
 						},
 						repos: {
-							'/path/to/repo': mockRepoState()
-						}
-					}
+							'/path/to/repo': mockRepoState(),
+						},
+					},
 				]);
 			});
 
-			it('Shouldn\'t send the updated repositories to the front-end when the view is not visible', () => {
+			it("Shouldn't send the updated repositories to the front-end when the view is not visible", () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 				const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 				mockedWebviewPanel.mocks.panel.setVisibility(false);
 
@@ -365,7 +586,7 @@ describe('GitGraphView', () => {
 				onDidChangeRepos.emit({
 					repos: { '/path/to/repo': mockRepoState() },
 					numRepos: 1,
-					loadRepo: null
+					loadRepo: null,
 				});
 
 				// Assert
@@ -374,14 +595,22 @@ describe('GitGraphView', () => {
 
 			it('Should transition to no repositories correctly', () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 				spyOnGetRepos.mockReturnValueOnce({});
 
 				// Run
 				onDidChangeRepos.emit({
 					repos: {},
 					numRepos: 0,
-					loadRepo: null
+					loadRepo: null,
 				});
 
 				// Assert
@@ -393,33 +622,51 @@ describe('GitGraphView', () => {
 			it('Should transition from no repositories correctly', () => {
 				// Setup
 				spyOnGetRepos.mockReturnValueOnce({});
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 
 				// Run
 				onDidChangeRepos.emit({
 					repos: {
-						'/path/to/repo': mockRepoState()
+						'/path/to/repo': mockRepoState(),
 					},
 					numRepos: 1,
-					loadRepo: '/path/to/repo'
+					loadRepo: '/path/to/repo',
 				});
 
 				// Assert
 				const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 				expect(mockedWebviewPanel.mocks.messages).toHaveLength(0);
-				expect(mockedWebviewPanel.panel.webview.html).toContain('"loadViewTo":{"repo":"/path/to/repo"}');
+				expect(mockedWebviewPanel.panel.webview.html).toContain(
+					'"loadViewTo":{"repo":"/path/to/repo"}',
+				);
 			});
 		});
 
 		describe('AvatarManager.onAvatar', () => {
 			it('Should send the avatar', () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 
 				// Run
 				onAvatar.emit({
 					email: 'user1@mhutchie.com',
-					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
+					image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE=',
 				});
 
 				// Assert
@@ -428,16 +675,24 @@ describe('GitGraphView', () => {
 					{
 						command: 'fetchAvatar',
 						email: 'user1@mhutchie.com',
-						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE='
-					}
+						image: 'data:image/png;base64,YmluYXJ5LWltYWdlLWRhdGE=',
+					},
 				]);
 			});
 		});
 
 		describe('RepoFileWatcher.repoChangeCallback', () => {
-			it('Should refresh the view when it\'s visible', () => {
+			it("Should refresh the view when it's visible", () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 
 				// Run
 				GitGraphView.currentPanel!['repoFileWatcher']['repoChangeCallback']();
@@ -446,14 +701,22 @@ describe('GitGraphView', () => {
 				const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 				expect(mockedWebviewPanel.mocks.messages).toStrictEqual([
 					{
-						command: 'refresh'
-					}
+						command: 'refresh',
+					},
 				]);
 			});
 
-			it('Shouldn\'t refresh the view when it isn\'t visible', () => {
+			it("Shouldn't refresh the view when it isn't visible", () => {
 				// Setup
-				GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+				GitGraphView.createOrShow(
+					'/path/to/extension',
+					dataSource,
+					extensionState,
+					avatarManager,
+					repoManager,
+					logger,
+					null,
+				);
 				const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 				mockedWebviewPanel.mocks.panel.setVisibility(false);
 
@@ -473,14 +736,25 @@ describe('GitGraphView', () => {
 		let spyOnRepoFileWatcherMute: jest.SpyInstance;
 		let spyOnRepoFileWatcherUnmute: jest.SpyInstance;
 		beforeEach(() => {
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 
 			onDidReceiveMessage = mockedWebviewPanel.mocks.panel.webview.onDidReceiveMessage;
 			messages = mockedWebviewPanel.mocks.messages;
 
 			spyOnRepoFileWatcherMute = jest.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'mute');
-			spyOnRepoFileWatcherUnmute = jest.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'unmute');
+			spyOnRepoFileWatcherUnmute = jest.spyOn(
+				GitGraphView.currentPanel!['repoFileWatcher'],
+				'unmute',
+			);
 		});
 
 		afterEach(() => {
@@ -502,17 +776,23 @@ describe('GitGraphView', () => {
 					name: 'origin',
 					url: 'url',
 					pushUrl: 'pushUrl',
-					fetch: true
+					fetch: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnAddRemote).toHaveBeenCalledWith('/path/to/repo', 'origin', 'url', 'pushUrl', true);
+					expect(spyOnAddRemote).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'origin',
+						'url',
+						'pushUrl',
+						true,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'addRemote',
-							error: addRemoteResolvedValue
-						}
+							error: addRemoteResolvedValue,
+						},
 					]);
 				});
 			});
@@ -536,12 +816,19 @@ describe('GitGraphView', () => {
 					message: 'message',
 					pushToRemote: null,
 					pushSkipRemoteCheck: true,
-					force: false
+					force: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnAddTag).toHaveBeenCalledWith('/path/to/repo', 'name', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', TagType.Annotated, 'message', false);
+					expect(spyOnAddTag).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'name',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						TagType.Annotated,
+						'message',
+						false,
+					);
 					expect(spyOnPushTag).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
@@ -550,8 +837,8 @@ describe('GitGraphView', () => {
 							tagName: 'name',
 							pushToRemote: null,
 							commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-							errors: [addTagResolvedValue]
-						}
+							errors: [addTagResolvedValue],
+						},
 					]);
 				});
 			});
@@ -575,13 +862,26 @@ describe('GitGraphView', () => {
 					message: 'message',
 					pushToRemote: 'origin',
 					pushSkipRemoteCheck: true,
-					force: false
+					force: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnAddTag).toHaveBeenCalledWith('/path/to/repo', 'name', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', TagType.Annotated, 'message', false);
-					expect(spyOnPushTag).toHaveBeenCalledWith('/path/to/repo', 'name', ['origin'], '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', true);
+					expect(spyOnAddTag).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'name',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						TagType.Annotated,
+						'message',
+						false,
+					);
+					expect(spyOnPushTag).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'name',
+						['origin'],
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						true,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'addTag',
@@ -589,13 +889,13 @@ describe('GitGraphView', () => {
 							tagName: 'name',
 							pushToRemote: 'origin',
 							commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-							errors: [addTagResolvedValue, spyOnPushTagResolvedValue[0]]
-						}
+							errors: [addTagResolvedValue, spyOnPushTagResolvedValue[0]],
+						},
 					]);
 				});
 			});
 
-			it('Shouldn\'t push the tag if an error occurred when adding the tag', async () => {
+			it("Shouldn't push the tag if an error occurred when adding the tag", async () => {
 				// Setup
 				const addTagResolvedValue = 'error message';
 				const spyOnAddTag = jest.spyOn(dataSource, 'addTag');
@@ -612,12 +912,19 @@ describe('GitGraphView', () => {
 					message: 'message',
 					pushToRemote: 'origin',
 					pushSkipRemoteCheck: true,
-					force: false
+					force: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnAddTag).toHaveBeenCalledWith('/path/to/repo', 'name', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', TagType.Annotated, 'message', false);
+					expect(spyOnAddTag).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'name',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						TagType.Annotated,
+						'message',
+						false,
+					);
 					expect(spyOnPushTag).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
@@ -626,8 +933,8 @@ describe('GitGraphView', () => {
 							tagName: 'name',
 							pushToRemote: 'origin',
 							commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-							errors: [addTagResolvedValue]
-						}
+							errors: [addTagResolvedValue],
+						},
 					]);
 				});
 			});
@@ -645,7 +952,7 @@ describe('GitGraphView', () => {
 					command: 'applyStash',
 					repo: '/path/to/repo',
 					selector: 'refs/stash@{0}',
-					reinstateIndex: true
+					reinstateIndex: true,
 				});
 
 				// Assert
@@ -654,8 +961,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'applyStash',
-							error: applyStashResolvedValue
-						}
+							error: applyStashResolvedValue,
+						},
 					]);
 				});
 			});
@@ -673,17 +980,21 @@ describe('GitGraphView', () => {
 					command: 'branchFromStash',
 					repo: '/path/to/repo',
 					selector: 'refs/stash@{0}',
-					branchName: 'new-branch'
+					branchName: 'new-branch',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnBranchFromStash).toHaveBeenCalledWith('/path/to/repo', 'refs/stash@{0}', 'new-branch');
+					expect(spyOnBranchFromStash).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'refs/stash@{0}',
+						'new-branch',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'branchFromStash',
-							error: branchFromStashResolvedValue
-						}
+							error: branchFromStashResolvedValue,
+						},
 					]);
 				});
 			});
@@ -703,19 +1014,23 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					branchName: 'develop',
 					remoteBranch: 'origin/develop',
-					pullAfterwards: null
+					pullAfterwards: null,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnCheckoutBranch).toHaveBeenCalledWith('/path/to/repo', 'develop', 'origin/develop');
+					expect(spyOnCheckoutBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'develop',
+						'origin/develop',
+					);
 					expect(spyOnPullBranch).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
 							command: 'checkoutBranch',
 							pullAfterwards: null,
-							errors: [checkoutBranchResolvedValue]
-						}
+							errors: [checkoutBranchResolvedValue],
+						},
 					]);
 				});
 			});
@@ -739,14 +1054,20 @@ describe('GitGraphView', () => {
 						branchName: 'develop',
 						remote: 'origin',
 						createNewCommit: true,
-						squash: false
-					}
+						squash: false,
+					},
 				});
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnCheckoutBranch).toHaveBeenCalledWith('/path/to/repo', 'develop', null);
-					expect(spyOnPullBranch).toHaveBeenCalledWith('/path/to/repo', 'develop', 'origin', true, false);
+					expect(spyOnPullBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'develop',
+						'origin',
+						true,
+						false,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'checkoutBranch',
@@ -754,15 +1075,15 @@ describe('GitGraphView', () => {
 								branchName: 'develop',
 								remote: 'origin',
 								createNewCommit: true,
-								squash: false
+								squash: false,
 							},
-							errors: [checkoutBranchResolvedValue, pullBranchResolvedValue]
-						}
+							errors: [checkoutBranchResolvedValue, pullBranchResolvedValue],
+						},
 					]);
 				});
 			});
 
-			it('Shouldn\'t pull the branch if an error occurred when checking out the branch', async () => {
+			it("Shouldn't pull the branch if an error occurred when checking out the branch", async () => {
 				// Setup
 				const checkoutBranchResolvedValue = 'error message';
 				const spyOnCheckoutBranch = jest.spyOn(dataSource, 'checkoutBranch');
@@ -779,8 +1100,8 @@ describe('GitGraphView', () => {
 						branchName: 'develop',
 						remote: 'origin',
 						createNewCommit: true,
-						squash: false
-					}
+						squash: false,
+					},
 				});
 
 				// Assert
@@ -794,10 +1115,10 @@ describe('GitGraphView', () => {
 								branchName: 'develop',
 								remote: 'origin',
 								createNewCommit: true,
-								squash: false
+								squash: false,
 							},
-							errors: [checkoutBranchResolvedValue]
-						}
+							errors: [checkoutBranchResolvedValue],
+						},
 					]);
 				});
 			});
@@ -814,17 +1135,20 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'checkoutCommit',
 					repo: '/path/to/repo',
-					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnCheckoutCommit).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b');
+					expect(spyOnCheckoutCommit).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'checkoutCommit',
-							error: checkoutCommitResolvedValue
-						}
+							error: checkoutCommitResolvedValue,
+						},
 					]);
 				});
 			});
@@ -845,18 +1169,24 @@ describe('GitGraphView', () => {
 					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					parentIndex: 1,
 					recordOrigin: true,
-					noCommit: false
+					noCommit: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnCherrypickCommit).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 1, true, false);
+					expect(spyOnCherrypickCommit).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						1,
+						true,
+						false,
+					);
 					expect(spyOnViewScm).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
 							command: 'cherrypickCommit',
-							errors: [cherrypickCommitResolvedValue]
-						}
+							errors: [cherrypickCommitResolvedValue],
+						},
 					]);
 				});
 			});
@@ -877,23 +1207,29 @@ describe('GitGraphView', () => {
 					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					parentIndex: 1,
 					recordOrigin: false,
-					noCommit: true
+					noCommit: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnCherrypickCommit).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 1, false, true);
+					expect(spyOnCherrypickCommit).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						1,
+						false,
+						true,
+					);
 					expect(spyOnViewScm).toHaveBeenCalledWith();
 					expect(messages).toStrictEqual([
 						{
 							command: 'cherrypickCommit',
-							errors: [cherrypickCommitResolvedValue, viewScmResolvedValue]
-						}
+							errors: [cherrypickCommitResolvedValue, viewScmResolvedValue],
+						},
 					]);
 				});
 			});
 
-			it('Shouldn\'t open the Visual Studio Code Source Control View if an error occurred when cherrypicking the commit', async () => {
+			it("Shouldn't open the Visual Studio Code Source Control View if an error occurred when cherrypicking the commit", async () => {
 				// Setup
 				const cherrypickCommitResolvedValue = 'error message';
 				const spyOnCherrypickCommit = jest.spyOn(dataSource, 'cherrypickCommit');
@@ -907,18 +1243,24 @@ describe('GitGraphView', () => {
 					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					parentIndex: 1,
 					recordOrigin: false,
-					noCommit: true
+					noCommit: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnCherrypickCommit).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 1, false, true);
+					expect(spyOnCherrypickCommit).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						1,
+						false,
+						true,
+					);
 					expect(spyOnViewScm).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
 							command: 'cherrypickCommit',
-							errors: [cherrypickCommitResolvedValue]
-						}
+							errors: [cherrypickCommitResolvedValue],
+						},
 					]);
 				});
 			});
@@ -935,7 +1277,7 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'cleanUntrackedFiles',
 					repo: '/path/to/repo',
-					directories: true
+					directories: true,
 				});
 
 				// Assert
@@ -944,8 +1286,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'cleanUntrackedFiles',
-							error: cleanUntrackedFilesResolvedValue
-						}
+							error: cleanUntrackedFilesResolvedValue,
+						},
 					]);
 				});
 			});
@@ -960,7 +1302,7 @@ describe('GitGraphView', () => {
 					id: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					lastActive: 1587559258000,
 					lastViewedFile: 'file1.txt',
-					remainingFiles: ['file2.txt', 'file3.txt']
+					remainingFiles: ['file2.txt', 'file3.txt'],
 				};
 				const spyOnGetCommitDetails = jest.spyOn(dataSource, 'getCommitDetails');
 				const spyOnGetAvatarImage = jest.spyOn(avatarManager, 'getAvatarImage');
@@ -977,14 +1319,21 @@ describe('GitGraphView', () => {
 					hasParents: true,
 					stash: null,
 					avatarEmail: 'user@mhutchie.com',
-					refresh: false
+					refresh: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetCommitDetails).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', true);
+					expect(spyOnGetCommitDetails).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						true,
+					);
 					expect(spyOnGetAvatarImage).toHaveBeenCalledWith('user@mhutchie.com');
-					expect(spyOnGetCodeReview).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b');
+					expect(spyOnGetCodeReview).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'commitDetails',
@@ -992,8 +1341,8 @@ describe('GitGraphView', () => {
 							avatar: getAvatarImageResolvedValue,
 							codeReview: getCodeReviewResolvedValue,
 							refresh: false,
-							error: null
-						}
+							error: null,
+						},
 					]);
 				});
 			});
@@ -1014,7 +1363,7 @@ describe('GitGraphView', () => {
 					hasParents: true,
 					stash: null,
 					avatarEmail: null,
-					refresh: false
+					refresh: false,
 				});
 
 				// Assert
@@ -1029,8 +1378,8 @@ describe('GitGraphView', () => {
 							avatar: null,
 							codeReview: null,
 							refresh: false,
-							error: null
-						}
+							error: null,
+						},
 					]);
 				});
 			});
@@ -1040,7 +1389,7 @@ describe('GitGraphView', () => {
 				const stash: GitCommitStash = {
 					selector: 'refs/stash@{0}',
 					baseHash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
-					untrackedFilesHash: null
+					untrackedFilesHash: null,
 				};
 				const getStashDetailsResolvedValue = { commitDetails: null, error: null };
 				const getCodeReviewResolvedValue = null;
@@ -1058,14 +1407,21 @@ describe('GitGraphView', () => {
 					hasParents: true,
 					stash: stash,
 					avatarEmail: null,
-					refresh: false
+					refresh: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetStashDetails).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', stash);
+					expect(spyOnGetStashDetails).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						stash,
+					);
 					expect(spyOnGetAvatarImage).not.toHaveBeenCalled();
-					expect(spyOnGetCodeReview).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b');
+					expect(spyOnGetCodeReview).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'commitDetails',
@@ -1073,8 +1429,8 @@ describe('GitGraphView', () => {
 							avatar: null,
 							codeReview: getCodeReviewResolvedValue,
 							refresh: false,
-							error: null
-						}
+							error: null,
+						},
 					]);
 				});
 			});
@@ -1088,7 +1444,7 @@ describe('GitGraphView', () => {
 					id: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2-1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					lastActive: 1587559258000,
 					lastViewedFile: 'file1.txt',
-					remainingFiles: ['file2.txt', 'file3.txt']
+					remainingFiles: ['file2.txt', 'file3.txt'],
 				};
 				const spyOnGetCommitComparison = jest.spyOn(dataSource, 'getCommitComparison');
 				const spyOnGetCodeReview = jest.spyOn(extensionState, 'getCodeReview');
@@ -1103,13 +1459,20 @@ describe('GitGraphView', () => {
 					compareWithHash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
 					fromHash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
 					toHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					refresh: false
+					refresh: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetCommitComparison).toHaveBeenCalledWith('/path/to/repo', 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b');
-					expect(spyOnGetCodeReview).toHaveBeenCalledWith('/path/to/repo', 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2-1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b');
+					expect(spyOnGetCommitComparison).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+					);
+					expect(spyOnGetCodeReview).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2-1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'compareCommits',
@@ -1118,8 +1481,8 @@ describe('GitGraphView', () => {
 							fileChanges: [],
 							codeReview: getCodeReviewResolvedValue,
 							refresh: false,
-							error: null
-						}
+							error: null,
+						},
 					]);
 				});
 			});
@@ -1139,12 +1502,16 @@ describe('GitGraphView', () => {
 					compareWithHash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
 					fromHash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
 					toHash: utils.UNCOMMITTED,
-					refresh: false
+					refresh: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetCommitComparison).toHaveBeenCalledWith('/path/to/repo', 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2', utils.UNCOMMITTED);
+					expect(spyOnGetCommitComparison).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
+						utils.UNCOMMITTED,
+					);
 					expect(spyOnGetCodeReview).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
@@ -1154,8 +1521,8 @@ describe('GitGraphView', () => {
 							fileChanges: [],
 							codeReview: null,
 							refresh: false,
-							error: null
-						}
+							error: null,
+						},
 					]);
 				});
 			});
@@ -1173,17 +1540,21 @@ describe('GitGraphView', () => {
 					command: 'copyFilePath',
 					repo: '/path/to/repo',
 					filePath: 'file.txt',
-					absolute: true
+					absolute: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnCopyFilePathToClipboard).toHaveBeenCalledWith('/path/to/repo', 'file.txt', true);
+					expect(spyOnCopyFilePathToClipboard).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'file.txt',
+						true,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'copyFilePath',
-							error: copyFilePathToClipboardResolvedValue
-						}
+							error: copyFilePathToClipboardResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1200,7 +1571,7 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'copyToClipboard',
 					type: 'Branch Name',
-					data: 'master'
+					data: 'master',
 				});
 
 				// Assert
@@ -1210,8 +1581,8 @@ describe('GitGraphView', () => {
 						{
 							command: 'copyToClipboard',
 							type: 'Branch Name',
-							error: copyToClipboardResolvedValue
-						}
+							error: copyToClipboardResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1228,7 +1599,7 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'createArchive',
 					repo: '/path/to/repo',
-					ref: 'master'
+					ref: 'master',
 				});
 
 				// Assert
@@ -1237,8 +1608,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'createArchive',
-							error: archiveResolvedValue
-						}
+							error: archiveResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1258,17 +1629,23 @@ describe('GitGraphView', () => {
 					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					branchName: 'feature-1',
 					checkout: true,
-					force: false
+					force: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnCreateBranch).toHaveBeenCalledWith('/path/to/repo', 'feature-1', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', true, false);
+					expect(spyOnCreateBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'feature-1',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						true,
+						false,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'createBranch',
-							errors: createBranchResolvedValue
-						}
+							errors: createBranchResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1288,7 +1665,7 @@ describe('GitGraphView', () => {
 					destRepo: 'destRepo',
 					destBranch: 'destBranch',
 					destRemote: 'destRemote',
-					destProjectId: 'destProjectId'
+					destProjectId: 'destProjectId',
 				};
 				const createPullRequestResolvedValue = null;
 				const spyOnPushBranch = jest.spyOn(dataSource, 'pushBranch');
@@ -1304,19 +1681,24 @@ describe('GitGraphView', () => {
 					sourceOwner: 'sourceOwner',
 					sourceRepo: 'sourceRepo',
 					sourceBranch: 'sourceBranch',
-					push: false
+					push: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnPushBranch).not.toHaveBeenCalled();
-					expect(spyOnCreatePullRequest).toHaveBeenCalledWith(pullRequestConfig, 'sourceOwner', 'sourceRepo', 'sourceBranch');
+					expect(spyOnCreatePullRequest).toHaveBeenCalledWith(
+						pullRequestConfig,
+						'sourceOwner',
+						'sourceRepo',
+						'sourceBranch',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'createPullRequest',
 							push: false,
-							errors: [null, createPullRequestResolvedValue]
-						}
+							errors: [null, createPullRequestResolvedValue],
+						},
 					]);
 				});
 			});
@@ -1334,7 +1716,7 @@ describe('GitGraphView', () => {
 					destRepo: 'destRepo',
 					destBranch: 'destBranch',
 					destRemote: 'destRemote',
-					destProjectId: 'destProjectId'
+					destProjectId: 'destProjectId',
 				};
 				const pushBranchResolvedValue = null;
 				const createPullRequestResolvedValue = null;
@@ -1352,25 +1734,36 @@ describe('GitGraphView', () => {
 					sourceOwner: 'sourceOwner',
 					sourceRepo: 'sourceRepo',
 					sourceBranch: 'sourceBranch',
-					push: true
+					push: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnPushBranch).toHaveBeenCalledWith('/path/to/repo', 'sourceBranch', 'origin', true, GitPushBranchMode.Normal);
-					expect(spyOnCreatePullRequest).toHaveBeenCalledWith(pullRequestConfig, 'sourceOwner', 'sourceRepo', 'sourceBranch');
+					expect(spyOnPushBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'sourceBranch',
+						'origin',
+						true,
+						GitPushBranchMode.Normal,
+					);
+					expect(spyOnCreatePullRequest).toHaveBeenCalledWith(
+						pullRequestConfig,
+						'sourceOwner',
+						'sourceRepo',
+						'sourceBranch',
+					);
 
 					expect(messages).toStrictEqual([
 						{
 							command: 'createPullRequest',
 							push: true,
-							errors: [pushBranchResolvedValue, createPullRequestResolvedValue]
-						}
+							errors: [pushBranchResolvedValue, createPullRequestResolvedValue],
+						},
 					]);
 				});
 			});
 
-			it('Shouldn\'t create a pull request if an error occurred when pushing the branch', async () => {
+			it("Shouldn't create a pull request if an error occurred when pushing the branch", async () => {
 				// Setup
 				const pullRequestConfig: PullRequestConfig = {
 					provider: PullRequestProvider.Bitbucket,
@@ -1383,7 +1776,7 @@ describe('GitGraphView', () => {
 					destRepo: 'destRepo',
 					destBranch: 'destBranch',
 					destRemote: 'destRemote',
-					destProjectId: 'destProjectId'
+					destProjectId: 'destProjectId',
 				};
 				const pushBranchResolvedValue = 'error message';
 				const spyOnPushBranch = jest.spyOn(dataSource, 'pushBranch');
@@ -1399,20 +1792,26 @@ describe('GitGraphView', () => {
 					sourceOwner: 'sourceOwner',
 					sourceRepo: 'sourceRepo',
 					sourceBranch: 'sourceBranch',
-					push: true
+					push: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnPushBranch).toHaveBeenCalledWith('/path/to/repo', 'sourceBranch', 'origin', true, GitPushBranchMode.Normal);
+					expect(spyOnPushBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'sourceBranch',
+						'origin',
+						true,
+						GitPushBranchMode.Normal,
+					);
 					expect(spyOnCreatePullRequest).not.toHaveBeenCalled();
 
 					expect(messages).toStrictEqual([
 						{
 							command: 'createPullRequest',
 							push: true,
-							errors: [pushBranchResolvedValue]
-						}
+							errors: [pushBranchResolvedValue],
+						},
 					]);
 				});
 			});
@@ -1432,7 +1831,7 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					branchName: 'feature-1',
 					forceDelete: false,
-					deleteOnRemotes: []
+					deleteOnRemotes: [],
 				});
 
 				// Assert
@@ -1445,8 +1844,8 @@ describe('GitGraphView', () => {
 							repo: '/path/to/repo',
 							branchName: 'feature-1',
 							deleteOnRemotes: [],
-							errors: [deleteBranchResolvedValue]
-						}
+							errors: [deleteBranchResolvedValue],
+						},
 					]);
 				});
 			});
@@ -1468,27 +1867,41 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					branchName: 'feature-1',
 					forceDelete: false,
-					deleteOnRemotes: ['origin', 'upstream']
+					deleteOnRemotes: ['origin', 'upstream'],
 				});
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnDeleteBranch).toHaveBeenCalledWith('/path/to/repo', 'feature-1', false);
-					expect(spyOnDeleteRemoteBranch).toHaveBeenNthCalledWith(1, '/path/to/repo', 'feature-1', 'origin');
-					expect(spyOnDeleteRemoteBranch).toHaveBeenNthCalledWith(2, '/path/to/repo', 'feature-1', 'upstream');
+					expect(spyOnDeleteRemoteBranch).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'feature-1',
+						'origin',
+					);
+					expect(spyOnDeleteRemoteBranch).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'feature-1',
+						'upstream',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'deleteBranch',
 							repo: '/path/to/repo',
 							branchName: 'feature-1',
 							deleteOnRemotes: ['origin', 'upstream'],
-							errors: [deleteBranchResolvedValue, deleteRemoteBranchResolvedValue1, deleteRemoteBranchResolvedValue2]
-						}
+							errors: [
+								deleteBranchResolvedValue,
+								deleteRemoteBranchResolvedValue1,
+								deleteRemoteBranchResolvedValue2,
+							],
+						},
 					]);
 				});
 			});
 
-			it('Shouldn\'t delete a branch on a remote if an error occurred when deleting the local branch', async () => {
+			it("Shouldn't delete a branch on a remote if an error occurred when deleting the local branch", async () => {
 				// Setup
 				const deleteBranchResolvedValue = 'error message';
 				const spyOnDeleteBranch = jest.spyOn(dataSource, 'deleteBranch');
@@ -1501,7 +1914,7 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					branchName: 'feature-1',
 					forceDelete: false,
-					deleteOnRemotes: ['origin', 'upstream']
+					deleteOnRemotes: ['origin', 'upstream'],
 				});
 
 				// Assert
@@ -1514,8 +1927,8 @@ describe('GitGraphView', () => {
 							repo: '/path/to/repo',
 							branchName: 'feature-1',
 							deleteOnRemotes: ['origin', 'upstream'],
-							errors: [deleteBranchResolvedValue]
-						}
+							errors: [deleteBranchResolvedValue],
+						},
 					]);
 				});
 			});
@@ -1532,7 +1945,7 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'deleteRemote',
 					repo: '/path/to/repo',
-					name: 'origin'
+					name: 'origin',
 				});
 
 				// Assert
@@ -1541,8 +1954,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'deleteRemote',
-							error: deleteRemoteResolvedValue
-						}
+							error: deleteRemoteResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1560,17 +1973,21 @@ describe('GitGraphView', () => {
 					command: 'deleteRemoteBranch',
 					repo: '/path/to/repo',
 					branchName: 'feature-1',
-					remote: 'origin'
+					remote: 'origin',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnDeleteRemoteBranch).toHaveBeenCalledWith('/path/to/repo', 'feature-1', 'origin');
+					expect(spyOnDeleteRemoteBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'feature-1',
+						'origin',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'deleteRemoteBranch',
-							error: deleteRemoteBranchResolvedValue
-						}
+							error: deleteRemoteBranchResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1588,7 +2005,7 @@ describe('GitGraphView', () => {
 					command: 'deleteTag',
 					repo: '/path/to/repo',
 					tagName: 'v1.0',
-					deleteOnRemote: null
+					deleteOnRemote: null,
 				});
 
 				// Assert
@@ -1597,8 +2014,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'deleteTag',
-							error: deleteTagResolvedValue
-						}
+							error: deleteTagResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1619,18 +2036,28 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					name: true,
 					email: true,
-					location: GitConfigLocation.Local
+					location: GitConfigLocation.Local,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnUnsetConfigValue).toHaveBeenNthCalledWith(1, '/path/to/repo', 'user.name', GitConfigLocation.Local);
-					expect(spyOnUnsetConfigValue).toHaveBeenNthCalledWith(2, '/path/to/repo', 'user.email', GitConfigLocation.Local);
+					expect(spyOnUnsetConfigValue).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'user.name',
+						GitConfigLocation.Local,
+					);
+					expect(spyOnUnsetConfigValue).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'user.email',
+						GitConfigLocation.Local,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'deleteUserDetails',
-							errors: [unsetConfigValueResolvedValue1, unsetConfigValueResolvedValue2]
-						}
+							errors: [unsetConfigValueResolvedValue1, unsetConfigValueResolvedValue2],
+						},
 					]);
 				});
 			});
@@ -1647,18 +2074,22 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					name: true,
 					email: false,
-					location: GitConfigLocation.Global
+					location: GitConfigLocation.Global,
 				});
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnUnsetConfigValue).toHaveBeenCalledTimes(1);
-					expect(spyOnUnsetConfigValue).toHaveBeenCalledWith('/path/to/repo', 'user.name', GitConfigLocation.Global);
+					expect(spyOnUnsetConfigValue).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'user.name',
+						GitConfigLocation.Global,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'deleteUserDetails',
-							errors: [unsetConfigValueResolvedValue]
-						}
+							errors: [unsetConfigValueResolvedValue],
+						},
 					]);
 				});
 			});
@@ -1675,18 +2106,22 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					name: false,
 					email: true,
-					location: GitConfigLocation.Global
+					location: GitConfigLocation.Global,
 				});
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnUnsetConfigValue).toHaveBeenCalledTimes(1);
-					expect(spyOnUnsetConfigValue).toHaveBeenCalledWith('/path/to/repo', 'user.email', GitConfigLocation.Global);
+					expect(spyOnUnsetConfigValue).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'user.email',
+						GitConfigLocation.Global,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'deleteUserDetails',
-							errors: [unsetConfigValueResolvedValue]
-						}
+							errors: [unsetConfigValueResolvedValue],
+						},
 					]);
 				});
 			});
@@ -1703,17 +2138,20 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'dropCommit',
 					repo: '/path/to/repo',
-					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnDropCommit).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b');
+					expect(spyOnDropCommit).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'dropCommit',
-							error: dropCommitResolvedValue
-						}
+							error: dropCommitResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1730,7 +2168,7 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'dropStash',
 					repo: '/path/to/repo',
-					selector: 'refs/stash@{0}'
+					selector: 'refs/stash@{0}',
 				});
 
 				// Assert
@@ -1739,8 +2177,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'dropStash',
-							error: dropStashResolvedValue
-						}
+							error: dropStashResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1762,17 +2200,25 @@ describe('GitGraphView', () => {
 					urlOld: 'https://github.com/mhutchie/old.git',
 					urlNew: 'https://github.com/mhutchie/new.git',
 					pushUrlOld: 'https://github.com/mhutchie/old-push.git',
-					pushUrlNew: 'https://github.com/mhutchie/new-push.git'
+					pushUrlNew: 'https://github.com/mhutchie/new-push.git',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnEditRemote).toHaveBeenCalledWith('/path/to/repo', 'old-origin', 'new-origin', 'https://github.com/mhutchie/old.git', 'https://github.com/mhutchie/new.git', 'https://github.com/mhutchie/old-push.git', 'https://github.com/mhutchie/new-push.git');
+					expect(spyOnEditRemote).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'old-origin',
+						'new-origin',
+						'https://github.com/mhutchie/old.git',
+						'https://github.com/mhutchie/new.git',
+						'https://github.com/mhutchie/old-push.git',
+						'https://github.com/mhutchie/new-push.git',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'editRemote',
-							error: editRemoteResolvedValue
-						}
+							error: editRemoteResolvedValue,
+						},
 					]);
 				});
 			});
@@ -1796,19 +2242,31 @@ describe('GitGraphView', () => {
 					email: 'user@mhutchie.com',
 					location: GitConfigLocation.Local,
 					deleteLocalName: false,
-					deleteLocalEmail: false
+					deleteLocalEmail: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(1, '/path/to/repo', 'user.name', 'name', GitConfigLocation.Local);
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(2, '/path/to/repo', 'user.email', 'user@mhutchie.com', GitConfigLocation.Local);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'user.name',
+						'name',
+						GitConfigLocation.Local,
+					);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'user.email',
+						'user@mhutchie.com',
+						GitConfigLocation.Local,
+					);
 					expect(spyOnUnsetConfigValue).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
 							command: 'editUserDetails',
-							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2]
-						}
+							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2],
+						},
 					]);
 				});
 			});
@@ -1834,20 +2292,47 @@ describe('GitGraphView', () => {
 					email: 'user@mhutchie.com',
 					location: GitConfigLocation.Global,
 					deleteLocalName: true,
-					deleteLocalEmail: true
+					deleteLocalEmail: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(1, '/path/to/repo', 'user.name', 'name', GitConfigLocation.Global);
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(2, '/path/to/repo', 'user.email', 'user@mhutchie.com', GitConfigLocation.Global);
-					expect(spyOnUnsetConfigValue).toHaveBeenNthCalledWith(1, '/path/to/repo', 'user.name', GitConfigLocation.Local);
-					expect(spyOnUnsetConfigValue).toHaveBeenNthCalledWith(2, '/path/to/repo', 'user.email', GitConfigLocation.Local);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'user.name',
+						'name',
+						GitConfigLocation.Global,
+					);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'user.email',
+						'user@mhutchie.com',
+						GitConfigLocation.Global,
+					);
+					expect(spyOnUnsetConfigValue).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'user.name',
+						GitConfigLocation.Local,
+					);
+					expect(spyOnUnsetConfigValue).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'user.email',
+						GitConfigLocation.Local,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'editUserDetails',
-							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2, unsetConfigValueResolvedValue1, unsetConfigValueResolvedValue2]
-						}
+							errors: [
+								setConfigValueResolvedValue1,
+								setConfigValueResolvedValue2,
+								unsetConfigValueResolvedValue1,
+								unsetConfigValueResolvedValue2,
+							],
+						},
 					]);
 				});
 			});
@@ -1871,20 +2356,40 @@ describe('GitGraphView', () => {
 					email: 'user@mhutchie.com',
 					location: GitConfigLocation.Global,
 					deleteLocalName: true,
-					deleteLocalEmail: false
+					deleteLocalEmail: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(1, '/path/to/repo', 'user.name', 'name', GitConfigLocation.Global);
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(2, '/path/to/repo', 'user.email', 'user@mhutchie.com', GitConfigLocation.Global);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'user.name',
+						'name',
+						GitConfigLocation.Global,
+					);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'user.email',
+						'user@mhutchie.com',
+						GitConfigLocation.Global,
+					);
 					expect(spyOnUnsetConfigValue).toHaveBeenCalledTimes(1);
-					expect(spyOnUnsetConfigValue).toHaveBeenCalledWith('/path/to/repo', 'user.name', GitConfigLocation.Local);
+					expect(spyOnUnsetConfigValue).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'user.name',
+						GitConfigLocation.Local,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'editUserDetails',
-							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2, unsetConfigValueResolvedValue]
-						}
+							errors: [
+								setConfigValueResolvedValue1,
+								setConfigValueResolvedValue2,
+								unsetConfigValueResolvedValue,
+							],
+						},
 					]);
 				});
 			});
@@ -1908,25 +2413,45 @@ describe('GitGraphView', () => {
 					email: 'user@mhutchie.com',
 					location: GitConfigLocation.Global,
 					deleteLocalName: false,
-					deleteLocalEmail: true
+					deleteLocalEmail: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(1, '/path/to/repo', 'user.name', 'name', GitConfigLocation.Global);
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(2, '/path/to/repo', 'user.email', 'user@mhutchie.com', GitConfigLocation.Global);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'user.name',
+						'name',
+						GitConfigLocation.Global,
+					);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'user.email',
+						'user@mhutchie.com',
+						GitConfigLocation.Global,
+					);
 					expect(spyOnUnsetConfigValue).toHaveBeenCalledTimes(1);
-					expect(spyOnUnsetConfigValue).toHaveBeenCalledWith('/path/to/repo', 'user.email', GitConfigLocation.Local);
+					expect(spyOnUnsetConfigValue).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'user.email',
+						GitConfigLocation.Local,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'editUserDetails',
-							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2, unsetConfigValueResolvedValue]
-						}
+							errors: [
+								setConfigValueResolvedValue1,
+								setConfigValueResolvedValue2,
+								unsetConfigValueResolvedValue,
+							],
+						},
 					]);
 				});
 			});
 
-			it('Shouldn\'t delete the local user.name or user.email if an error occurred when editing the global user.name', async () => {
+			it("Shouldn't delete the local user.name or user.email if an error occurred when editing the global user.name", async () => {
 				// Setup
 				const setConfigValueResolvedValue1 = 'error message';
 				const setConfigValueResolvedValue2 = null;
@@ -1943,24 +2468,36 @@ describe('GitGraphView', () => {
 					email: 'user@mhutchie.com',
 					location: GitConfigLocation.Global,
 					deleteLocalName: true,
-					deleteLocalEmail: true
+					deleteLocalEmail: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(1, '/path/to/repo', 'user.name', 'name', GitConfigLocation.Global);
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(2, '/path/to/repo', 'user.email', 'user@mhutchie.com', GitConfigLocation.Global);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'user.name',
+						'name',
+						GitConfigLocation.Global,
+					);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'user.email',
+						'user@mhutchie.com',
+						GitConfigLocation.Global,
+					);
 					expect(spyOnUnsetConfigValue).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
 							command: 'editUserDetails',
-							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2]
-						}
+							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2],
+						},
 					]);
 				});
 			});
 
-			it('Shouldn\'t delete the local user.name or user.email if an error occurred when editing the global user.email', async () => {
+			it("Shouldn't delete the local user.name or user.email if an error occurred when editing the global user.email", async () => {
 				// Setup
 				const setConfigValueResolvedValue1 = null;
 				const setConfigValueResolvedValue2 = 'error message';
@@ -1977,19 +2514,31 @@ describe('GitGraphView', () => {
 					email: 'user@mhutchie.com',
 					location: GitConfigLocation.Global,
 					deleteLocalName: true,
-					deleteLocalEmail: true
+					deleteLocalEmail: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(1, '/path/to/repo', 'user.name', 'name', GitConfigLocation.Global);
-					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(2, '/path/to/repo', 'user.email', 'user@mhutchie.com', GitConfigLocation.Global);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						1,
+						'/path/to/repo',
+						'user.name',
+						'name',
+						GitConfigLocation.Global,
+					);
+					expect(spyOnSetConfigValue).toHaveBeenNthCalledWith(
+						2,
+						'/path/to/repo',
+						'user.email',
+						'user@mhutchie.com',
+						GitConfigLocation.Global,
+					);
 					expect(spyOnUnsetConfigValue).not.toHaveBeenCalled();
 					expect(messages).toStrictEqual([
 						{
 							command: 'editUserDetails',
-							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2]
-						}
+							errors: [setConfigValueResolvedValue1, setConfigValueResolvedValue2],
+						},
 					]);
 				});
 			});
@@ -2005,12 +2554,15 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'endCodeReview',
 					repo: '/path/to/repo',
-					id: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+					id: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnEndCodeReview).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b');
+					expect(spyOnEndCodeReview).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+					);
 					expect(messages).toHaveLength(0);
 				});
 			});
@@ -2026,7 +2578,7 @@ describe('GitGraphView', () => {
 				// Run
 				onDidReceiveMessage({
 					command: 'exportRepoConfig',
-					repo: '/path/to/repo'
+					repo: '/path/to/repo',
 				});
 
 				// Assert
@@ -2035,8 +2587,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'exportRepoConfig',
-							error: exportRepoConfigResolvedValue
-						}
+							error: exportRepoConfigResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2055,7 +2607,7 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					name: null,
 					prune: true,
-					pruneTags: false
+					pruneTags: false,
 				});
 
 				// Assert
@@ -2064,8 +2616,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'fetch',
-							error: fetchResolvedValue
-						}
+							error: fetchResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2075,7 +2627,7 @@ describe('GitGraphView', () => {
 			it('Should fetch an avatar', async () => {
 				// Setup
 				const spyOnFetchAvatarImage = jest.spyOn(avatarManager, 'fetchAvatarImage');
-				spyOnFetchAvatarImage.mockImplementationOnce(() => { });
+				spyOnFetchAvatarImage.mockImplementationOnce(() => {});
 
 				// Run
 				onDidReceiveMessage({
@@ -2083,12 +2635,17 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					remote: 'origin',
 					email: 'user@mhutchie.com',
-					commits: ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']
+					commits: ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'],
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnFetchAvatarImage).toHaveBeenCalledWith('user@mhutchie.com', '/path/to/repo', 'origin', ['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b']);
+					expect(spyOnFetchAvatarImage).toHaveBeenCalledWith(
+						'user@mhutchie.com',
+						'/path/to/repo',
+						'origin',
+						['1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'],
+					);
 					expect(messages).toHaveLength(0);
 				});
 			});
@@ -2108,17 +2665,23 @@ describe('GitGraphView', () => {
 					remote: 'origin',
 					remoteBranch: 'remote-branch',
 					localBranch: 'local-branch',
-					force: false
+					force: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnFetchIntoLocalBranch).toHaveBeenCalledWith('/path/to/repo', 'origin', 'remote-branch', 'local-branch', false);
+					expect(spyOnFetchIntoLocalBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'origin',
+						'remote-branch',
+						'local-branch',
+						false,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'fetchIntoLocalBranch',
-							error: fetchIntoLocalBranchResolvedValue
-						}
+							error: fetchIntoLocalBranchResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2137,13 +2700,13 @@ describe('GitGraphView', () => {
 						heads: ['master'],
 						tags: [],
 						remotes: [{ name: 'origin/master', remote: 'origin' }],
-						stash: null
-					}
+						stash: null,
+					},
 				],
 				head: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 				tags: ['tag1', 'tag2'],
 				moreCommitsAvailable: false,
-				error: null
+				error: null,
 			};
 
 			it('Should get commits (show tags)', async () => {
@@ -2165,12 +2728,24 @@ describe('GitGraphView', () => {
 					commitOrdering: CommitOrdering.Date,
 					remotes: ['origin', 'upstream'],
 					hideRemotes: ['upstream'],
-					stashes: []
+					stashes: [],
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetCommits).toHaveBeenCalledWith('/path/to/repo', null, 300, true, false, false, false, CommitOrdering.Date, ['origin', 'upstream'], ['upstream'], []);
+					expect(spyOnGetCommits).toHaveBeenCalledWith(
+						'/path/to/repo',
+						null,
+						300,
+						true,
+						false,
+						false,
+						false,
+						CommitOrdering.Date,
+						['origin', 'upstream'],
+						['upstream'],
+						[],
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'loadCommits',
@@ -2180,8 +2755,8 @@ describe('GitGraphView', () => {
 							tags: getCommitsResolvedValue.tags,
 							moreCommitsAvailable: getCommitsResolvedValue.moreCommitsAvailable,
 							onlyFollowFirstParent: false,
-							error: getCommitsResolvedValue.error
-						}
+							error: getCommitsResolvedValue.error,
+						},
 					]);
 					expect(GitGraphView.currentPanel!['loadCommitsRefreshId']).toBe(2);
 				});
@@ -2206,12 +2781,24 @@ describe('GitGraphView', () => {
 					commitOrdering: CommitOrdering.Date,
 					remotes: ['origin', 'upstream'],
 					hideRemotes: ['upstream'],
-					stashes: []
+					stashes: [],
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetCommits).toHaveBeenCalledWith('/path/to/repo', null, 300, false, true, false, false, CommitOrdering.Date, ['origin', 'upstream'], ['upstream'], []);
+					expect(spyOnGetCommits).toHaveBeenCalledWith(
+						'/path/to/repo',
+						null,
+						300,
+						false,
+						true,
+						false,
+						false,
+						CommitOrdering.Date,
+						['origin', 'upstream'],
+						['upstream'],
+						[],
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'loadCommits',
@@ -2221,8 +2808,8 @@ describe('GitGraphView', () => {
 							tags: getCommitsResolvedValue.tags,
 							moreCommitsAvailable: getCommitsResolvedValue.moreCommitsAvailable,
 							onlyFollowFirstParent: false,
-							error: getCommitsResolvedValue.error
-						}
+							error: getCommitsResolvedValue.error,
+						},
 					]);
 					expect(GitGraphView.currentPanel!['loadCommitsRefreshId']).toBe(2);
 				});
@@ -2247,12 +2834,24 @@ describe('GitGraphView', () => {
 					commitOrdering: CommitOrdering.Date,
 					remotes: ['origin', 'upstream'],
 					hideRemotes: ['upstream'],
-					stashes: []
+					stashes: [],
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetCommits).toHaveBeenCalledWith('/path/to/repo', null, 300, false, false, true, false, CommitOrdering.Date, ['origin', 'upstream'], ['upstream'], []);
+					expect(spyOnGetCommits).toHaveBeenCalledWith(
+						'/path/to/repo',
+						null,
+						300,
+						false,
+						false,
+						true,
+						false,
+						CommitOrdering.Date,
+						['origin', 'upstream'],
+						['upstream'],
+						[],
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'loadCommits',
@@ -2262,8 +2861,8 @@ describe('GitGraphView', () => {
 							tags: getCommitsResolvedValue.tags,
 							moreCommitsAvailable: getCommitsResolvedValue.moreCommitsAvailable,
 							onlyFollowFirstParent: false,
-							error: getCommitsResolvedValue.error
-						}
+							error: getCommitsResolvedValue.error,
+						},
 					]);
 					expect(GitGraphView.currentPanel!['loadCommitsRefreshId']).toBe(2);
 				});
@@ -2288,12 +2887,24 @@ describe('GitGraphView', () => {
 					commitOrdering: CommitOrdering.Date,
 					remotes: ['origin', 'upstream'],
 					hideRemotes: ['upstream'],
-					stashes: []
+					stashes: [],
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetCommits).toHaveBeenCalledWith('/path/to/repo', null, 300, false, false, false, true, CommitOrdering.Date, ['origin', 'upstream'], ['upstream'], []);
+					expect(spyOnGetCommits).toHaveBeenCalledWith(
+						'/path/to/repo',
+						null,
+						300,
+						false,
+						false,
+						false,
+						true,
+						CommitOrdering.Date,
+						['origin', 'upstream'],
+						['upstream'],
+						[],
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'loadCommits',
@@ -2303,8 +2914,8 @@ describe('GitGraphView', () => {
 							tags: getCommitsResolvedValue.tags,
 							moreCommitsAvailable: getCommitsResolvedValue.moreCommitsAvailable,
 							onlyFollowFirstParent: true,
-							error: getCommitsResolvedValue.error
-						}
+							error: getCommitsResolvedValue.error,
+						},
 					]);
 					expect(GitGraphView.currentPanel!['loadCommitsRefreshId']).toBe(2);
 				});
@@ -2319,15 +2930,18 @@ describe('GitGraphView', () => {
 					head: 'master',
 					remotes: ['origin', 'upstream'],
 					stashes: [],
-					error: null
+					error: null,
 				};
 				const spyOnGetRepoInfo = jest.spyOn(dataSource, 'getRepoInfo');
 				const spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
 				const spyOnSetLastActiveRepo = jest.spyOn(extensionState, 'setLastActiveRepo');
-				const spyOnRepoFileWatcherStart = jest.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'start');
+				const spyOnRepoFileWatcherStart = jest.spyOn(
+					GitGraphView.currentPanel!['repoFileWatcher'],
+					'start',
+				);
 				spyOnGetRepoInfo.mockResolvedValueOnce(getRepoInfoResolvedValue);
-				spyOnSetLastActiveRepo.mockImplementationOnce(() => { });
-				spyOnRepoFileWatcherStart.mockImplementationOnce(() => { });
+				spyOnSetLastActiveRepo.mockImplementationOnce(() => {});
+				spyOnRepoFileWatcherStart.mockImplementationOnce(() => {});
 
 				// Run
 				onDidReceiveMessage({
@@ -2336,7 +2950,7 @@ describe('GitGraphView', () => {
 					refreshId: 0,
 					showRemoteBranches: true,
 					showStashes: false,
-					hideRemotes: ['upstream']
+					hideRemotes: ['upstream'],
 				});
 
 				// Assert
@@ -2354,8 +2968,8 @@ describe('GitGraphView', () => {
 							remotes: getRepoInfoResolvedValue.remotes,
 							stashes: getRepoInfoResolvedValue.stashes,
 							isRepo: true,
-							error: getRepoInfoResolvedValue.error
-						}
+							error: getRepoInfoResolvedValue.error,
+						},
 					]);
 					expect(GitGraphView.currentPanel!['currentRepo']).toBe('/path/to/repo');
 					expect(GitGraphView.currentPanel!['loadRepoInfoRefreshId']).toBe(0);
@@ -2369,12 +2983,15 @@ describe('GitGraphView', () => {
 					head: 'master',
 					remotes: ['origin', 'upstream'],
 					stashes: [],
-					error: null
+					error: null,
 				};
 				const spyOnGetRepoInfo = jest.spyOn(dataSource, 'getRepoInfo');
 				const spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
 				const spyOnSetLastActiveRepo = jest.spyOn(extensionState, 'setLastActiveRepo');
-				const spyOnRepoFileWatcherStart = jest.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'start');
+				const spyOnRepoFileWatcherStart = jest.spyOn(
+					GitGraphView.currentPanel!['repoFileWatcher'],
+					'start',
+				);
 				spyOnGetRepoInfo.mockResolvedValueOnce(getRepoInfoResolvedValue);
 				GitGraphView.currentPanel!['currentRepo'] = '/path/to/repo';
 
@@ -2385,7 +3002,7 @@ describe('GitGraphView', () => {
 					refreshId: 1,
 					showRemoteBranches: true,
 					showStashes: false,
-					hideRemotes: ['upstream']
+					hideRemotes: ['upstream'],
 				});
 
 				// Assert
@@ -2403,8 +3020,8 @@ describe('GitGraphView', () => {
 							remotes: getRepoInfoResolvedValue.remotes,
 							stashes: getRepoInfoResolvedValue.stashes,
 							isRepo: true,
-							error: getRepoInfoResolvedValue.error
-						}
+							error: getRepoInfoResolvedValue.error,
+						},
 					]);
 					expect(GitGraphView.currentPanel!['currentRepo']).toBe('/path/to/repo');
 					expect(GitGraphView.currentPanel!['loadRepoInfoRefreshId']).toBe(1);
@@ -2418,12 +3035,15 @@ describe('GitGraphView', () => {
 					head: 'master',
 					remotes: ['origin', 'upstream'],
 					stashes: [],
-					error: 'error message'
+					error: 'error message',
 				};
 				const spyOnGetRepoInfo = jest.spyOn(dataSource, 'getRepoInfo');
 				const spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
 				const spyOnSetLastActiveRepo = jest.spyOn(extensionState, 'setLastActiveRepo');
-				const spyOnRepoFileWatcherStart = jest.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'start');
+				const spyOnRepoFileWatcherStart = jest.spyOn(
+					GitGraphView.currentPanel!['repoFileWatcher'],
+					'start',
+				);
 				spyOnGetRepoInfo.mockResolvedValueOnce(getRepoInfoResolvedValue);
 				spyOnRepoRoot.mockResolvedValueOnce('/path/to/repo');
 				GitGraphView.currentPanel!['currentRepo'] = '/path/to/repo';
@@ -2435,7 +3055,7 @@ describe('GitGraphView', () => {
 					refreshId: 2,
 					showRemoteBranches: true,
 					showStashes: false,
-					hideRemotes: ['upstream']
+					hideRemotes: ['upstream'],
 				});
 
 				// Assert
@@ -2453,8 +3073,8 @@ describe('GitGraphView', () => {
 							remotes: getRepoInfoResolvedValue.remotes,
 							stashes: getRepoInfoResolvedValue.stashes,
 							isRepo: true,
-							error: getRepoInfoResolvedValue.error
-						}
+							error: getRepoInfoResolvedValue.error,
+						},
 					]);
 					expect(GitGraphView.currentPanel!['currentRepo']).toBe('/path/to/repo');
 					expect(GitGraphView.currentPanel!['loadRepoInfoRefreshId']).toBe(2);
@@ -2468,12 +3088,15 @@ describe('GitGraphView', () => {
 					head: 'master',
 					remotes: ['origin', 'upstream'],
 					stashes: [],
-					error: 'error message'
+					error: 'error message',
 				};
 				const spyOnGetRepoInfo = jest.spyOn(dataSource, 'getRepoInfo');
 				const spyOnRepoRoot = jest.spyOn(dataSource, 'repoRoot');
 				const spyOnSetLastActiveRepo = jest.spyOn(extensionState, 'setLastActiveRepo');
-				const spyOnRepoFileWatcherStart = jest.spyOn(GitGraphView.currentPanel!['repoFileWatcher'], 'start');
+				const spyOnRepoFileWatcherStart = jest.spyOn(
+					GitGraphView.currentPanel!['repoFileWatcher'],
+					'start',
+				);
 				spyOnGetRepoInfo.mockResolvedValueOnce(getRepoInfoResolvedValue);
 				spyOnRepoRoot.mockResolvedValueOnce(null);
 				GitGraphView.currentPanel!['currentRepo'] = '/path/to/repo';
@@ -2485,7 +3108,7 @@ describe('GitGraphView', () => {
 					refreshId: 3,
 					showRemoteBranches: true,
 					showStashes: false,
-					hideRemotes: ['upstream']
+					hideRemotes: ['upstream'],
 				});
 
 				// Assert
@@ -2503,8 +3126,8 @@ describe('GitGraphView', () => {
 							remotes: getRepoInfoResolvedValue.remotes,
 							stashes: getRepoInfoResolvedValue.stashes,
 							isRepo: false,
-							error: null
-						}
+							error: null,
+						},
 					]);
 					expect(GitGraphView.currentPanel!['currentRepo']).toBe('/path/to/repo');
 					expect(GitGraphView.currentPanel!['loadRepoInfoRefreshId']).toBe(3);
@@ -2523,7 +3146,7 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'loadConfig',
 					repo: '/path/to/repo',
-					remotes: ['origin']
+					remotes: ['origin'],
 				});
 
 				// Assert
@@ -2534,8 +3157,8 @@ describe('GitGraphView', () => {
 							command: 'loadConfig',
 							repo: '/path/to/repo',
 							config: getConfigResolvedValue.config,
-							error: getConfigResolvedValue.error
-						}
+							error: getConfigResolvedValue.error,
+						},
 					]);
 				});
 			});
@@ -2549,7 +3172,7 @@ describe('GitGraphView', () => {
 				// Run
 				onDidReceiveMessage({
 					command: 'loadRepos',
-					check: false
+					check: false,
 				});
 
 				// Assert
@@ -2560,8 +3183,8 @@ describe('GitGraphView', () => {
 							command: 'loadRepos',
 							repos: { '/path/to/repo': mockRepoState() },
 							lastActiveRepo: null,
-							loadViewTo: null
-						}
+							loadViewTo: null,
+						},
 					]);
 				});
 			});
@@ -2574,7 +3197,7 @@ describe('GitGraphView', () => {
 				// Run
 				onDidReceiveMessage({
 					command: 'loadRepos',
-					check: true
+					check: true,
 				});
 
 				// Assert
@@ -2592,7 +3215,7 @@ describe('GitGraphView', () => {
 				// Run
 				onDidReceiveMessage({
 					command: 'loadRepos',
-					check: true
+					check: true,
 				});
 
 				// Assert
@@ -2603,8 +3226,8 @@ describe('GitGraphView', () => {
 							command: 'loadRepos',
 							repos: { '/path/to/repo': mockRepoState() },
 							lastActiveRepo: null,
-							loadViewTo: null
-						}
+							loadViewTo: null,
+						},
 					]);
 				});
 			});
@@ -2626,18 +3249,26 @@ describe('GitGraphView', () => {
 					createNewCommit: true,
 					allowUnrelatedHistories: false,
 					squash: false,
-					noCommit: false
+					noCommit: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnMerge).toHaveBeenCalledWith('/path/to/repo', 'master', MergeActionOn.Branch, true, false, false, false);
+					expect(spyOnMerge).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'master',
+						MergeActionOn.Branch,
+						true,
+						false,
+						false,
+						false,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'merge',
 							actionOn: MergeActionOn.Branch,
-							error: mergeResolvedValue
-						}
+							error: mergeResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2657,18 +3288,26 @@ describe('GitGraphView', () => {
 					createNewCommit: false,
 					allowUnrelatedHistories: false,
 					squash: true,
-					noCommit: false
+					noCommit: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnMerge).toHaveBeenCalledWith('/path/to/repo', 'master', MergeActionOn.Branch, false, false, true, false);
+					expect(spyOnMerge).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'master',
+						MergeActionOn.Branch,
+						false,
+						false,
+						true,
+						false,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'merge',
 							actionOn: MergeActionOn.Branch,
-							error: mergeResolvedValue
-						}
+							error: mergeResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2688,18 +3327,26 @@ describe('GitGraphView', () => {
 					createNewCommit: false,
 					allowUnrelatedHistories: false,
 					squash: false,
-					noCommit: true
+					noCommit: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnMerge).toHaveBeenCalledWith('/path/to/repo', 'master', MergeActionOn.Branch, false, false, false, true);
+					expect(spyOnMerge).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'master',
+						MergeActionOn.Branch,
+						false,
+						false,
+						false,
+						true,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'merge',
 							actionOn: MergeActionOn.Branch,
-							error: mergeResolvedValue
-						}
+							error: mergeResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2714,7 +3361,7 @@ describe('GitGraphView', () => {
 
 				// Run
 				onDidReceiveMessage({
-					command: 'openExtensionSettings'
+					command: 'openExtensionSettings',
 				});
 
 				// Assert
@@ -2723,8 +3370,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'openExtensionSettings',
-							error: openExtensionSettingsResolvedValue
-						}
+							error: openExtensionSettingsResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2743,17 +3390,22 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					fromHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					toHash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
-					isGui: false
+					isGui: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnOpenExternalDirDiff).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2', false);
+					expect(spyOnOpenExternalDirDiff).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
+						false,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'openExternalDirDiff',
-							error: openExternalDirDiffResolvedValue
-						}
+							error: openExternalDirDiffResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2769,7 +3421,7 @@ describe('GitGraphView', () => {
 				// Run
 				onDidReceiveMessage({
 					command: 'openExternalUrl',
-					url: 'https://www.mhutchie.com'
+					url: 'https://www.mhutchie.com',
 				});
 
 				// Assert
@@ -2778,8 +3430,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'openExternalUrl',
-							error: openExternalUrlResolvedValue
-						}
+							error: openExternalUrlResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2797,17 +3449,22 @@ describe('GitGraphView', () => {
 					command: 'openFile',
 					repo: '/path/to/repo',
 					hash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					filePath: 'file.txt'
+					filePath: 'file.txt',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnOpenFile).toHaveBeenCalledWith('/path/to/repo', 'file.txt', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', dataSource);
+					expect(spyOnOpenFile).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'file.txt',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						dataSource,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'openFile',
-							error: openFileResolvedValue
-						}
+							error: openFileResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2824,7 +3481,7 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'openTerminal',
 					repo: '/path/to/repo',
-					name: 'repo-name'
+					name: 'repo-name',
 				});
 
 				// Assert
@@ -2833,8 +3490,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'openTerminal',
-							error: openGitTerminalResolvedValue
-						}
+							error: openGitTerminalResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2852,7 +3509,7 @@ describe('GitGraphView', () => {
 					command: 'popStash',
 					repo: '/path/to/repo',
 					selector: 'refs/stash@{0}',
-					reinstateIndex: true
+					reinstateIndex: true,
 				});
 
 				// Assert
@@ -2861,8 +3518,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'popStash',
-							error: popStashResolvedValue
-						}
+							error: popStashResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2879,7 +3536,7 @@ describe('GitGraphView', () => {
 				onDidReceiveMessage({
 					command: 'pruneRemote',
 					repo: '/path/to/repo',
-					name: 'origin'
+					name: 'origin',
 				});
 
 				// Assert
@@ -2888,8 +3545,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'pruneRemote',
-							error: pruneRemoteResolvedValue
-						}
+							error: pruneRemoteResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2909,17 +3566,23 @@ describe('GitGraphView', () => {
 					branchName: 'master',
 					remote: 'origin',
 					createNewCommit: true,
-					squash: false
+					squash: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnPullBranch).toHaveBeenCalledWith('/path/to/repo', 'master', 'origin', true, false);
+					expect(spyOnPullBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'master',
+						'origin',
+						true,
+						false,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'pullBranch',
-							error: pullBranchResolvedValue
-						}
+							error: pullBranchResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2929,8 +3592,13 @@ describe('GitGraphView', () => {
 			it('Should push a branch to a remote', async () => {
 				// Setup
 				const pushBranchToMultipleRemotesResolvedValue = [null];
-				const spyOnPushBranchToMultipleRemotes = jest.spyOn(dataSource, 'pushBranchToMultipleRemotes');
-				spyOnPushBranchToMultipleRemotes.mockResolvedValueOnce(pushBranchToMultipleRemotesResolvedValue);
+				const spyOnPushBranchToMultipleRemotes = jest.spyOn(
+					dataSource,
+					'pushBranchToMultipleRemotes',
+				);
+				spyOnPushBranchToMultipleRemotes.mockResolvedValueOnce(
+					pushBranchToMultipleRemotesResolvedValue,
+				);
 
 				// Run
 				onDidReceiveMessage({
@@ -2940,18 +3608,24 @@ describe('GitGraphView', () => {
 					remotes: ['origin'],
 					setUpstream: true,
 					mode: GitPushBranchMode.Normal,
-					willUpdateBranchConfig: false
+					willUpdateBranchConfig: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnPushBranchToMultipleRemotes).toHaveBeenCalledWith('/path/to/repo', 'develop', ['origin'], true, GitPushBranchMode.Normal);
+					expect(spyOnPushBranchToMultipleRemotes).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'develop',
+						['origin'],
+						true,
+						GitPushBranchMode.Normal,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'pushBranch',
 							willUpdateBranchConfig: false,
-							errors: pushBranchToMultipleRemotesResolvedValue
-						}
+							errors: pushBranchToMultipleRemotesResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2969,7 +3643,7 @@ describe('GitGraphView', () => {
 					command: 'pushStash',
 					repo: '/path/to/repo',
 					message: 'stash message',
-					includeUntracked: true
+					includeUntracked: true,
 				});
 
 				// Assert
@@ -2978,8 +3652,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'pushStash',
-							error: pushStashResolvedValue
-						}
+							error: pushStashResolvedValue,
+						},
 					]);
 				});
 			});
@@ -2999,12 +3673,18 @@ describe('GitGraphView', () => {
 					tagName: 'tag-name',
 					remotes: ['origin'],
 					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					skipRemoteCheck: true
+					skipRemoteCheck: true,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnPushTag).toHaveBeenCalledWith('/path/to/repo', 'tag-name', ['origin'], '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', true);
+					expect(spyOnPushTag).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'tag-name',
+						['origin'],
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						true,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'pushTag',
@@ -3012,8 +3692,8 @@ describe('GitGraphView', () => {
 							tagName: 'tag-name',
 							remotes: ['origin'],
 							commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-							errors: spyOnPushTagResolvedValue
-						}
+							errors: spyOnPushTagResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3033,19 +3713,25 @@ describe('GitGraphView', () => {
 					obj: 'feature',
 					actionOn: RebaseActionOn.Branch,
 					ignoreDate: true,
-					interactive: false
+					interactive: false,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnRebase).toHaveBeenCalledWith('/path/to/repo', 'feature', RebaseActionOn.Branch, true, false);
+					expect(spyOnRebase).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'feature',
+						RebaseActionOn.Branch,
+						true,
+						false,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'rebase',
 							actionOn: RebaseActionOn.Branch,
 							interactive: false,
-							error: rebaseResolvedValue
-						}
+							error: rebaseResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3063,17 +3749,21 @@ describe('GitGraphView', () => {
 					command: 'renameBranch',
 					repo: '/path/to/repo',
 					oldName: 'old-branch',
-					newName: 'new-branch'
+					newName: 'new-branch',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnRenameBranch).toHaveBeenCalledWith('/path/to/repo', 'old-branch', 'new-branch');
+					expect(spyOnRenameBranch).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'old-branch',
+						'new-branch',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'renameBranch',
-							error: renameBranchResolvedValue
-						}
+							error: renameBranchResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3088,7 +3778,7 @@ describe('GitGraphView', () => {
 
 				// Run
 				onDidReceiveMessage({
-					command: 'rescanForRepos'
+					command: 'rescanForRepos',
 				});
 
 				// Assert
@@ -3108,13 +3798,15 @@ describe('GitGraphView', () => {
 
 				// Run
 				onDidReceiveMessage({
-					command: 'rescanForRepos'
+					command: 'rescanForRepos',
 				});
 
 				// Assert
 				await waitForExpect(() => {
 					expect(spyOnSearchWorkspaceForRepos).toHaveBeenCalledWith();
-					expect(spyOnShowErrorMessage).toHaveBeenCalledWith('No Git repositories were found in the current workspace.');
+					expect(spyOnShowErrorMessage).toHaveBeenCalledWith(
+						'No Git repositories were found in the current workspace.',
+					);
 					expect(messages).toHaveLength(0);
 				});
 			});
@@ -3132,17 +3824,21 @@ describe('GitGraphView', () => {
 					command: 'resetFileToRevision',
 					repo: '/path/to/repo',
 					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					filePath: 'path/to/file'
+					filePath: 'path/to/file',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnResetFileToRevision).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 'path/to/file');
+					expect(spyOnResetFileToRevision).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						'path/to/file',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'resetFileToRevision',
-							error: resetFileToRevisionResolvedValue
-						}
+							error: resetFileToRevisionResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3160,17 +3856,21 @@ describe('GitGraphView', () => {
 					command: 'resetToCommit',
 					repo: '/path/to/repo',
 					commit: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					resetMode: GitResetMode.Mixed
+					resetMode: GitResetMode.Mixed,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnResetToCommit).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', GitResetMode.Mixed);
+					expect(spyOnResetToCommit).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						GitResetMode.Mixed,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'resetToCommit',
-							error: resetToCommitResolvedValue
-						}
+							error: resetToCommitResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3188,17 +3888,21 @@ describe('GitGraphView', () => {
 					command: 'revertCommit',
 					repo: '/path/to/repo',
 					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					parentIndex: 1
+					parentIndex: 1,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnRevertCommit).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 1);
+					expect(spyOnRevertCommit).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						1,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'revertCommit',
-							error: revertCommitResolvedValue
-						}
+							error: revertCommitResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3210,7 +3914,7 @@ describe('GitGraphView', () => {
 				const globalViewState: GitGraphViewGlobalState = {
 					alwaysAcceptCheckoutCommit: true,
 					issueLinkingConfig: null,
-					pushTagSkipRemoteCheck: false
+					pushTagSkipRemoteCheck: false,
 				};
 				const setGlobalViewStateResolvedValue = null;
 				const spyOnSetGlobalViewState = jest.spyOn(extensionState, 'setGlobalViewState');
@@ -3219,7 +3923,7 @@ describe('GitGraphView', () => {
 				// Run
 				onDidReceiveMessage({
 					command: 'setGlobalViewState',
-					state: globalViewState
+					state: globalViewState,
 				});
 
 				// Assert
@@ -3228,8 +3932,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'setGlobalViewState',
-							error: setGlobalViewStateResolvedValue
-						}
+							error: setGlobalViewStateResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3240,13 +3944,13 @@ describe('GitGraphView', () => {
 				// Setup
 				const repoState = mockRepoState();
 				const spyOnSetRepoState = jest.spyOn(repoManager, 'setRepoState');
-				spyOnSetRepoState.mockImplementationOnce(() => { });
+				spyOnSetRepoState.mockImplementationOnce(() => {});
 
 				// Run
 				onDidReceiveMessage({
 					command: 'setRepoState',
 					repo: '/path/to/repo',
-					state: repoState
+					state: repoState,
 				});
 
 				// Assert
@@ -3263,7 +3967,7 @@ describe('GitGraphView', () => {
 				const workspaceViewState: GitGraphViewWorkspaceState = {
 					findIsCaseSensitive: true,
 					findIsRegex: false,
-					findOpenCommitDetailsView: true
+					findOpenCommitDetailsView: true,
 				};
 				const setWorkspaceViewStateResolvedValue = null;
 				const spyOnSetWorkspaceViewState = jest.spyOn(extensionState, 'setWorkspaceViewState');
@@ -3272,7 +3976,7 @@ describe('GitGraphView', () => {
 				// Run
 				onDidReceiveMessage({
 					command: 'setWorkspaceViewState',
-					state: workspaceViewState
+					state: workspaceViewState,
 				});
 
 				// Assert
@@ -3281,8 +3985,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'setWorkspaceViewState',
-							error: setWorkspaceViewStateResolvedValue
-						}
+							error: setWorkspaceViewStateResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3297,7 +4001,7 @@ describe('GitGraphView', () => {
 				// Run
 				onDidReceiveMessage({
 					command: 'showErrorMessage',
-					message: 'error message'
+					message: 'error message',
 				});
 
 				// Assert
@@ -3316,9 +4020,9 @@ describe('GitGraphView', () => {
 						id: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 						lastActive: 1587559258000,
 						lastViewedFile: null,
-						remainingFiles: ['file1.txt', 'file2.txt', 'file3.txt']
+						remainingFiles: ['file1.txt', 'file2.txt', 'file3.txt'],
 					},
-					error: null
+					error: null,
 				};
 				const spyOnStartCodeReview = jest.spyOn(extensionState, 'startCodeReview');
 				spyOnStartCodeReview.mockResolvedValueOnce(startCodeReviewResolvedValue);
@@ -3331,27 +4035,32 @@ describe('GitGraphView', () => {
 					files: ['file1.txt', 'file2.txt', 'file3.txt'],
 					lastViewedFile: null,
 					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					compareWithHash: null
+					compareWithHash: null,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnStartCodeReview).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', ['file1.txt', 'file2.txt', 'file3.txt'], null);
+					expect(spyOnStartCodeReview).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						['file1.txt', 'file2.txt', 'file3.txt'],
+						null,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'startCodeReview',
 							codeReview: startCodeReviewResolvedValue.codeReview,
 							commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 							compareWithHash: null,
-							error: startCodeReviewResolvedValue.error
-						}
+							error: startCodeReviewResolvedValue.error,
+						},
 					]);
 				});
 			});
 		});
 
 		describe('tagDetails', () => {
-			it('Should get a tag\'s details', async () => {
+			it("Should get a tag's details", async () => {
 				// Setup
 				const getTagDetailsResolvedValue = { details: null, error: null };
 				const spyOnGetTagDetails = jest.spyOn(dataSource, 'getTagDetails');
@@ -3362,7 +4071,7 @@ describe('GitGraphView', () => {
 					command: 'tagDetails',
 					repo: '/path/to/repo',
 					tagName: 'tag-name',
-					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b'
+					commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 				});
 
 				// Assert
@@ -3374,8 +4083,8 @@ describe('GitGraphView', () => {
 							tagName: 'tag-name',
 							commitHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 							details: null,
-							error: null
-						}
+							error: null,
+						},
 					]);
 				});
 			});
@@ -3394,17 +4103,22 @@ describe('GitGraphView', () => {
 					repo: '/path/to/repo',
 					id: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					remainingFiles: ['file2.txt', 'file3.txt'],
-					lastViewedFile: 'file1.txt'
+					lastViewedFile: 'file1.txt',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnUpdateCodeReview).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', ['file2.txt', 'file3.txt'], 'file1.txt');
+					expect(spyOnUpdateCodeReview).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						['file2.txt', 'file3.txt'],
+						'file1.txt',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'updateCodeReview',
-							error: updateCodeReviewResolvedValue
-						}
+							error: updateCodeReviewResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3425,17 +4139,24 @@ describe('GitGraphView', () => {
 					toHash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
 					oldFilePath: 'old-file.txt',
 					newFilePath: 'new-file.txt',
-					type: GitFileStatus.Renamed
+					type: GitFileStatus.Renamed,
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnViewDiff).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2', 'old-file.txt', 'new-file.txt', GitFileStatus.Renamed);
+					expect(spyOnViewDiff).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
+						'old-file.txt',
+						'new-file.txt',
+						GitFileStatus.Renamed,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'viewDiff',
-							error: viewDiffResolvedValue
-						}
+							error: viewDiffResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3453,17 +4174,22 @@ describe('GitGraphView', () => {
 					command: 'viewDiffWithWorkingFile',
 					repo: '/path/to/repo',
 					hash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					filePath: 'file.txt'
+					filePath: 'file.txt',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnViewDiffWithWorkingFile).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 'file.txt', dataSource);
+					expect(spyOnViewDiffWithWorkingFile).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						'file.txt',
+						dataSource,
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'viewDiffWithWorkingFile',
-							error: viewDiffWithWorkingFileResolvedValue
-						}
+							error: viewDiffWithWorkingFileResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3481,17 +4207,21 @@ describe('GitGraphView', () => {
 					command: 'viewFileAtRevision',
 					repo: '/path/to/repo',
 					hash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
-					filePath: 'file.txt'
+					filePath: 'file.txt',
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnViewFileAtRevision).toHaveBeenCalledWith('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', 'file.txt');
+					expect(spyOnViewFileAtRevision).toHaveBeenCalledWith(
+						'/path/to/repo',
+						'1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
+						'file.txt',
+					);
 					expect(messages).toStrictEqual([
 						{
 							command: 'viewFileAtRevision',
-							error: viewFileAtRevisionResolvedValue
-						}
+							error: viewFileAtRevisionResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3506,7 +4236,7 @@ describe('GitGraphView', () => {
 
 				// Run
 				onDidReceiveMessage({
-					command: 'viewScm'
+					command: 'viewScm',
 				});
 
 				// Assert
@@ -3515,8 +4245,8 @@ describe('GitGraphView', () => {
 					expect(messages).toStrictEqual([
 						{
 							command: 'viewScm',
-							error: viewScmResolvedValue
-						}
+							error: viewScmResolvedValue,
+						},
 					]);
 				});
 			});
@@ -3525,7 +4255,15 @@ describe('GitGraphView', () => {
 
 	describe('sendMessage', () => {
 		beforeEach(() => {
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 			spyOnLog.mockReset();
 			spyOnLogError.mockReset();
 		});
@@ -3538,21 +4276,21 @@ describe('GitGraphView', () => {
 
 			// Run
 			mockedWebviewPanel.mocks.panel.webview.onDidReceiveMessage({
-				command: 'viewScm'
+				command: 'viewScm',
 			});
 
 			// Assert
 			await waitForExpect(() => {
 				expect(mockedWebviewPanel.panel.webview.postMessage).toHaveBeenCalledWith({
 					command: 'viewScm',
-					error: null
+					error: null,
 				});
 				expect(spyOnLog).not.toHaveBeenCalled();
 				expect(spyOnLogError).not.toHaveBeenCalled();
 			});
 		});
 
-		it('Should log an error message when Webview.postMessage rejects, and the GitGraphView hasn\'t been disposed', async () => {
+		it("Should log an error message when Webview.postMessage rejects, and the GitGraphView hasn't been disposed", async () => {
 			// Setup
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 			jest.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
@@ -3560,17 +4298,19 @@ describe('GitGraphView', () => {
 
 			// Run
 			mockedWebviewPanel.mocks.panel.webview.onDidReceiveMessage({
-				command: 'viewScm'
+				command: 'viewScm',
 			});
 
 			// Assert
 			await waitForExpect(() => {
 				expect(mockedWebviewPanel.panel.webview.postMessage).toHaveBeenCalledWith({
 					command: 'viewScm',
-					error: null
+					error: null,
 				});
 				expect(spyOnLog).not.toHaveBeenCalled();
-				expect(spyOnLogError).toHaveBeenCalledWith('Unable to send "viewScm" message to the Git Graph View.');
+				expect(spyOnLogError).toHaveBeenCalledWith(
+					'Unable to send "viewScm" message to the Git Graph View.',
+				);
 			});
 		});
 
@@ -3585,21 +4325,23 @@ describe('GitGraphView', () => {
 
 			// Run
 			mockedWebviewPanel.mocks.panel.webview.onDidReceiveMessage({
-				command: 'viewScm'
+				command: 'viewScm',
 			});
 
 			// Assert
 			await waitForExpect(() => {
 				expect(mockedWebviewPanel.panel.webview.postMessage).toHaveBeenCalledWith({
 					command: 'viewScm',
-					error: null
+					error: null,
 				});
-				expect(spyOnLog).toHaveBeenCalledWith('The Git Graph View was disposed while sending "viewScm" message.');
+				expect(spyOnLog).toHaveBeenCalledWith(
+					'The Git Graph View was disposed while sending "viewScm" message.',
+				);
 				expect(spyOnLogError).not.toHaveBeenCalled();
 			});
 		});
 
-		it('Shouldn\'t send a message to the Webview if it has been disposed', async () => {
+		it("Shouldn't send a message to the Webview if it has been disposed", async () => {
 			// Setup
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 			jest.spyOn(utils, 'viewScm').mockResolvedValueOnce(null);
@@ -3608,13 +4350,15 @@ describe('GitGraphView', () => {
 			// Run
 			GitGraphView.currentPanel!.dispose();
 			mockedWebviewPanel.mocks.panel.webview.onDidReceiveMessage({
-				command: 'viewScm'
+				command: 'viewScm',
 			});
 
 			// Assert
 			await waitForExpect(() => {
 				expect(mockedWebviewPanel.panel.webview.postMessage).not.toHaveBeenCalled();
-				expect(spyOnLog).toHaveBeenCalledWith('The Git Graph View has already been disposed, ignored sending "viewScm" message.');
+				expect(spyOnLog).toHaveBeenCalledWith(
+					'The Git Graph View has already been disposed, ignored sending "viewScm" message.',
+				);
 				expect(spyOnLogError).not.toHaveBeenCalled();
 			});
 		});
@@ -3627,10 +4371,16 @@ describe('GitGraphView', () => {
 		afterEach(() => {
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
-			expect(mockedWebviewPanel.panel.webview.html).toContain('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src vscode-webview-resource: \'unsafe-inline\'; script-src \'nonce-1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d\'; img-src data:;">');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('<link rel="stylesheet" type="text/css" href="vscode-webview-resource://file///path/to/extension/media/out.min.css">');
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				"<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src vscode-webview-resource: 'unsafe-inline'; script-src 'nonce-1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d'; img-src data:;\">",
+			);
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'<link rel="stylesheet" type="text/css" href="vscode-webview-resource://file///path/to/extension/media/out.min.css">',
+			);
 			expect(mockedWebviewPanel.panel.webview.html).toContain('<title>Git Graph</title>');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('<style>body{--git-graph-color0:#0085d9; --git-graph-color1:#d9008f; --git-graph-color2:#00d90a; --git-graph-color3:#d98500; --git-graph-color4:#a300d9; --git-graph-color5:#ff0000; --git-graph-color6:#00d9cc; --git-graph-color7:#e138e8; --git-graph-color8:#85d900; --git-graph-color9:#dc5b23; --git-graph-color10:#6f24d6; --git-graph-color11:#ffcc00; } [data-color=\"0\"]{--git-graph-color:var(--git-graph-color0);} [data-color=\"1\"]{--git-graph-color:var(--git-graph-color1);} [data-color=\"2\"]{--git-graph-color:var(--git-graph-color2);} [data-color=\"3\"]{--git-graph-color:var(--git-graph-color3);} [data-color=\"4\"]{--git-graph-color:var(--git-graph-color4);} [data-color=\"5\"]{--git-graph-color:var(--git-graph-color5);} [data-color=\"6\"]{--git-graph-color:var(--git-graph-color6);} [data-color=\"7\"]{--git-graph-color:var(--git-graph-color7);} [data-color=\"8\"]{--git-graph-color:var(--git-graph-color8);} [data-color=\"9\"]{--git-graph-color:var(--git-graph-color9);} [data-color=\"10\"]{--git-graph-color:var(--git-graph-color10);} [data-color=\"11\"]{--git-graph-color:var(--git-graph-color11);} </style>');
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'<style>body{--git-graph-color0:#0085d9; --git-graph-color1:#d9008f; --git-graph-color2:#00d90a; --git-graph-color3:#d98500; --git-graph-color4:#a300d9; --git-graph-color5:#ff0000; --git-graph-color6:#00d9cc; --git-graph-color7:#e138e8; --git-graph-color8:#85d900; --git-graph-color9:#dc5b23; --git-graph-color10:#6f24d6; --git-graph-color11:#ffcc00; } [data-color=\"0\"]{--git-graph-color:var(--git-graph-color0);} [data-color=\"1\"]{--git-graph-color:var(--git-graph-color1);} [data-color=\"2\"]{--git-graph-color:var(--git-graph-color2);} [data-color=\"3\"]{--git-graph-color:var(--git-graph-color3);} [data-color=\"4\"]{--git-graph-color:var(--git-graph-color4);} [data-color=\"5\"]{--git-graph-color:var(--git-graph-color5);} [data-color=\"6\"]{--git-graph-color:var(--git-graph-color6);} [data-color=\"7\"]{--git-graph-color:var(--git-graph-color7);} [data-color=\"8\"]{--git-graph-color:var(--git-graph-color8);} [data-color=\"9\"]{--git-graph-color:var(--git-graph-color9);} [data-color=\"10\"]{--git-graph-color:var(--git-graph-color10);} [data-color=\"11\"]{--git-graph-color:var(--git-graph-color11);} </style>',
+			);
 		});
 
 		it('Should get HTML when no Git executable is known', () => {
@@ -3638,7 +4388,15 @@ describe('GitGraphView', () => {
 			spyOnIsGitExecutableUnknown.mockReturnValueOnce(true);
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
@@ -3651,13 +4409,25 @@ describe('GitGraphView', () => {
 			spyOnGetRepos.mockResolvedValueOnce({});
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 			expect(mockedWebviewPanel.panel.webview.html).toContain('<h2>Unable to load Git Graph</h2>');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('No Git repositories were found in the current workspace when it was last scanned by Git Graph.');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d">');
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'No Git repositories were found in the current workspace when it was last scanned by Git Graph.',
+			);
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d">',
+			);
 		});
 
 		it('Should get HTML when repositories exist', () => {
@@ -3666,13 +4436,25 @@ describe('GitGraphView', () => {
 			vscode.mockExtensionSettingReturnValue('repository.commits.fetchAvatars', false);
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 			expect(mockedWebviewPanel.panel.webview.html).toContain('<div id="view" tabindex="-1">');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d">');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d" src="vscode-webview-resource://file///path/to/extension/media/out.min.js"></script>');
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d">',
+			);
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d" src="vscode-webview-resource://file///path/to/extension/media/out.min.js"></script>',
+			);
 			expect(spyOnIsAvatarStorageAvailable).not.toHaveBeenCalled();
 		});
 
@@ -3682,13 +4464,25 @@ describe('GitGraphView', () => {
 			vscode.mockExtensionSettingReturnValue('repository.commits.fetchAvatars', true);
 
 			// Run
-			GitGraphView.createOrShow('/path/to/extension', dataSource, extensionState, avatarManager, repoManager, logger, null);
+			GitGraphView.createOrShow(
+				'/path/to/extension',
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				null,
+			);
 
 			// Assert
 			const mockedWebviewPanel = vscode.getMockedWebviewPanel(0);
 			expect(mockedWebviewPanel.panel.webview.html).toContain('<div id="view" tabindex="-1">');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d">');
-			expect(mockedWebviewPanel.panel.webview.html).toContain('<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d" src="vscode-webview-resource://file///path/to/extension/media/out.min.js"></script>');
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d">',
+			);
+			expect(mockedWebviewPanel.panel.webview.html).toContain(
+				'<script nonce="1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d" src="vscode-webview-resource://file///path/to/extension/media/out.min.js"></script>',
+			);
 			expect(spyOnIsAvatarStorageAvailable).toHaveBeenCalledWith();
 		});
 	});

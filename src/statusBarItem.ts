@@ -19,13 +19,18 @@ export class StatusBarItem extends Disposable {
 	 * @param repoManager The Git Graph RepoManager instance.
 	 * @param logger The Git Graph Logger instance.
 	 */
-	constructor(initialNumRepos: number, onDidChangeRepos: Event<RepoChangeEvent>, onDidChangeConfiguration: Event<vscode.ConfigurationChangeEvent>, logger: Logger) {
+	constructor(
+		initialNumRepos: number,
+		onDidChangeRepos: Event<RepoChangeEvent>,
+		onDidChangeConfiguration: Event<vscode.ConfigurationChangeEvent>,
+		logger: Logger,
+	) {
 		super();
 		this.logger = logger;
 
 		const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
 		statusBarItem.text = 'Git Graph';
-		statusBarItem.tooltip = 'View Git Graph';
+		statusBarItem.tooltip = vscode.l10n.t('ui.viewGitGraph');
 		statusBarItem.command = 'git-graph.view';
 		this.statusBarItem = statusBarItem;
 
@@ -38,7 +43,7 @@ export class StatusBarItem extends Disposable {
 					this.refresh();
 				}
 			}),
-			statusBarItem
+			statusBarItem,
 		);
 
 		this.setNumRepos(initialNumRepos);

@@ -7,7 +7,13 @@
  * - Full details are available at: https://api.mhutchie.com/vscode-git-graph/about
  */
 
-import { LifeCycleStage, generateNonce, getDataDirectory, getLifeCycleStateInDirectory, sendQueue } from './utils';
+import {
+	LifeCycleStage,
+	generateNonce,
+	getDataDirectory,
+	getLifeCycleStateInDirectory,
+	sendQueue,
+} from './utils';
 
 (async function () {
 	try {
@@ -18,10 +24,10 @@ import { LifeCycleStage, generateNonce, getDataDirectory, getLifeCycleStateInDir
 					stage: LifeCycleStage.Uninstall,
 					extension: state.current.extension,
 					vscode: state.current.vscode,
-					nonce: generateNonce()
+					nonce: generateNonce(),
 				});
 				await sendQueue(state.queue);
 			}
 		}
-	} catch (_) { }
+	} catch (_) {}
 })();

@@ -30,9 +30,12 @@ describe('RepoFileWatcher', () => {
 	it('Should start and receive file events', () => {
 		// Setup
 		repoFileWatcher.start('/path/to/repo');
-		const onDidCreate = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidCreate).mock.calls[0][0];
-		const onDidChange = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidChange).mock.calls[0][0];
-		const onDidDelete = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidDelete).mock.calls[0][0];
+		const onDidCreate = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidCreate).mock
+			.calls[0][0];
+		const onDidChange = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidChange).mock
+			.calls[0][0];
+		const onDidDelete = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidDelete).mock
+			.calls[0][0];
 
 		// Run
 		onDidCreate(vscode.Uri.file('/path/to/repo/file'));
@@ -72,7 +75,8 @@ describe('RepoFileWatcher', () => {
 	it('Should ignore file system events while muted', () => {
 		// Setup
 		repoFileWatcher.start('/path/to/repo');
-		const onDidCreate = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidCreate).mock.calls[0][0];
+		const onDidCreate = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidCreate).mock
+			.calls[0][0];
 
 		// Run
 		repoFileWatcher.mute();
@@ -87,8 +91,10 @@ describe('RepoFileWatcher', () => {
 		// Setup
 		date.setCurrentTime(1587559258);
 		repoFileWatcher.start('/path/to/repo');
-		const onDidCreate = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidCreate).mock.calls[0][0];
-		const onDidChange = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidChange).mock.calls[0][0];
+		const onDidCreate = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidCreate).mock
+			.calls[0][0];
+		const onDidChange = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidChange).mock
+			.calls[0][0];
 
 		// Run
 		repoFileWatcher.mute();
@@ -105,7 +111,8 @@ describe('RepoFileWatcher', () => {
 	it('Should ignore file system events on files ignored within .git directory', () => {
 		// Setup
 		repoFileWatcher.start('/path/to/repo');
-		const onDidCreate = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidCreate).mock.calls[0][0];
+		const onDidCreate = (<jest.Mock<any, any>>repoFileWatcher['fsWatcher']!.onDidCreate).mock
+			.calls[0][0];
 
 		// Run
 		onDidCreate(vscode.Uri.file('/path/to/repo/.git/config-x'));

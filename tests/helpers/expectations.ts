@@ -1,6 +1,9 @@
 import { mocks } from '../mocks/vscode';
 
-export function expectRenamedExtensionSettingToHaveBeenCalled(newSection: string, oldSection: string) {
+export function expectRenamedExtensionSettingToHaveBeenCalled(
+	newSection: string,
+	oldSection: string,
+) {
 	expect(mocks.workspaceConfiguration.inspect).toBeCalledWith(newSection);
 	expect(mocks.workspaceConfiguration.inspect).toBeCalledWith(oldSection);
 }

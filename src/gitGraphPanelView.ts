@@ -27,7 +27,7 @@ export class GitGraphPanelView extends BaseGitGraphView implements vscode.Webvie
 		extensionState: ExtensionState,
 		avatarManager: AvatarManager,
 		repoManager: RepoManager,
-		logger: Logger
+		logger: Logger,
 	): GitGraphPanelView {
 		if (!GitGraphPanelView.instance) {
 			GitGraphPanelView.instance = new GitGraphPanelView(
@@ -36,7 +36,7 @@ export class GitGraphPanelView extends BaseGitGraphView implements vscode.Webvie
 				extensionState,
 				avatarManager,
 				repoManager,
-				logger
+				logger,
 			);
 		}
 		return GitGraphPanelView.instance;
@@ -68,13 +68,13 @@ export class GitGraphPanelView extends BaseGitGraphView implements vscode.Webvie
 		extensionState: ExtensionState,
 		avatarManager: AvatarManager,
 		repoManager: RepoManager,
-		logger: Logger
+		logger: Logger,
 	) {
 		super(extensionPath, dataSource, extensionState, avatarManager, repoManager, logger, null);
 		this.registerDisposables(
 			toDisposable(() => {
 				GitGraphPanelView.instance = undefined;
-			})
+			}),
 		);
 	}
 
@@ -84,13 +84,13 @@ export class GitGraphPanelView extends BaseGitGraphView implements vscode.Webvie
 	public resolveWebviewView(
 		webviewView: vscode.WebviewView,
 		context: vscode.WebviewViewResolveContext,
-		_token: vscode.CancellationToken
+		_token: vscode.CancellationToken,
 	) {
 		this._view = webviewView;
 
 		webviewView.webview.options = {
 			enableScripts: true,
-			localResourceRoots: [vscode.Uri.file(path.join(this.extensionPath, 'media'))]
+			localResourceRoots: [vscode.Uri.file(path.join(this.extensionPath, 'media'))],
 		};
 
 		// Only initialize once
@@ -107,7 +107,7 @@ export class GitGraphPanelView extends BaseGitGraphView implements vscode.Webvie
 				webviewView.onDidDispose(() => {
 					this._view = undefined;
 					this._isInitialized = false;
-				})
+				}),
 			);
 
 			// Initialize common functionality

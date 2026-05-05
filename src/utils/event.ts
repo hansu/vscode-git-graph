@@ -29,7 +29,7 @@ export class EventEmitter<T> implements vscode.Disposable {
 					if (removeListener > -1) {
 						this.listeners.splice(removeListener, 1);
 					}
-				}
+				},
 			};
 		};
 	}
@@ -49,7 +49,7 @@ export class EventEmitter<T> implements vscode.Disposable {
 		this.listeners.forEach((listener) => {
 			try {
 				listener(event);
-			} catch (_) { }
+			} catch (_) {}
 		});
 	}
 

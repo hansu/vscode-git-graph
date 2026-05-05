@@ -71,7 +71,7 @@ describe('Disposable', () => {
 		const disposable2 = {
 			dispose: jest.fn(() => {
 				throw new Error();
-			})
+			}),
 		};
 		const disposable3 = { dispose: jest.fn() };
 		disposableTest.registerDisposables(disposable1, disposable2, disposable3);
@@ -91,7 +91,7 @@ describe('Disposable', () => {
 describe('toDisposable', () => {
 	it('Should wrap a function with a disposable', () => {
 		// Setup
-		const fn = () => { };
+		const fn = () => {};
 
 		// Run
 		const result = toDisposable(fn);

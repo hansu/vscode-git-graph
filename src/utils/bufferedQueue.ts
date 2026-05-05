@@ -19,18 +19,24 @@ export class BufferedQueue<T> extends Disposable {
 	 * @param bufferDuration The number of milliseconds to buffer items in the queue.
 	 * @returns The BufferedQueue instance.
 	 */
-	constructor(onItem: (item: T) => Promise<boolean>, onChanges: () => void, bufferDuration: number = 1000) {
+	constructor(
+		onItem: (item: T) => Promise<boolean>,
+		onChanges: () => void,
+		bufferDuration: number = 1000,
+	) {
 		super();
 		this.bufferDuration = bufferDuration;
 		this.onItem = onItem;
 		this.onChanges = onChanges;
 
-		this.registerDisposable(toDisposable(() => {
-			if (this.timeout !== null) {
-				clearTimeout(this.timeout);
-				this.timeout = null;
-			}
-		}));
+		this.registerDisposable(
+			toDisposable(() => {
+				if (this.timeout !== null) {
+					clearTimeout(this.timeout);
+					this.timeout = null;
+				}
+			}),
+		);
 	}
 
 	/**
@@ -60,8 +66,9 @@ export class BufferedQueue<T> extends Disposable {
 	 */
 	private async run() {
 		this.processing = true;
-		let item, changes = false;
-		while (item = this.queue.shift()) {
+		let item,
+			changes = false;
+		while ((item = this.queue.shift())) {
 			if (await this.onItem(item)) {
 				changes = true;
 			}
