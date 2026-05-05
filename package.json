@@ -256,6 +256,10 @@
 									"type": "boolean",
 									"title": "%configuration.contextMenuActionsVisibility.commit.cherrypick%"
 								},
+								"editMessage": {
+									"type": "boolean",
+									"title": "%configuration.contextMenuActionsVisibility.commit.editMessage%"
+								},
 								"revert": {
 									"type": "boolean",
 									"title": "%configuration.contextMenuActionsVisibility.commit.revert%"
