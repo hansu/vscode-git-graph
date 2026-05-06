@@ -32,6 +32,54 @@ interface UnavailablePoint {
 
 type VertexOrNull = Vertex | null;
 
+function remapColumnSwap(x: number, a: number, b: number): number {
+	if (a === b) return x;
+	return x === a ? b : x === b ? a : x;
+}
+
+/**
+ * Move every point on column `from` to column `to`, shifting intermediate columns by one
+ * (no two-column swap). Preserves left-to-right order of all other tracks.
+ */
+function remapColumnMove(x: number, from: number, to: number): number {
+	if (from === to) return x;
+	if (from > to) {
+		if (x === from) return to;
+		if (x >= to && x < from) return x + 1;
+		return x;
+	}
+	if (x === from) return to;
+	if (x > from && x <= to) return x - 1;
+	return x;
+}
+
+function swapSparsePair<T>(arr: T[], a: number, b: number): void {
+	if (a === b) return;
+	const ca = arr[a];
+	const cb = arr[b];
+	if (typeof ca !== 'undefined') {
+		arr[b] = ca;
+	} else {
+		delete arr[b];
+	}
+	if (typeof cb !== 'undefined') {
+		arr[a] = cb;
+	} else {
+		delete arr[a];
+	}
+}
+
+function moveGraphColumnCoords(branches: Branch[], vertices: Vertex[], from: number, to: number): void {
+	if (from === to) return;
+	let i;
+	for (i = 0; i < branches.length; i++) {
+		branches[i].remapColumnCoordsInLines(from, to);
+	}
+	for (i = 0; i < vertices.length; i++) {
+		vertices[i].remapColumnCoordsInVertex(from, to);
+	}
+}
+
 
 /* Branch Class */
 
@@ -67,6 +115,28 @@ class Branch {
 
 	public setEnd(end: number) {
 		this.end = end;
+	}
+
+	public getMinX() {
+		let m = Infinity, i;
+		for (i = 0; i < this.lines.length; i++) {
+			m = Math.min(m, this.lines[i].p1.x, this.lines[i].p2.x);
+		}
+		return m;
+	}
+
+	/** Remap column indices on this branch's line segments (graph edges). */
+	public remapColumnCoordsInLines(from: number, to: number) {
+		if (from === to) return;
+		let i;
+		for (i = 0; i < this.lines.length; i++) {
+			const line = this.lines[i];
+			this.lines[i] = {
+				p1: { x: remapColumnMove(line.p1.x, from, to), y: line.p1.y },
+				p2: { x: remapColumnMove(line.p2.x, from, to), y: line.p2.y },
+				lockedFirst: line.lockedFirst
+			};
+		}
 	}
 
 
@@ -273,6 +343,37 @@ class Vertex {
 		}
 	}
 
+	/** Remap column index for the commit dot and merge-connection slots on this row. */
+	public remapColumnCoordsInVertex(from: number, to: number) {
+		if (from === to) return;
+		this.x = remapColumnMove(this.x, from, to);
+		const old = this.connections;
+		const next: UnavailablePoint[] = [];
+		let i;
+		for (i = 0; i < old.length; i++) {
+			if (old[i]) {
+				next[remapColumnMove(i, from, to)] = old[i];
+			}
+		}
+		this.connections = next;
+		this.recomputeNextX();
+	}
+
+	private recomputeNextX() {
+		let maxX = this.x, i;
+		for (i = 0; i < this.connections.length; i++) {
+			if (this.connections[i]) maxX = Math.max(maxX, i);
+		}
+		this.nextX = maxX + 1;
+	}
+
+	public swapColumnCoords(a: number, b: number) {
+		if (a === b) return;
+		this.x = remapColumnSwap(this.x, a, b);
+		swapSparsePair(this.connections, a, b);
+		this.recomputeNextX();
+	}
+
 
 	/* Get / Set State */
 
@@ -437,6 +538,45 @@ class Graph {
 				i++;
 			}
 		}
+
+		this.alignHeadBranchLeft();
+	}
+
+	private getGlobalMinX() {
+		let m = Infinity, i;
+		for (i = 0; i < this.branches.length; i++) {
+			m = Math.min(m, this.branches[i].getMinX());
+		}
+		for (i = 0; i < this.vertices.length; i++) {
+			if (!this.vertices[i].isNotOnBranch()) {
+				m = Math.min(m, this.vertices[i].getPoint().x);
+			}
+		}
+		return m;
+	}
+
+	/**
+	 * When headOnLeft is enabled, move the HEAD commit's column to the global leftmost column index,
+	 * shifting other columns right by one as needed (preserves their relative order; no two-column swap).
+	 * Uses the HEAD commit's column (dot position), not the minimum x over the whole branch: merge connectors
+	 * often use a smaller x than the checked-out commit row, which would otherwise skip the move incorrectly.
+	 */
+	private alignHeadBranchLeft() {
+		if (!this.config.headOnLeft || this.commitHead === null) return;
+		const headIdx = this.commitLookup[this.commitHead];
+		if (typeof headIdx !== 'number') return;
+		const headVertex = this.vertices[headIdx];
+		const headBranch = headVertex.getBranch();
+		if (headBranch === null) return;
+
+		const headColumn = headVertex.getPoint().x;
+		const globalMinX = this.getGlobalMinX();
+
+		if (globalMinX === Infinity || headColumn === globalMinX) {
+			return;
+		}
+
+		moveGraphColumnCoords(this.branches, this.vertices, headColumn, globalMinX);
 	}
 
 	public render(expandedCommit: ExpandedCommit | null) {
