@@ -90,18 +90,19 @@ export async function activate(context: vscode.ExtensionContext) {
 				getGitExecutableFromPaths(paths).then(
 					(gitExecutable) => {
 						gitExecutableEmitter.emit(gitExecutable);
-						const msg = 'Git Graph is now using ' + gitExecutable.path + ' (version: ' + gitExecutable.version + ')';
+						const msg = vscode.l10n.t('ui.gitGraphNowUsing', {
+							path: gitExecutable.path,
+							version: gitExecutable.version
+						});
 						showInformationMessage(msg);
 						logger.log(msg);
 						repoManager.searchWorkspaceForRepos();
 					},
 					() => {
-						const msg =
-							'The new value of "git.path" ("' +
-							paths.join('", "') +
-							'") does not ' +
-							(paths.length > 1 ? 'contain a string that matches' : 'match') +
-							' the path and filename of a valid Git executable.';
+						const msg = vscode.l10n.t('ui.gitPathNewValue', {
+							paths: paths.join('", "'),
+							plural: paths.length > 1
+						});
 						showErrorMessage(msg);
 						logger.logError(msg);
 					}

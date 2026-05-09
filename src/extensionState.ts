@@ -346,7 +346,11 @@ export class ExtensionState extends Disposable {
 	public startCodeReview(repo: string, id: string, files: string[], lastViewedFile: string | null) {
 		let reviews = this.getCodeReviews();
 		if (typeof reviews[repo] === 'undefined') reviews[repo] = {};
-		reviews[repo][id] = { lastActive: new Date().getTime(), lastViewedFile: lastViewedFile, remainingFiles: files };
+		reviews[repo][id] = {
+			lastActive: new Date().getTime(),
+			lastViewedFile: lastViewedFile,
+			remainingFiles: files
+		};
 		return this.setCodeReviews(reviews).then((err) => ({
 			codeReview: <CodeReview>Object.assign({ id: id }, reviews[repo][id]),
 			error: err
@@ -393,7 +397,7 @@ export class ExtensionState extends Disposable {
 		const reviews = this.getCodeReviews();
 
 		if (typeof reviews[repo] === 'undefined' || typeof reviews[repo][id] === 'undefined') {
-			return Promise.resolve('The Code Review could not be found.');
+			return Promise.resolve(vscode.l10n.t('ui.codeReviewNotFound'));
 		}
 
 		if (remainingFiles.length > 0) {
@@ -462,7 +466,7 @@ export class ExtensionState extends Disposable {
 	private updateGlobalState(key: string, value: any): Thenable<ErrorInfo> {
 		return this.globalState.update(key, value).then(
 			() => null,
-			() => 'Visual Studio Code was unable to save the Git Graph Global State Memento.'
+			() => vscode.l10n.t('ui.cannotSaveGlobalState')
 		);
 	}
 
@@ -475,7 +479,7 @@ export class ExtensionState extends Disposable {
 	private updateWorkspaceState(key: string, value: any): Thenable<ErrorInfo> {
 		return this.workspaceState.update(key, value).then(
 			() => null,
-			() => 'Visual Studio Code was unable to save the Git Graph Workspace State Memento.'
+			() => vscode.l10n.t('ui.cannotSaveWorkspaceState')
 		);
 	}
 }

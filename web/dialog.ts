@@ -110,7 +110,7 @@ class Dialog {
 			DialogType.Form,
 			message,
 			actionName,
-			'Cancel',
+			getText('cancel'),
 			() => {
 				this.close();
 				actioned();
@@ -249,7 +249,15 @@ class Dialog {
 	) {
 		this.showForm(
 			message,
-			[{ type: DialogInputType.Select, name: '', options: options, defaults: defaultValues, multiple: true }],
+			[
+				{
+					type: DialogInputType.Select,
+					name: '',
+					options: options,
+					defaults: defaultValues,
+					multiple: true
+				}
+			],
 			actionName,
 			(values) => actioned(<string[]>values[0]),
 			target
@@ -273,7 +281,7 @@ class Dialog {
 		actionName: string,
 		actioned: (values: DialogInputValue[]) => void,
 		target: DialogTarget | null,
-		secondaryActionName: string = 'Cancel',
+		secondaryActionName: string = getText('ui.cancel'),
 		secondaryActioned: ((values: DialogInputValue[]) => void) | null = null,
 		includeLineBreak: boolean = true
 	) {
@@ -451,7 +459,7 @@ class Dialog {
 				alterClass(this.elem, CLASS_DIALOG_NO_INPUT, noInput);
 				if (alterClass(this.elem, CLASS_DIALOG_INPUT_INVALID, !noInput && invalidInput)) {
 					dialogAction.title = invalidInput
-						? 'Unable to ' + actionName + ', one or more invalid characters entered.'
+						? getText('ui.cannot') + actionName + getText('ui.invalidCharactersEntered')
 						: '';
 				}
 			});
@@ -468,7 +476,7 @@ class Dialog {
 	 * @param html The HTML to display in the dialog.
 	 */
 	public showMessage(html: string) {
-		this.show(DialogType.Message, html, null, 'Close', null, null, null);
+		this.show(DialogType.Message, html, null, getText('close'), null, null, null);
 	}
 
 	/**
@@ -483,14 +491,15 @@ class Dialog {
 			DialogType.Message,
 			'<span class="dialogAlert">' +
 				SVG_ICONS.alert +
-				'Error: ' +
+				getText('error') +
+				': ' +
 				message +
 				'</span>' +
 				(reason !== null
 					? '<br><span class="messageContent errorContent">' + escapeHtml(reason).split('\n').join('<br>') + '</span>'
 					: ''),
 			actionName,
-			'Dismiss',
+			getText('close'),
 			() => {
 				this.close();
 				if (actioned !== null) actioned();
@@ -507,9 +516,9 @@ class Dialog {
 	public showActionRunning(action: string) {
 		this.show(
 			DialogType.ActionRunning,
-			'<span class="actionRunning">' + SVG_ICONS.loading + action + ' ...</span>',
+			'<span class="actionRunning">' + SVG_ICONS.loading + action + getText('ui.dialogEllipsisRunning') + '</span>',
 			null,
-			'Dismiss',
+			getText('close'),
 			null,
 			null,
 			null
@@ -937,7 +946,7 @@ class CustomSelect {
 		const value =
 			formatCommaSeparatedList(
 				this.data.options.filter((_, index) => this.selected[index]).map((option) => option.name)
-			) || 'None';
+			) || getText('none');
 		this.currentElem.title = value;
 		this.currentElem.innerHTML = escapeHtml(value);
 	}

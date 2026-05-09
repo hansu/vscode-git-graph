@@ -154,7 +154,14 @@ class Config {
 				unselectInBranchesDropdown: true,
 				copyName: true
 			},
-			stash: { apply: true, createBranch: true, pop: true, drop: true, copyName: true, copyHash: true },
+			stash: {
+				apply: true,
+				createBranch: true,
+				pop: true,
+				drop: true,
+				copyName: true,
+				copyHash: true
+			},
 			tag: { viewDetails: true, delete: true, push: true, createArchive: true, copyName: true },
 			uncommittedChanges: { stash: true, reset: true, clean: true, openSourceControlView: true }
 		};
@@ -740,6 +747,13 @@ class Config {
 	get viewLocation(): 'editor' | 'panel' | 'both' {
 		const value = this.config.get<string>('viewLocation', 'editor');
 		return value === 'panel' || value === 'both' ? value : 'editor';
+	}
+
+	/**
+	 * Get the value of the `git-graph.language` Extension Setting.
+	 */
+	get language() {
+		return this.config.get<string>('language', '');
 	}
 
 	/**

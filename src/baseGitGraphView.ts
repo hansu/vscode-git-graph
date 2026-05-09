@@ -38,6 +38,8 @@ import {
 	viewFileAtRevision,
 	viewScm
 } from './utils';
+import { createWebviewNlsTranslator } from './utils/nlsWebview';
+import { mergeWebviewExtraNls, mergeWebviewUserPromptNls } from './utils/webviewExtraNls';
 import { Disposable, toDisposable } from './utils/disposable';
 
 /**
@@ -714,7 +716,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				break;
 			case 'rescanForRepos':
 				if (!(await this.repoManager.searchWorkspaceForRepos())) {
-					showErrorMessage('No Git repositories were found in the current workspace.');
+					showErrorMessage(vscode.l10n.t('ui.noGitRepositoriesFound'));
 				}
 				break;
 			case 'resetFileToRevision':
@@ -851,6 +853,229 @@ export abstract class BaseGitGraphView extends Disposable {
 	protected getHtmlForWebview() {
 		const config = getConfig(),
 			nonce = getNonce();
+		// Create NLS translator for webview strings
+		const wt = createWebviewNlsTranslator(this.extensionPath, config.language);
+		// Build i18n object with extra NLS keys and user prompt keys
+		// Use uppercase keys for compatibility with webview getText function
+		const i18n = {
+			GIT_FILE_CHANGE_TYPES: {
+				A: wt('git.fileChangeTypes.added'),
+				M: wt('git.fileChangeTypes.modified'),
+				D: wt('git.fileChangeTypes.deleted'),
+				R: wt('git.fileChangeTypes.renamed'),
+				U: wt('git.fileChangeTypes.untracked')
+			},
+			GIT_SIGNATURE_STATUS_DESCRIPTIONS: {
+				G: wt('git.signatureStatusDescriptions.valid'),
+				U: wt('git.signatureStatusDescriptions.unknown'),
+				X: wt('git.signatureStatusDescriptions.expired'),
+				Y: wt('git.signatureStatusDescriptions.expiredKey'),
+				R: wt('git.signatureStatusDescriptions.revokedKey'),
+				E: wt('git.signatureStatusDescriptions.unchecked'),
+				B: wt('git.signatureStatusDescriptions.bad')
+			},
+			UNCOMMITTED_CHANGES: wt('ui.uncommittedChanges'),
+			SHOW_ALL_BRANCHES: wt('ui.showAllBranches'),
+			LOADING: wt('ui.loading'),
+			REFRESHING: wt('ui.refreshing'),
+			NO_COMMITS: wt('ui.noCommits'),
+			NO_REPOSITORIES: wt('ui.noRepositories'),
+			RESCAN_FOR_REPOS: wt('ui.rescanForRepos'),
+			UNABLE_TO_LOAD: wt('ui.unableToLoad'),
+			UNABLE_TO_FIND_GIT: wt('ui.unableToFindGit'),
+			REPOSITORY_SETTINGS: wt('ui.repositorySettings'),
+			GENERAL: wt('ui.general'),
+			EDIT_NAME: wt('ui.editName'),
+			DELETE_NAME: wt('ui.deleteName'),
+			EDIT_INITIAL_BRANCHES: wt('ui.editInitialBranches'),
+			CLEAR_INITIAL_BRANCHES: wt('ui.clearInitialBranches'),
+			SHOW_STASHES: wt('ui.showStashes'),
+			SHOW_TAGS: wt('ui.showTags'),
+			INCLUDE_COMMITS_MENTIONED_BY_REFLOGS: wt('ui.includeCommitsMentionedByReflogs'),
+			ONLY_FOLLOW_FIRST_PARENT: wt('ui.onlyFollowFirstParent'),
+			USER_DETAILS: wt('ui.userDetails'),
+			USER_NAME: wt('ui.userName'),
+			USER_EMAIL: wt('ui.userEmail'),
+			EDIT: wt('ui.edit'),
+			REMOVE: wt('ui.remove'),
+			ADD_USER_DETAILS: wt('ui.addUserDetails'),
+			REMOTE_CONFIGURATION: wt('ui.remoteConfiguration'),
+			REMOTE: wt('ui.remote'),
+			URL: wt('ui.url'),
+			TYPE: wt('ui.type'),
+			ACTIONS: wt('ui.actions'),
+			CLICK_TO_SHOW_BRANCHES: wt('ui.clickToShowBranches'),
+			CLICK_TO_HIDE_BRANCHES: wt('ui.clickToHideBranches'),
+			FETCH_URL: wt('ui.fetchUrl'),
+			FETCH: wt('ui.fetch'),
+			FETCH_FROM_REMOTE: wt('ui.fetchFromRemote'),
+			PRUNE_REMOTE: wt('ui.pruneRemote'),
+			EDIT_REMOTE: wt('ui.editRemote'),
+			DELETE_REMOTE: wt('ui.deleteRemote'),
+			PUSH_URL: wt('ui.pushUrl'),
+			PUSH: wt('ui.push'),
+			NO_REMOTES_CONFIGURED: wt('ui.noRemotesConfigured'),
+			ADD_REMOTE: wt('ui.addRemote'),
+			ISSUE_LINKING: wt('ui.issueLinking'),
+			ISSUE_REGEX: wt('ui.issueRegex'),
+			ISSUE_URL: wt('ui.issueUrl'),
+			ADD_ISSUE_LINKING: wt('ui.addIssueLinking'),
+			PULL_REQUEST_CREATION: wt('ui.pullRequestCreation'),
+			PROVIDER: wt('ui.provider'),
+			SOURCE_REPOSITORY: wt('ui.sourceRepository'),
+			DESTINATION_REPOSITORY: wt('ui.destinationRepository'),
+			DESTINATION_BRANCH: wt('ui.destinationBranch'),
+			CONFIGURE_PULL_REQUEST_INTEGRATION: wt('ui.configurePullRequestIntegration'),
+			GIT_GRAPH_CONFIGURATION: wt('ui.gitGraphConfiguration'),
+			OPEN_GIT_GRAPH_EXTENSION_SETTINGS: wt('ui.openGitGraphExtensionSettings'),
+			EXPORT_REPOSITORY_CONFIG: wt('ui.exportRepositoryConfig'),
+			REPOS: wt('ui.repos'),
+			BRANCHES: wt('ui.branches'),
+			AUTHORS: wt('ui.authors'),
+			FETCH_AND_PRUNE: wt('ui.fetchAndPrune'),
+			FROM_REMOTES: wt('ui.fromRemotes'),
+			OPENING_TERMINAL: wt('ui.openingTerminal'),
+			UNABLE_TO_LOAD_REPO_INFO: wt('ui.unableToLoadRepoInfo'),
+			UNABLE_TO_LOAD_COMMITS: wt('ui.unableToLoadCommits'),
+			RETRY: wt('ui.retry'),
+			HEAD: wt('ui.head'),
+			CONFIGURE_INITIAL_BRANCHES: wt('ui.configureInitialBranches'),
+			CONFIGURE_INITIAL_BRANCHES_DESCRIPTION: wt('ui.configureInitialBranchesDescription'),
+			CONFIGURE_INITIAL_BRANCHES_NOTE: wt('ui.configureInitialBranchesNote'),
+			USE_GLOBALLY: wt('ui.useGlobally'),
+			USE_GLOBALLY_DESCRIPTION: wt('ui.useGloballyDescription'),
+			PRUNE_TAGS: wt('ui.pruneTags'),
+			PRUNE_TAGS_DESCRIPTION: wt('ui.pruneTagsDescription'),
+			CANNOT_CONFIGURE_PULL_REQUEST_INTEGRATION: wt('ui.cannotConfigurePullRequestIntegration'),
+			CANNOT_CONFIGURE_PULL_REQUEST_INTEGRATION_DESCRIPTION: wt('ui.cannotConfigurePullRequestIntegrationDescription'),
+			CONFIRM_REMOVE_PULL_REQUEST_INTEGRATION: wt('ui.confirmRemovePullRequestIntegration'),
+			YES_REMOVE: wt('ui.yesRemove'),
+			ISSUE_URL_DESCRIPTION: wt('ui.issueUrlDescription'),
+			USE_GLOBALLY_ISSUE_LINKING: wt('ui.useGloballyIssueLinking'),
+			USE_GLOBALLY_ISSUE_LINKING_DESCRIPTION: wt('ui.useGloballyIssueLinkingDescription'),
+			CONFIGURE_PULL_REQUEST_CREATION_STEP1: wt('ui.configurePullRequestCreationStep1'),
+			CONFIGURE_PULL_REQUEST_CREATION_STEP2: wt('ui.configurePullRequestCreationStep2'),
+			SAVE_CONFIGURATION: wt('ui.saveConfiguration'),
+			FIND_PLACEHOLDER: wt('ui.findPlaceholder'),
+			FIND_CASE_SENSITIVE: wt('ui.findCaseSensitive'),
+			FIND_REGEX: wt('ui.findRegex'),
+			FIND_PREVIOUS_MATCH: wt('ui.findPreviousMatch'),
+			FIND_NEXT_MATCH: wt('ui.findNextMatch'),
+			FIND_OPEN_COMMIT_DETAILS_VIEW: wt('ui.findOpenCommitDetailsView'),
+			FIND_CLOSE: wt('ui.findClose'),
+			cancel: wt('ui.cancel'),
+			close: wt('ui.close'),
+			error: wt('ui.error'),
+			filter: wt('ui.filter'),
+			noResults: wt('ui.noResults'),
+			none: wt('ui.none'),
+			noZeroLengthMatch: wt('ui.noZeroLengthMatch'),
+			loading: wt('ui.loading'),
+			name: wt('ui.name'),
+			fileSystemDefaultName: wt('ui.fileSystemDefaultName'),
+			initialBranches: wt('ui.initialBranches'),
+			local: wt('ui.local'),
+			global: wt('ui.global'),
+			onlyApplicableWhenShowingAllBranches: wt('ui.onlyApplicableWhenShowingAllBranches'),
+			whenDiscoveringCommitsToLoadDoNotFollowAllParentCommitsOnlyFollowTheFirstParentCommit: wt(
+				'ui.whenDiscoveringCommitsToLoadDoNotFollowAllParentCommitsOnlyFollowTheFirstParentCommit'
+			),
+			userDetailsAreUsedByGitToRecordTheAuthorAndCommitterOfCommitObjects: wt(
+				'ui.userDetailsAreUsedByGitToRecordTheAuthorAndCommitterOfCommitObjects'
+			),
+			notSet: wt('ui.notSet'),
+			issueLinkingConvertsIssueNumbersInCommitAndTagMessagesToHyperlinksThatOpenTheIssueInYourIssueTrackingSystemIfABranchNameContainsAnIssueNumberYouCanViewTheIssueViaTheBranchSContextMenu:
+				wt(
+					'ui.issueLinkingConvertsIssueNumbersInCommitAndTagMessagesToHyperlinksThatOpenTheIssueInYourIssueTrackingSystemIfABranchNameContainsAnIssueNumberYouCanViewTheIssueViaTheBranchSContextMenu'
+				),
+			pullRequestCreationAutomatesTheOpeningAndPreFillingOfPullRequestFormsDirectlyFromTheBranchSContextMenu: wt(
+				'ui.pullRequestCreationAutomatesTheOpeningAndPreFillingOfPullRequestFormsDirectlyFromTheBranchSContextMenu'
+			),
+			specifyANameForThisRepository: wt('ui.specifyANameForThisRepository'),
+			saveName: wt('ui.saveName'),
+			areYouSureYouWantToDeleteTheManuallyConfiguredNameForThisRepository: wt(
+				'ui.areYouSureYouWantToDeleteTheManuallyConfiguredNameForThisRepository'
+			),
+			andUseTheFileSystemsDefaultName: wt('ui.andUseTheFileSystemsDefaultName'),
+			yesDelete: wt('ui.yesDelete'),
+			checkedOutBranch: wt('ui.checkedOutBranch'),
+			specificBranches: wt('ui.specificBranches'),
+			saveConfiguration: wt('ui.saveConfiguration'),
+			areYouSureYouWantToClearTheBranchesInitiallyShownWhenLoadingThisRepositoryInTheGitGraphView: wt(
+				'ui.areYouSureYouWantToClearTheBranchesInitiallyShownWhenLoadingThisRepositoryInTheGitGraphView'
+			),
+			yesClear: wt('ui.yesClear'),
+			setTheUsernameAndEmailThatGitUsesToRecordTheAuthorAndCommitterOfCommitObjects: wt(
+				'ui.setTheUsernameAndEmailThatGitUsesToRecordTheAuthorAndCommitterOfCommitObjects'
+			),
+			setUserDetails: wt('ui.setUserDetails'),
+			areYouSureYouWantToRemoveThe: wt('ui.areYouSureYouWantToRemoveThe'),
+			configurationThatGitUsesToRecordTheAuthorAndCommitterOfCommits: wt(
+				'ui.configurationThatGitUsesToRecordTheAuthorAndCommitterOfCommits'
+			),
+			removeUserDetails: wt('ui.removeUserDetails'),
+			leaveBlankToUseFetchUrl: wt('ui.leaveBlankToUseFetchUrl'),
+			addARemoteRepositoryToThisRepository: wt('ui.addARemoteRepositoryToThisRepository'),
+			fetchUrl: wt('ui.fetchUrl'),
+			pushUrl: wt('ui.pushUrl'),
+			fetchImmediately: wt('ui.fetchImmediately'),
+			addingRemote: wt('ui.addingRemote'),
+			editRemoteRepository: wt('ui.editRemoteRepository'),
+			saveChanges: wt('ui.saveChanges'),
+			savingRemoteChanges: wt('ui.savingRemoteChanges'),
+			areYouSureYouWantToDeleteTheRemoteRepository: wt('ui.areYouSureYouWantToDeleteTheRemoteRepository'),
+			deletingRemote: wt('ui.deletingRemote'),
+			areYouSureYouWantToFetchFromTheRemoteRepository: wt('ui.areYouSureYouWantToFetchFromTheRemoteRepository'),
+			prune: wt('ui.prune'),
+			beforeFetchDeleteRemoteTrackingReferencesThatNoLongerExistOnTheRemote: wt(
+				'ui.beforeFetchDeleteRemoteTrackingReferencesThatNoLongerExistOnTheRemote'
+			),
+			yesFetch: wt('ui.yesFetch'),
+			fetchingFromRemote: wt('ui.fetchingFromRemote'),
+			areYouSureYouWantToPruneRemoteTrackingReferencesThatNoLongerExistOnTheRemoteRepository: wt(
+				'ui.areYouSureYouWantToPruneRemoteTrackingReferencesThatNoLongerExistOnTheRemoteRepository'
+			),
+			yesPrune: wt('ui.yesPrune'),
+			pruningRemote: wt('ui.pruningRemote'),
+			clickTo: wt('ui.clickTo'),
+			show: wt('ui.show'),
+			hide: wt('ui.hide'),
+			theBranchesForThisRemoteRepository: wt('ui.theBranchesForThisRemoteRepository'),
+			areYouSureYouWantToRemove: wt('ui.areYouSureYouWantToRemove'),
+			theLocallyConfiguredInThisRepository: wt('ui.theLocallyConfiguredInThisRepository'),
+			issueLinking: wt('ui.issueLinking'),
+			theGloballyConfiguredIssueLinkingInGitGraph: wt('ui.theGloballyConfiguredIssueLinkingInGitGraph'),
+			exportingGitGraphRepositoryConfigurationWillGenerateAFileThatCanBeCommittedToThisRepositorySoThatOtherCollaboratorsCanUseTheSameConfiguration:
+				wt(
+					'ui.exportingGitGraphRepositoryConfigurationWillGenerateAFileThatCanBeCommittedToThisRepositorySoThatOtherCollaboratorsCanUseTheSameConfiguration'
+				),
+			import: wt('ui.import'),
+			importRepositoryConfiguration: wt('ui.importRepositoryConfiguration'),
+			importing: wt('ui.importing'),
+			successfullyImported: wt('ui.successfullyImported'),
+			successfullyImportedDescription: wt('ui.successfullyImportedDescription'),
+			ok: wt('ui.ok'),
+			unableToImport: wt('ui.unableToImport'),
+			unableToImportDescription: wt('ui.unableToImportDescription'),
+			errors: wt('ui.errors'),
+			viewError: wt('ui.viewError'),
+			viewErrors: wt('ui.viewErrors'),
+			paths: wt('ui.paths'),
+			simplify: wt('ui.simplify'),
+			current: wt('ui.current'),
+			find: wt('ui.find'),
+			openTerminal: wt('ui.openTerminal'),
+			repo: wt('ui.repo'),
+			remotes: wt('ui.remotes'),
+			selectPathByContextMenu: wt('ui.selectPathByContextMenu'),
+			showRemoteBranches: wt('ui.showRemoteBranches'),
+			simplifyByDecoration: wt('ui.simplifyByDecoration'),
+			unableToLoadGitGraph: wt('ui.unableToLoadGitGraph'),
+			noGitRepositoriesFound: wt('ui.noGitRepositoriesFound'),
+			maxDepthOfRepoSearchHelp: wt('ui.maxDepthOfRepoSearchHelp'),
+			...mergeWebviewExtraNls(wt),
+			...mergeWebviewUserPromptNls(wt)
+		};
 		const initialState: GitGraphViewInitialState = {
 			config: {
 				commitDetailsView: config.commitDetailsView,
@@ -871,6 +1096,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				includeCommitsMentionedByReflogs: config.includeCommitsMentionedByReflogs,
 				initialLoadCommits: config.initialLoadCommits,
 				keybindings: config.keybindings,
+				language: config.language,
 				loadMoreCommits: config.loadMoreCommits,
 				loadMoreCommitsAutomatically: config.loadMoreCommitsAutomatically,
 				markdown: config.markdown,
@@ -887,6 +1113,7 @@ export abstract class BaseGitGraphView extends Disposable {
 				showTags: config.showTags,
 				toolbarButtonVisibility: config.toolbarButtonVisibility
 			},
+			i18n: i18n as any,
 			lastActiveRepo: this.extensionState.getLastActiveRepo(),
 			loadViewTo: this.loadViewTo,
 			repos: this.repoManager.getRepos(),
@@ -924,16 +1151,16 @@ export abstract class BaseGitGraphView extends Disposable {
 			body = `<body>
 			<div id="view" tabindex="-1">
 				<div id="controls"${stickyClassAttr}>
-					<span id="repoControl"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
-					<span id="branchControl"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
-					<span id="pathFilterControl" title="Select path by context menu in file explorer"><span class="unselectable">Paths: </span><div id="pathFilterDropdown" class="dropdown"></div></span>
-					<span id="authorControl"><span class="unselectable">Authors: </span><div id="authorDropdown" class="dropdown"></div></span>
-					<label ${hideRemotes} id="showRemoteBranchesControl" title="Show Remote Branches"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Remotes</label>
-					<label ${hideSimplify} id="simplifyByDecorationControl" title="Simplify By Decoration"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>Simplify</label>
-					<div id="currentBtn" title="Current"></div>
-					<div id="findBtn" title="Find"></div>
-					<div id="terminalBtn" title="Open a Terminal for this Repository"></div>
-					<div id="settingsBtn" title="Repository Settings"></div>
+					<span id="repoControl"><span class="unselectable">${wt('ui.repo')}: </span><div id="repoDropdown" class="dropdown"></div></span>
+					<span id="branchControl"><span class="unselectable">${wt('ui.branches')}: </span><div id="branchDropdown" class="dropdown"></div></span>
+					<span id="pathFilterControl" title="${wt('ui.selectPathByContextMenu')}"><span class="unselectable">${wt('ui.paths')}: </span><div id="pathFilterDropdown" class="dropdown"></div></span>
+					<span id="authorControl"><span class="unselectable">${wt('ui.authors')}: </span><div id="authorDropdown" class="dropdown"></div></span>
+					<label ${hideRemotes} id="showRemoteBranchesControl" title="${wt('ui.showRemoteBranches')}"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>${wt('ui.remotes')}</label>
+					<label ${hideSimplify} id="simplifyByDecorationControl" title="${wt('ui.simplifyByDecoration')}"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>${wt('ui.simplify')}</label>
+					<div id="currentBtn" title="${wt('ui.current')}"></div>
+					<div id="findBtn" title="${wt('ui.find')}"></div>
+					<div id="terminalBtn" title="${wt('ui.openTerminal')}"></div>
+					<div id="settingsBtn" title="${wt('ui.repositorySettings')}"></div>
 					<div id="fetchBtn"></div>
 					<div id="refreshBtn"></div>
 				</div>
@@ -948,10 +1175,10 @@ export abstract class BaseGitGraphView extends Disposable {
 			</body>`;
 		} else {
 			body = `<body class="unableToLoad">
-			<h2>Unable to load Git Graph</h2>
-			<p class="unableToLoadMessage">No Git repositories were found in the current workspace when it was last scanned by Git Graph.</p>
-			<p>If your repositories are in subfolders of the open workspace folder(s), make sure you have set the Git Graph Setting "git-graph.maxDepthOfRepoSearch" appropriately (read the <a href="https://github.com/hansu/vscode-git-graph/wiki/Extension-Settings#max-depth-of-repo-search" target="_blank">documentation</a> for more information).</p>
-			<p><div id="rescanForReposBtn" class="roundedBtn">Re-scan the current workspace for repositories</div></p>
+			<h2>${wt('ui.unableToLoadGitGraph')}</h2>
+			<p class="unableToLoadMessage">${wt('ui.noGitRepositoriesFound')}</p>
+			<p>${wt('ui.maxDepthOfRepoSearchHelp')}</p>
+			<p><div id="rescanForReposBtn" class="roundedBtn">${wt('ui.rescanForRepos')}</div></p>
 			<script nonce="${nonce}">(function(){ var api = acquireVsCodeApi(); document.getElementById('rescanForReposBtn').addEventListener('click', function(){ api.postMessage({command: 'rescanForRepos'}); }); })();</script>
 			</body>`;
 		}

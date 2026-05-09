@@ -236,7 +236,14 @@ class TextFormatter {
 		config: TF.Config
 	) {
 		this.config = Object.assign(
-			{ commits: false, emoji: false, issueLinking: false, markdown: false, multiline: false, urls: false },
+			{
+				commits: false,
+				emoji: false,
+				issueLinking: false,
+				markdown: false,
+				multiline: false,
+				urls: false
+			},
 			config
 		);
 		this.commits = commits;

@@ -68,7 +68,9 @@ export const enum GitConfigKey {
 	UserName = 'user.name'
 }
 
-const GPG_STATUS_CODE_PARSING_DETAILS: Readonly<{ [statusCode: string]: GpgStatusCodeParsingDetails }> = {
+const GPG_STATUS_CODE_PARSING_DETAILS: Readonly<{
+	[statusCode: string]: GpgStatusCodeParsingDetails;
+}> = {
 	GOODSIG: { status: GitSignatureStatus.GoodAndValid, uid: true },
 	BADSIG: { status: GitSignatureStatus.Bad, uid: true },
 	ERRSIG: { status: GitSignatureStatus.CannotBeChecked, uid: false },
@@ -397,7 +399,7 @@ export class DataSource extends Disposable {
 									author: '*',
 									email: '',
 									date: Math.round(new Date().getTime() / 1000),
-									message: 'Uncommitted Changes (' + numUncommittedChanges + ')'
+									message: vscode.l10n.t('ui.uncommittedChanges', { count: numUncommittedChanges })
 								});
 							}
 							break;
@@ -489,7 +491,6 @@ export class DataSource extends Disposable {
 						});
 					}
 				}
-
 				/* Annotate orphaned refs to nearest ancestor (path filter only) */
 				if (pathFilterActive) {
 					const orphanedByHash = new Map<
@@ -546,7 +547,6 @@ export class DataSource extends Disposable {
 						}
 					}
 				}
-
 				return {
 					commits: commitNodes,
 					head: refData.head,
@@ -678,7 +678,7 @@ export class DataSource extends Disposable {
 					return {};
 				}
 			} else {
-				errorMessage = 'An unexpected error occurred while spawning the Git child process.';
+				errorMessage = vscode.l10n.t('ui.errorStartingGitProcess');
 			}
 			throw errorMessage;
 		})) as Promise<ActionedUser[]>;
@@ -1197,7 +1197,7 @@ export class DataSource extends Disposable {
 					constructIncompatibleGitVersionMessage(
 						this.gitExecutable,
 						GitVersionRequirement.FetchAndPruneTags,
-						'pruning tags when fetching'
+						vscode.l10n.t('ui.pruneTagsWhenFetching')
 					)
 				);
 			}
@@ -1253,7 +1253,7 @@ export class DataSource extends Disposable {
 		noVerify: boolean
 	): Promise<ErrorInfo[]> {
 		if (remotes.length === 0) {
-			return ['No remote(s) were specified to push the branch ' + branchName + ' to.'];
+			return [vscode.l10n.t('ui.noRemoteToPushBranch', { branch: branchName })];
 		}
 
 		const results: ErrorInfo[] = [];
@@ -1282,7 +1282,7 @@ export class DataSource extends Disposable {
 		skipRemoteCheck: boolean
 	): Promise<ErrorInfo[]> {
 		if (remotes.length === 0) {
-			return ['No remote(s) were specified to push the tag ' + tagName + ' to.'];
+			return [vscode.l10n.t('ui.noRemoteToPushTag', { tag: tagName })];
 		}
 
 		if (!skipRemoteCheck) {
@@ -1373,12 +1373,7 @@ export class DataSource extends Disposable {
 			let trackingBranchStatus = await this.runGitCommand(['branch', '-d', '-r', remote + '/' + branchName], repo);
 			return trackingBranchStatus === null
 				? null
-				: 'Branch does not exist on the remote, deleting the remote tracking branch ' +
-						remote +
-						'/' +
-						branchName +
-						'.\n' +
-						trackingBranchStatus;
+				: vscode.l10n.t('ui.branchNotOnRemote', { remote, branch: branchName }) + '\n' + trackingBranchStatus;
 		}
 		return remoteStatus;
 	}
@@ -1554,7 +1549,9 @@ export class DataSource extends Disposable {
 					(signoff ? '--signoff ' : '') +
 					(getConfig().signCommits ? '-S ' : '') +
 					(actionOn === RebaseActionOn.Branch ? obj.replace(/'/g, '"\'"') : obj),
-				'Rebase on "' + (actionOn === RebaseActionOn.Branch ? obj : abbrevCommit(obj)) + '"'
+				vscode.l10n.t('ui.rebasingOn', {
+					target: actionOn === RebaseActionOn.Branch ? obj : abbrevCommit(obj)
+				})
 			);
 		} else {
 			const args = ['rebase', obj];
@@ -1756,7 +1753,7 @@ export class DataSource extends Disposable {
 	 */
 	public async dropCommits(repo: string, commits: ReadonlyArray<string>): Promise<ErrorInfo> {
 		if (commits.length === 0) {
-			return 'No commits selected for dropping.';
+			return vscode.l10n.t('ui.noCommitsSelectedToDrop');
 		}
 
 		if (commits.length === 1) {
@@ -1791,7 +1788,7 @@ export class DataSource extends Disposable {
 		noVerify: boolean
 	): Promise<ErrorInfo> {
 		if (commits.length < 2) {
-			return 'At least 2 commits are required for squashing.';
+			return vscode.l10n.t('ui.needAtLeastTwoCommitsToSquash');
 		}
 
 		const oldestCommit = commits[commits.length - 1];
@@ -2093,7 +2090,7 @@ export class DataSource extends Disposable {
 						}
 					});
 				} else {
-					openGitTerminal(repo, this.gitExecutable.path, args.join(' '), 'Open External Directory Diff');
+					openGitTerminal(repo, this.gitExecutable.path, args.join(' '), vscode.l10n.t('ui.openExternalDirDiff'));
 				}
 				setTimeout(() => resolve(null), 1500);
 			}
@@ -2225,7 +2222,7 @@ export class DataSource extends Disposable {
 					return {};
 				}
 			} else {
-				errorMessage = 'An unexpected error occurred while spawning the Git child process.';
+				errorMessage = vscode.l10n.t('ui.errorStartingGitProcess');
 			}
 			throw errorMessage;
 		});
@@ -2318,9 +2315,6 @@ export class DataSource extends Disposable {
 	 * @param stashes An array of all stashes in the repository.
 	 * @returns An array of commits.
 	 */
-	/**
-	 * Build the common branch/remote/tag arguments for git log commands.
-	 */
 	private buildLogBranchArgs(
 		branches: ReadonlyArray<string> | null,
 		authors: ReadonlyArray<string> | null,
@@ -2332,7 +2326,7 @@ export class DataSource extends Disposable {
 		hideRemotes: ReadonlyArray<string>,
 		stashes: ReadonlyArray<GitStash>,
 		simplifyByDecoration: boolean
-	): string[] {
+	) {
 		const args: string[] = [];
 		if (simplifyByDecoration) {
 			args.push('--simplify-by-decoration');
@@ -2374,6 +2368,7 @@ export class DataSource extends Disposable {
 
 			args.push('HEAD');
 		}
+
 		return args;
 	}
 
@@ -2573,7 +2568,6 @@ export class DataSource extends Disposable {
 			return null;
 		});
 	}
-
 	/**
 	 * Get the references in a repository.
 	 * @param repo The path of the repository.

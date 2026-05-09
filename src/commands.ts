@@ -231,17 +231,13 @@ export class CommandManager extends Disposable {
 					if (isPathInWorkspace(path)) {
 						this.repoManager.registerRepo(path, false).then((status) => {
 							if (status.error === null) {
-								showInformationMessage('The repository "' + status.root! + '" was added to Git Graph.');
+								showInformationMessage(vscode.l10n.t('ui.repoAdded', { repo: status.root! }));
 							} else {
-								showErrorMessage(status.error + ' Therefore it could not be added to Git Graph.');
+								showErrorMessage(vscode.l10n.t('ui.cannotAddRepo', { error: status.error }));
 							}
 						});
 					} else {
-						showErrorMessage(
-							'The folder "' +
-								path +
-								'" is not within the opened Visual Studio Code workspace, and therefore could not be added to Git Graph.'
-						);
+						showErrorMessage(vscode.l10n.t('ui.folderNotInWorkspace', { path }));
 					}
 				}
 			},
@@ -268,16 +264,16 @@ export class CommandManager extends Disposable {
 
 		vscode.window
 			.showQuickPick(items, {
-				placeHolder: 'Select a repository to remove from Git Graph:',
+				placeHolder: vscode.l10n.t('ui.selectRepoToRemove'),
 				canPickMany: false
 			})
 			.then(
 				(item) => {
 					if (item && item.description !== undefined) {
 						if (this.repoManager.ignoreRepo(item.description)) {
-							showInformationMessage('The repository "' + item.label + '" was removed from Git Graph.');
+							showInformationMessage(vscode.l10n.t('ui.repoRemoved', { repo: item.label }));
 						} else {
-							showErrorMessage('The repository "' + item.label + '" is not known to Git Graph.');
+							showErrorMessage(vscode.l10n.t('ui.repoUnknown', { repo: item.label }));
 						}
 					}
 				},
@@ -292,13 +288,13 @@ export class CommandManager extends Disposable {
 		this.avatarManager.clearCache().then(
 			(errorInfo) => {
 				if (errorInfo === null) {
-					showInformationMessage('The Avatar Cache was successfully cleared.');
+					showInformationMessage(vscode.l10n.t('ui.avatarCacheCleared'));
 				} else {
 					showErrorMessage(errorInfo);
 				}
 			},
 			() => {
-				showErrorMessage('An unexpected error occurred while running the command "Clear Avatar Cache".');
+				showErrorMessage(vscode.l10n.t('ui.errorClearingAvatarCache'));
 			}
 		);
 	}
@@ -327,7 +323,7 @@ export class CommandManager extends Disposable {
 
 			vscode.window
 				.showQuickPick(items, {
-					placeHolder: 'Select the repository you want to open in Git Graph, and fetch from remote(s):',
+					placeHolder: vscode.l10n.t('ui.selectRepoToFetch'),
 					canPickMany: false
 				})
 				.then(
@@ -348,7 +344,7 @@ export class CommandManager extends Disposable {
 						}
 					},
 					() => {
-						showErrorMessage('An unexpected error occurred while running the command "Fetch from Remote(s)".');
+						showErrorMessage(vscode.l10n.t('ui.errorRunningFetchCommand'));
 					}
 				);
 		} else if (repoPaths.length === 1) {
@@ -382,7 +378,7 @@ export class CommandManager extends Disposable {
 	 */
 	private endAllWorkspaceCodeReviews() {
 		this.extensionState.endAllWorkspaceCodeReviews();
-		showInformationMessage('Ended All Code Reviews in Workspace');
+		showInformationMessage(vscode.l10n.t('ui.endedAllCodeReviews'));
 	}
 
 	/**
@@ -391,13 +387,13 @@ export class CommandManager extends Disposable {
 	private endSpecificWorkspaceCodeReview() {
 		const codeReviews = this.extensionState.getCodeReviews();
 		if (Object.keys(codeReviews).length === 0) {
-			showErrorMessage('There are no Code Reviews in progress within the current workspace.');
+			showErrorMessage(vscode.l10n.t('ui.noActiveCodeReviews'));
 			return;
 		}
 
 		vscode.window
 			.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
-				placeHolder: 'Select the Code Review you want to end:',
+				placeHolder: vscode.l10n.t('ui.selectCodeReviewToEnd'),
 				canPickMany: false
 			})
 			.then(
@@ -406,7 +402,7 @@ export class CommandManager extends Disposable {
 						this.extensionState.endCodeReview(item.codeReviewRepo, item.codeReviewId).then(
 							(errorInfo) => {
 								if (errorInfo === null) {
-									showInformationMessage('Successfully ended Code Review "' + item.label + '".');
+									showInformationMessage(vscode.l10n.t('ui.codeReviewEnded', { review: item.label }));
 								} else {
 									showErrorMessage(errorInfo);
 								}
@@ -416,9 +412,7 @@ export class CommandManager extends Disposable {
 					}
 				},
 				() => {
-					showErrorMessage(
-						'An unexpected error occurred while running the command "End a specific Code Review in Workspace...".'
-					);
+					showErrorMessage(vscode.l10n.t('ui.errorEndingCodeReview'));
 				}
 			);
 	}
@@ -429,13 +423,13 @@ export class CommandManager extends Disposable {
 	private resumeWorkspaceCodeReview() {
 		const codeReviews = this.extensionState.getCodeReviews();
 		if (Object.keys(codeReviews).length === 0) {
-			showErrorMessage('There are no Code Reviews in progress within the current workspace.');
+			showErrorMessage(vscode.l10n.t('ui.noActiveCodeReviews'));
 			return;
 		}
 
 		vscode.window
 			.showQuickPick(this.getCodeReviewQuickPickItems(codeReviews), {
-				placeHolder: 'Select the Code Review you want to resume:',
+				placeHolder: vscode.l10n.t('ui.selectCodeReviewToResume'),
 				canPickMany: false
 			})
 			.then(
@@ -460,9 +454,7 @@ export class CommandManager extends Disposable {
 					}
 				},
 				() => {
-					showErrorMessage(
-						'An unexpected error occurred while running the command "Resume a specific Code Review in Workspace...".'
-					);
+					showErrorMessage(vscode.l10n.t('ui.errorResumingCodeReview'));
 				}
 			);
 	}
@@ -486,9 +478,9 @@ export class CommandManager extends Disposable {
 				os.release() +
 				'\nGit: ' +
 				(this.gitExecutable !== null ? this.gitExecutable.version : '(none)');
-			vscode.window.showInformationMessage(information, { modal: true }, 'Copy').then(
+			vscode.window.showInformationMessage(information, { modal: true }, vscode.l10n.t('ui.copy')).then(
 				(selectedItem) => {
-					if (selectedItem === 'Copy') {
+					if (selectedItem === vscode.l10n.t('ui.copy')) {
 						copyToClipboard(information).then((result) => {
 							if (result !== null) {
 								showErrorMessage(result);
@@ -499,7 +491,7 @@ export class CommandManager extends Disposable {
 				() => {}
 			);
 		} catch (_) {
-			showErrorMessage('An unexpected error occurred while retrieving version information.');
+			showErrorMessage(vscode.l10n.t('ui.errorGettingVersionInfo'));
 		}
 	}
 
@@ -516,12 +508,12 @@ export class CommandManager extends Disposable {
 			return openFile(request.repo, request.filePath, request.commit, this.dataSource, vscode.ViewColumn.Active).then(
 				(errorInfo) => {
 					if (errorInfo !== null) {
-						return showErrorMessage('Unable to Open File: ' + errorInfo);
+						return showErrorMessage(vscode.l10n.t('ui.cannotOpenFile', { filePath: errorInfo }));
 					}
 				}
 			);
 		} else {
-			return showErrorMessage('Unable to Open File: The command was not called with the required arguments.');
+			return showErrorMessage(vscode.l10n.t('ui.cannotOpenFileMissingArgs'));
 		}
 	}
 
@@ -538,7 +530,7 @@ export class CommandManager extends Disposable {
 		const absPath = getPathFromUri(arg);
 		const repo = this.repoManager.getRepoContainingFile(absPath);
 		if (repo === null) {
-			showErrorMessage('The selected path is not within a known Git repository.');
+			showErrorMessage(vscode.l10n.t('ui.selectedPathNotInRepo'));
 			return;
 		}
 

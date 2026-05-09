@@ -229,12 +229,9 @@ export class RepoManager extends Disposable {
 		return new Promise<{ root: string | null; error: string | null }>(async (resolve) => {
 			let root = await this.dataSource.repoRoot(path);
 			if (root === null) {
-				resolve({ root: null, error: 'The folder "' + path + '" is not a Git repository.' });
+				resolve({ root: null, error: vscode.l10n.t('ui.folderNotGitRepo', { path }) });
 			} else if (typeof this.repos[root] !== 'undefined') {
-				resolve({
-					root: null,
-					error: 'The folder "' + path + '" is contained within the known repository "' + root + '".'
-				});
+				resolve({ root: null, error: vscode.l10n.t('ui.folderInKnownRepo', { path, root }) });
 			} else {
 				if (this.ignoredRepos.includes(root)) {
 					this.ignoredRepos.splice(this.ignoredRepos.indexOf(root), 1);
@@ -710,37 +707,30 @@ export class RepoManager extends Disposable {
 				const validationError = validateExternalConfigFile(file);
 				if (validationError === null) {
 					const action = isRepoNew
-						? 'Yes'
+						? vscode.l10n.t('ui.yes')
 						: await vscode.window.showInformationMessage(
-								'A newer Git Graph Repository Configuration File has been detected for the repository "' +
-									(state.name || getRepoName(repo)) +
-									'". Would you like to override your current repository configuration with the new changes?',
-								'Yes',
-								'No'
+								vscode.l10n.t('ui.configFileUpdated', { repo: state.name || getRepoName(repo) }),
+								vscode.l10n.t('ui.yes'),
+								vscode.l10n.t('ui.no')
 							);
 					if (this.isKnownRepo(repo) && action) {
 						const state = this.repos[repo];
-						if (action === 'Yes') {
+						if (action === vscode.l10n.t('ui.yes')) {
 							applyExternalConfigFile(file, state);
 						}
 						state.lastImportAt = file.exportedAt;
 						this.extensionState.saveRepos(this.repos);
-						if (!isRepoNew && action === 'Yes') {
-							showInformationMessage(
-								'Git Graph Repository Configuration was successfully imported for the repository "' +
-									(state.name || getRepoName(repo)) +
-									'".'
-							);
+						if (!isRepoNew && action === vscode.l10n.t('ui.yes')) {
+							showInformationMessage(vscode.l10n.t('ui.configFileImported', { repo: state.name || getRepoName(repo) }));
 						}
 						return true;
 					}
 				} else {
 					showErrorMessage(
-						'The value for "' +
-							validationError +
-							'" in the configuration file "' +
-							getPathFromStr(path.join(repo, '.vscode', 'vscode-git-graph.json')) +
-							'" is invalid.'
+						vscode.l10n.t('ui.invalidConfigValue', {
+							file: getPathFromStr(path.join(repo, '.vscode', 'vscode-git-graph.json')),
+							value: validationError
+						})
 					);
 				}
 			}
@@ -915,21 +905,13 @@ function writeExternalConfigFile(repo: string, file: ExternalRepoConfig.File) {
 				const configPath = path.join(vscodePath, 'vscode-git-graph.json');
 				fs.writeFile(configPath, JSON.stringify(file, null, 4), (err) => {
 					if (err) {
-						reject(
-							'Failed to write the Git Graph Repository Configuration File to "' + getPathFromStr(configPath) + '".'
-						);
+						reject(vscode.l10n.t('ui.cannotWriteConfigFile', { path: getPathFromStr(configPath) }));
 					} else {
-						resolve(
-							'Successfully exported the Git Graph Repository Configuration to "' + getPathFromStr(configPath) + '".'
-						);
+						resolve(vscode.l10n.t('ui.configFileExported', { path: getPathFromStr(configPath) }));
 					}
 				});
 			} else {
-				reject(
-					'An unexpected error occurred while checking if the "' +
-						getPathFromStr(vscodePath) +
-						'" directory exists. This directory is used to store the Git Graph Repository Configuration file.'
-				);
+				reject(vscode.l10n.t('ui.errorCheckingDir', { path: getPathFromStr(vscodePath) }));
 			}
 		});
 	});

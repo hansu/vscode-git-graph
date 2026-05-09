@@ -67,7 +67,7 @@ export class AskpassManager extends Disposable {
 			vscode.window
 				.showInputBox({
 					placeHolder: data.request,
-					prompt: 'Git Graph: ' + data.host,
+					prompt: vscode.l10n.t('ui.askpassPrompt', { host: data.host }),
 					password: /password/i.test(data.request),
 					ignoreFocusOut: true
 				})
