@@ -878,13 +878,16 @@ body.tagLabelsRightAligned .gitRef.tag{
 	margin-right:6px;
 }
 .dropdownCurrentValue{
-	max-width:30vw;
+	max-width:20vw;
 }
 #controls.singleRepo #repoControl{
 	display:none;
 }
 #controls.singleRepo .dropdownCurrentValue{
-	max-width:40vw;
+	max-width:20vw;
+}
+#branchControl .dropdownCurrentValue{
+	min-width:12vw;
 }
 
 #currentBtn, #findBtn, #terminalBtn, #settingsBtn, #fetchBtn, #refreshBtn{

@@ -25,6 +25,7 @@
 	white-space:nowrap;
 	overflow-x:hidden;
 	text-overflow:ellipsis;
+	min-width:8vw;
 }
 .dropdownCurrentValue:hover{
 	background-color:rgba(128,128,128,0.2);
@@ -58,7 +59,7 @@
 	overflow-x:hidden;
 	margin-top:-1px;
 	white-space:nowrap;
-	max-width:50vw;
+	max-width:80vw;
 }
 
 .dropdownOption{
