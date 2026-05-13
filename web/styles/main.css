@@ -877,17 +877,23 @@ body.tagLabelsRightAligned .gitRef.tag{
 #showRemoteBranchesControl > .customCheckbox, #simplifyByDecorationControl > .customCheckbox{
 	margin-right:6px;
 }
-.dropdownCurrentValue{
+.dropdown{
 	max-width:20vw;
 }
 #controls.singleRepo #repoControl{
 	display:none;
 }
-#controls.singleRepo .dropdownCurrentValue{
-	max-width:20vw;
+#branchControl, #authorControl, #pathFilterControl, #repoControl {
+ display:flex;
 }
-#branchControl .dropdownCurrentValue{
-	min-width:12vw;
+.dropdown {
+	width:100%
+}
+#branchDropdown{
+	max-width: 30vw
+}
+#controls.singleRepo #branchDropdown{
+	max-width: 40vw
 }
 
 #currentBtn, #findBtn, #terminalBtn, #settingsBtn, #fetchBtn, #refreshBtn{
