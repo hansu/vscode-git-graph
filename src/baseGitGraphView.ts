@@ -733,19 +733,22 @@ export abstract class BaseGitGraphView extends Disposable {
 			</body>`;
 		} else if (numRepos > 0) {
 			const stickyClassAttr = initialState.config.stickyHeader ? ' class="sticky"' : '';
-			let hideRemotes = '', hideSimplify = '';
-			let hidePathFilter = 'style="flex: 1"';
-			if (!config.toolbarButtonVisibility.remotes) { hideRemotes = 'style="display: none"'; }
-			if (!config.toolbarButtonVisibility.simplify) { hideSimplify = 'style="display: none"'; }
-			if (!config.toolbarButtonVisibility.pathFilter) { hidePathFilter = 'style="display: none"'; }
+			let hideRemotes = 'style="display: none"';
+			let hideSimplify = 'style="display: none"';
+			let pathFilterStyle = 'style="display: none"';
+			let optElements = 0;
+			if (numRepos > 1) { optElements++; }
+			if (config.toolbarButtonVisibility.remotes) { optElements++; hideRemotes = ''; }
+			if (config.toolbarButtonVisibility.simplify) { optElements++; hideSimplify = ''; }
+			if (config.toolbarButtonVisibility.pathFilter) { optElements++; pathFilterStyle = `style="flex: 1; max-width: ${30 - 3 * optElements}vw;"`; }
 			body = `<body>
 			<div id="view" tabindex="-1">
 				<div id="controls"${stickyClassAttr}>
 					<div id="filterControls" style="display: flex; flex-wrap: wrap; justify-content: center">
-						<span id="repoControl" style="flex: 1;"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
-						<span id="branchControl" style="flex: 2;"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
-						<span id="pathFilterControl" ${hidePathFilter} title="Select path by context menu in file explorer"><span class="unselectable">Paths: </span><div id="pathFilterDropdown" class="dropdown"></div></span>
-						<span id="authorControl" style="flex: 1;"><span class="unselectable">Authors: </span><div id="authorDropdown" class="dropdown"></div></span>
+						<span id="repoControl" style="flex: 1; "><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
+						<span id="branchControl" style="flex: 2; max-width: ${50 - 6 * optElements}vw;"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
+						<span id="pathFilterControl" ${pathFilterStyle} title="Select path by context menu in file explorer"><span class="unselectable">Paths: </span><div id="pathFilterDropdown" class="dropdown"></div></span>
+						<span id="authorControl" style="flex: 1; max-width: ${30 - 3 * optElements}vw;"><span class="unselectable">Authors: </span><div id="authorDropdown" class="dropdown"></div></span>
 						<label id="showRemoteBranchesControl" ${hideRemotes} title="Show Remote Branches"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Remotes</label>
 						<label id="simplifyByDecorationControl" ${hideSimplify} title="Simplify By Decoration"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>Simplify</label>
 						<div id="currentBtn" title="Current"></div>

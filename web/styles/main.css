@@ -887,15 +887,6 @@ body.tagLabelsRightAligned .gitRef.tag{
 .dropdown {
 	width:100%;
 }
-#authorControl, #pathFilterControl, #repoControl {
-	max-width: 20vw
-}
-#branchControl{
-	max-width: 30vw
-}
-#controls.singleRepo #branchControl{
-	max-width: 40vw
-}
 
 #currentBtn, #findBtn, #terminalBtn, #settingsBtn, #fetchBtn, #refreshBtn{
 	position:absolute;
