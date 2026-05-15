@@ -878,22 +878,22 @@ body.tagLabelsRightAligned .gitRef.tag{
 #showRemoteBranchesControl > .customCheckbox, #simplifyByDecorationControl > .customCheckbox{
 	margin-right:6px;
 }
-.dropdown{
-	max-width:20vw;
-}
 #controls.singleRepo #repoControl{
 	display:none;
 }
 #branchControl, #authorControl, #pathFilterControl, #repoControl {
- display:flex;
+	display:flex;
 }
 .dropdown {
-	width:100%
+	width:100%;
 }
-#branchDropdown{
+#authorControl, #pathFilterControl, #repoControl {
+	max-width: 20vw
+}
+#branchControl{
 	max-width: 30vw
 }
-#controls.singleRepo #branchDropdown{
+#controls.singleRepo #branchControl{
 	max-width: 40vw
 }
 
