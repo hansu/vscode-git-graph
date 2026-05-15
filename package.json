@@ -589,11 +589,16 @@
 						"Simplify": {
 							"type": "boolean",
 							"title": "Visibility of the Simplify checkbox"
+						},
+						"Paths": {
+							"type": "boolean",
+							"title": "Visibility of the Paths Filter dropdown"
 						}
 					},
 					"default": {
 						"Remotes": true,
-						"Simplify": true
+						"Simplify": true,
+						"Paths": true
 					},
 					"description": "An object specifying the default visibility of the items of the tool bar. Example: {\"Remotes\": true\", Simplify\": true}"
 				},

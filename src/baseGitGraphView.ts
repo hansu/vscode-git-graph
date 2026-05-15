@@ -734,18 +734,20 @@ export abstract class BaseGitGraphView extends Disposable {
 		} else if (numRepos > 0) {
 			const stickyClassAttr = initialState.config.stickyHeader ? ' class="sticky"' : '';
 			let hideRemotes = '', hideSimplify = '';
+			let hidePathFilter = 'style="flex: 1"';
 			if (!config.toolbarButtonVisibility.remotes) { hideRemotes = 'style="display: none"'; }
 			if (!config.toolbarButtonVisibility.simplify) { hideSimplify = 'style="display: none"'; }
+			if (!config.toolbarButtonVisibility.pathFilter) { hidePathFilter = 'style="display: none"'; }
 			body = `<body>
 			<div id="view" tabindex="-1">
 				<div id="controls"${stickyClassAttr}>
 					<div id="filterControls" style="display: flex; flex-wrap: wrap; justify-content: center">
 						<span id="repoControl" style="flex: 1;"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
 						<span id="branchControl" style="flex: 2;"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
-						<span id="pathFilterControl" style="flex: 1;" title="Select path by context menu in file explorer"><span class="unselectable">Paths: </span><div id="pathFilterDropdown" class="dropdown"></div></span>
+						<span id="pathFilterControl" ${hidePathFilter} title="Select path by context menu in file explorer"><span class="unselectable">Paths: </span><div id="pathFilterDropdown" class="dropdown"></div></span>
 						<span id="authorControl" style="flex: 1;"><span class="unselectable">Authors: </span><div id="authorDropdown" class="dropdown"></div></span>
-						<label ${hideRemotes} id="showRemoteBranchesControl" title="Show Remote Branches"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Remotes</label>
-						<label ${hideSimplify} id="simplifyByDecorationControl" title="Simplify By Decoration"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>Simplify</label>
+						<label id="showRemoteBranchesControl" ${hideRemotes} title="Show Remote Branches"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Remotes</label>
+						<label id="simplifyByDecorationControl" ${hideSimplify} title="Simplify By Decoration"><input type="checkbox" id="simplifyByDecorationCheckbox" tabindex="-1"><span class="customCheckbox"></span>Simplify</label>
 						<div id="currentBtn" title="Current"></div>
 						<div id="findBtn" title="Find"></div>
 						<div id="terminalBtn" title="Open a Terminal for this Repository"></div>

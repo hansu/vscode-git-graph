@@ -175,10 +175,18 @@ class Config {
 	 */
 	get toolbarButtonVisibility(): ToolbarButtonVisibility {
 		let obj: any = this.config.get('toolbarButtonVisibility', {});
-		if (typeof obj === 'object' && obj !== null && typeof obj['Remotes'] === 'boolean' && typeof obj['Simplify'] === 'boolean') {
-			return { remotes: obj['Remotes'], simplify: obj['Simplify'] };
+		if (typeof obj === 'object' && obj !== null
+			&& typeof obj['Remotes'] === 'boolean'
+			&& typeof obj['Simplify'] === 'boolean'
+			&& typeof obj['Paths'] === 'boolean'
+		) {
+			return {
+				remotes: obj['Remotes'],
+				simplify: obj['Simplify'],
+				pathFilter: obj['Paths']
+			};
 		} else {
-			return { remotes: true, simplify: true };
+			return { remotes: true, simplify: true, pathFilter: true };
 		}
 	}
 

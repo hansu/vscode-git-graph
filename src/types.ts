@@ -479,6 +479,7 @@ export interface DefaultColumnVisibility {
 export interface ToolbarButtonVisibility {
 	readonly remotes: boolean;
 	readonly simplify: boolean;
+	readonly pathFilter: boolean;
 }
 
 export interface DialogDefaults {
