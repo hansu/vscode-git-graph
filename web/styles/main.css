@@ -859,6 +859,7 @@ body.tagLabelsRightAligned .gitRef.tag{
 	font-size:13px;
 	-webkit-user-select:none;
 	user-select:none;
+    margin-left:10px;
 }
 
 #controls.sticky {
@@ -866,10 +867,10 @@ body.tagLabelsRightAligned .gitRef.tag{
 	z-index:12;
 }
 
-#repoControl, #branchControl, #showRemoteBranchesControl, #simplifyByDecorationControl, #pathFilterControl{
+#repoControl, #branchControl, #showRemoteBranchesControl, #simplifyByDecorationControl, #pathFilterControl, #authorControl{
 	display:inline-block;
 	white-space:nowrap;
-	margin:0 10px;
+	margin-right:10px;
 }
 #repoDropdown, #branchDropdown, #pathFilterDropdown, #authorDropdown{
 	margin-left:3px;
