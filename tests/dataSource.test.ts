@@ -142,6 +142,36 @@ describe('DataSource', () => {
 	});
 
 	describe('getRepoInfo', () => {
+		it('Should return remote fetch URLs when requested', async () => {
+			// Setup
+			mockGitSuccessOnce('* master\n');
+			mockGitSuccessOnce('fork\norigin\nupstream\n');
+			mockGitSuccessOnce(
+				'remote.fork.url\nssh://git@example.com/team/fork.git\0' +
+				'remote.origin.url\ngit@github.com:user/repo.git\0' +
+				'remote.upstream.url\nhttps://github.com/org/repo.git\0'
+			);
+			vscode.mockExtensionSettingReturnValue('repository.showRemoteHeads', true);
+
+			// Run
+			const result = await dataSource.getRepoInfo('/path/to/repo', false, false, [], true);
+
+			// Assert
+			expect(result).toStrictEqual({
+				branches: ['master'],
+				head: 'master',
+				remotes: ['fork', 'origin', 'upstream'],
+				remoteUrls: [
+					{ name: 'fork', url: 'ssh://git@example.com/team/fork.git' },
+					{ name: 'origin', url: 'git@github.com:user/repo.git' },
+					{ name: 'upstream', url: 'https://github.com/org/repo.git' }
+				],
+				stashes: [],
+				error: null
+			});
+			expect(spyOnSpawn).toBeCalledWith('/path/to/git', ['--no-pager', 'config', '--list', '-z', '--includes', '--local'], expect.objectContaining({ cwd: '/path/to/repo' }));
+		});
+
 		it('Should return the repository info', async () => {
 			// Setup
 			mockGitSuccessOnce(
@@ -166,6 +196,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master', 'remotes/origin/HEAD', 'remotes/origin/develop', 'remotes/origin/master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [
 					{
 						author: 'Test Author',
@@ -213,6 +244,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});
@@ -245,6 +277,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});
@@ -277,6 +310,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});
@@ -309,6 +343,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});
@@ -341,6 +376,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});
@@ -365,6 +401,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});
@@ -394,6 +431,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});
@@ -423,6 +461,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master', 'remotes/origin/develop', 'remotes/origin/master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});
@@ -446,6 +485,7 @@ describe('DataSource', () => {
 				branches: [],
 				head: null,
 				remotes: [],
+				remoteUrls: [],
 				stashes: [],
 				error: 'error message'
 			});
@@ -469,6 +509,7 @@ describe('DataSource', () => {
 				branches: [],
 				head: null,
 				remotes: [],
+				remoteUrls: [],
 				stashes: [],
 				error: 'error message'
 			});
@@ -492,6 +533,7 @@ describe('DataSource', () => {
 				branches: ['develop', 'master'],
 				head: 'develop',
 				remotes: ['origin'],
+				remoteUrls: [],
 				stashes: [],
 				error: null
 			});

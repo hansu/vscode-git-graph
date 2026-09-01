@@ -122,6 +122,11 @@ export interface GitRepoSettingsRemote {
 	readonly pushUrl: string | null;
 }
 
+export interface GitRemoteUrl {
+	readonly name: string;
+	readonly url: string | null;
+}
+
 export const enum GitResetMode {
 	Soft = 'soft',
 	Mixed = 'mixed',
@@ -164,6 +169,7 @@ export type GitRepoSet = { [repo: string]: GitRepoState };
 
 export interface IssueLinkingConfig {
 	readonly issue: string;
+	readonly remote?: string;
 	readonly url: string;
 }
 
@@ -984,6 +990,7 @@ export interface RequestLoadRepoInfo extends RepoRequest {
 	readonly simplifyByDecoration: boolean;
 	readonly showStashes: boolean;
 	readonly hideRemotes: ReadonlyArray<string>;
+	readonly loadRemoteUrls?: boolean;
 }
 export interface ResponseLoadRepoInfo extends ResponseWithErrorInfo {
 	readonly command: 'loadRepoInfo';
@@ -991,6 +998,7 @@ export interface ResponseLoadRepoInfo extends ResponseWithErrorInfo {
 	readonly branches: ReadonlyArray<string>;
 	readonly head: string | null;
 	readonly remotes: ReadonlyArray<string>;
+	readonly remoteUrls: ReadonlyArray<GitRemoteUrl>;
 	readonly stashes: ReadonlyArray<GitStash>;
 	readonly isRepo: boolean;
 }

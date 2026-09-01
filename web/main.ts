@@ -4,6 +4,7 @@ class GitGraphView {
 	private gitBranchHead: string | null = null;
 	private gitConfig: GG.GitRepoConfig | null = null;
 	private gitRemotes: ReadonlyArray<string> = [];
+	private gitRemoteUrls: ReadonlyArray<GG.GitRemoteUrl> = [];
 	private gitStashes: ReadonlyArray<GG.GitStash> = [];
 	private gitTags: ReadonlyArray<string> = [];
 	private commits: GG.GitCommit[] = [];
@@ -142,7 +143,7 @@ class GitGraphView {
 			this.avatars = prevState.avatars;
 			this.gitConfig = prevState.gitConfig;
 			this.selectedCommits = new Set(prevState.selectedCommits || []);
-			this.loadRepoInfo(prevState.gitBranches, prevState.gitBranchHead, prevState.gitRemotes, prevState.gitStashes, true);
+			this.loadRepoInfo(prevState.gitBranches, prevState.gitBranchHead, prevState.gitRemotes, prevState.gitRemoteUrls || (prevState.gitConfig !== null ? prevState.gitConfig.remotes : []), prevState.gitStashes, true);
 			this.loadCommits(prevState.commits, prevState.commitHead, prevState.gitTags, prevState.moreCommitsAvailable, prevState.onlyFollowFirstParent);
 			this.findWidget.restoreState(prevState.findWidget);
 			this.settingsWidget.restoreState(prevState.settingsWidget);
@@ -236,6 +237,7 @@ class GitGraphView {
 		this.maxCommits = this.config.initialLoadCommits;
 		this.gitConfig = null;
 		this.gitRemotes = [];
+		this.gitRemoteUrls = [];
 		this.gitStashes = [];
 		this.gitTags = [];
 		this.currentBranches = null;
@@ -247,11 +249,11 @@ class GitGraphView {
 		this.refresh(true);
 	}
 
-	private loadRepoInfo(branchOptions: ReadonlyArray<string>, branchHead: string | null, remotes: ReadonlyArray<string>, stashes: ReadonlyArray<GG.GitStash>, isRepo: boolean) {
+	private loadRepoInfo(branchOptions: ReadonlyArray<string>, branchHead: string | null, remotes: ReadonlyArray<string>, remoteUrls: ReadonlyArray<GG.GitRemoteUrl>, stashes: ReadonlyArray<GG.GitStash>, isRepo: boolean) {
 		// Changes to this.gitStashes are reflected as changes to the commits when loadCommits is run
 		this.gitStashes = stashes;
 
-		if (!isRepo || (!this.currentRepoRefreshState.hard && arraysStrictlyEqual(this.gitBranches, branchOptions) && this.gitBranchHead === branchHead && arraysStrictlyEqual(this.gitRemotes, remotes))) {
+		if (!isRepo || (!this.currentRepoRefreshState.hard && arraysStrictlyEqual(this.gitBranches, branchOptions) && this.gitBranchHead === branchHead && arraysStrictlyEqual(this.gitRemotes, remotes) && arraysEqual(this.gitRemoteUrls, remoteUrls, (a, b) => a.name === b.name && a.url === b.url))) {
 			this.saveState();
 			this.finaliseLoadRepoInfo(false, isRepo);
 			return;
@@ -261,6 +263,7 @@ class GitGraphView {
 		this.gitBranches = branchOptions;
 		this.gitBranchHead = branchHead;
 		this.gitRemotes = remotes;
+		this.gitRemoteUrls = remoteUrls;
 
 		// Update the state of the fetch button
 		this.renderFetchButton();
@@ -496,7 +499,7 @@ class GitGraphView {
 		if (msg.error === null) {
 			const refreshState = this.currentRepoRefreshState;
 			if (refreshState.inProgress && refreshState.loadRepoInfoRefreshId === msg.refreshId) {
-				this.loadRepoInfo(msg.branches, msg.head, msg.remotes, msg.stashes, msg.isRepo);
+				this.loadRepoInfo(msg.branches, msg.head, msg.remotes, msg.remoteUrls, msg.stashes, msg.isRepo);
 			}
 		} else {
 			this.displayLoadDataError('Unable to load Repository Info', msg.error);
@@ -655,7 +658,8 @@ class GitGraphView {
 			showRemoteBranches: getShowRemoteBranches(repoState.showRemoteBranchesV2),
 			simplifyByDecoration: getSimplifyByDecoration(repoState.simplifyByDecoration),
 			showStashes: getShowStashes(repoState.showStashes),
-			hideRemotes: repoState.hideRemotes
+			hideRemotes: repoState.hideRemotes,
+			loadRemoteUrls: issueLinkingConfigUsesRemote(repoState.issueLinkingConfig !== null ? repoState.issueLinkingConfig : globalState.issueLinkingConfig)
 		});
 	}
 
@@ -775,6 +779,7 @@ class GitGraphView {
 			gitBranchHead: this.gitBranchHead,
 			gitConfig: this.gitConfig,
 			gitRemotes: this.gitRemotes,
+			gitRemoteUrls: this.gitRemoteUrls,
 			gitStashes: this.gitStashes,
 			gitTags: this.gitTags,
 			commits: this.commits,
@@ -1099,7 +1104,7 @@ class GitGraphView {
 		const vertexColours = this.graph.getVertexColours();
 		const widthsAtVertices = this.config.referenceLabels.branchLabelsAlignedToGraph ? this.graph.getWidthsAtVertices() : [];
 		const mutedCommits = this.graph.getMutedCommits(currentHash);
-		const textFormatter = new TextFormatter(this.commits, this.gitRepos[this.currentRepo].issueLinkingConfig, {
+		const textFormatter = new TextFormatter(this.commits, this.gitRepos[this.currentRepo].issueLinkingConfig, this.gitRemoteUrls, {
 			emoji: true,
 			issueLinking: true,
 			markdown: this.config.markdown
@@ -1252,7 +1257,7 @@ class GitGraphView {
 	}
 
 	public renderTagDetails(tagName: string, commitHash: string, details: GG.GitTagDetails) {
-		const textFormatter = new TextFormatter(this.commits, this.gitRepos[this.currentRepo].issueLinkingConfig, {
+		const textFormatter = new TextFormatter(this.commits, this.gitRepos[this.currentRepo].issueLinkingConfig, this.gitRemoteUrls, {
 			commits: true,
 			emoji: true,
 			issueLinking: true,
@@ -1904,14 +1909,19 @@ class GitGraphView {
 		const issueLinks: { url: string, displayText: string }[] = [];
 
 		let issueLinking: IssueLinking | null, match: RegExpExecArray | null;
-		if (visible && (issueLinking = parseIssueLinkingConfig(this.gitRepos[this.currentRepo].issueLinkingConfig)) !== null) {
+		const repoIssueLinkingConfig = this.gitRepos[this.currentRepo].issueLinkingConfig;
+		const issueLinkingConfig = repoIssueLinkingConfig !== null ? repoIssueLinkingConfig : globalState.issueLinkingConfig;
+		if (visible && (issueLinking = parseIssueLinkingConfig(issueLinkingConfig, this.gitRemoteUrls)) !== null) {
 			issueLinking.regexp.lastIndex = 0;
 			while (match = issueLinking.regexp.exec(refName)) {
 				if (match[0].length === 0) break;
-				issueLinks.push({
-					url: generateIssueLinkFromMatch(match, issueLinking),
-					displayText: match[0]
-				});
+				const url = generateIssueLinkFromMatch(match, issueLinking);
+				if (url !== null) {
+					issueLinks.push({
+						url,
+						displayText: match[0]
+					});
+				}
 			}
 		}
 
@@ -3011,7 +3021,7 @@ class GitGraphView {
 			if (expandedCommit.compareWithHash === null) {
 				// Commit details should be shown
 				if (expandedCommit.commitHash !== UNCOMMITTED) {
-					const textFormatter = new TextFormatter(this.commits, this.gitRepos[this.currentRepo].issueLinkingConfig, {
+					const textFormatter = new TextFormatter(this.commits, this.gitRepos[this.currentRepo].issueLinkingConfig, this.gitRemoteUrls, {
 						commits: true,
 						emoji: true,
 						issueLinking: true,

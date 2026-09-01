@@ -128,10 +128,11 @@ class TextFormatter {
 	 * Construct a TextFormatter instance.
 	 * @param commits The array of commits currently loaded in the Git Graph View.
 	 * @param repoIssueLinkingConfig The Issue Linking Configuration of the current repository.
+	 * @param remoteUrls The repository's remotes and raw fetch URLs.
 	 * @param config The configuration of the TextFormatter, to determine which types of formatting should be performed.
 	 * @returns The TextFormatter instance.
 	 */
-	constructor(commits: ReadonlyArray<GG.GitCommit>, repoIssueLinkingConfig: GG.IssueLinkingConfig | null, config: TF.Config) {
+	constructor(commits: ReadonlyArray<GG.GitCommit>, repoIssueLinkingConfig: GG.IssueLinkingConfig | null, remoteUrls: ReadonlyArray<GG.GitRemoteUrl>, config: TF.Config) {
 		this.config = Object.assign({ commits: false, emoji: false, issueLinking: false, markdown: false, multiline: false, urls: false }, config);
 		this.commits = commits;
 		const issueLinkingConfig = repoIssueLinkingConfig !== null
@@ -139,7 +140,7 @@ class TextFormatter {
 			: globalState.issueLinkingConfig;
 
 		if (this.config.issueLinking) {
-			this.issueLinking = parseIssueLinkingConfig(issueLinkingConfig);
+			this.issueLinking = parseIssueLinkingConfig(issueLinkingConfig, remoteUrls);
 		}
 	}
 
@@ -252,14 +253,17 @@ class TextFormatter {
 			this.issueLinking.regexp.lastIndex = 0;
 			while (match = this.issueLinking.regexp.exec(input)) {
 				if (match[0].length === 0) break;
-				TextFormatter.insertIntoTreeIfNoOverlap(tree, {
-					type: TF.NodeType.Url,
-					start: match.index,
-					end: this.issueLinking.regexp.lastIndex - 1,
-					url: generateIssueLinkFromMatch(match, this.issueLinking),
-					displayText: match[0],
-					contains: []
-				});
+				const url = generateIssueLinkFromMatch(match, this.issueLinking);
+				if (url !== null) {
+					TextFormatter.insertIntoTreeIfNoOverlap(tree, {
+						type: TF.NodeType.Url,
+						start: match.index,
+						end: this.issueLinking.regexp.lastIndex - 1,
+						url,
+						displayText: match[0],
+						contains: []
+					});
+				}
 			}
 		}
 
@@ -580,46 +584,4 @@ function isExternalUrlElem(elem: Element) {
  */
 function isInternalUrlElem(elem: Element) {
 	return elem.classList.contains(CLASS_INTERNAL_URL);
-}
-
-
-/* Issue Linking Methods */
-
-interface IssueLinking {
-	readonly regexp: RegExp;
-	readonly url: string;
-}
-
-const ISSUE_LINKING_ARGUMENT_REGEXP = /\$([1-9][0-9]*)/g;
-
-/**
- * Parses the Issue Linking Configuration of a repository, so it's ready to be used for detecting issues and generating links.
- * @param issueLinkingConfig The Issue Linking Configuration.
- * @returns The parsed Issue Linking, or `NULL` if it's not available.
- */
-function parseIssueLinkingConfig(issueLinkingConfig: GG.IssueLinkingConfig | null): IssueLinking | null {
-	if (issueLinkingConfig !== null) {
-		try {
-			return {
-				regexp: new RegExp(issueLinkingConfig.issue, 'gu'),
-				url: issueLinkingConfig.url
-			};
-		} catch (_) { }
-	}
-	return null;
-}
-
-/**
- * Generate the URL for an issue link, performing all variable substitutions from a match.
- * @param match The match produced by `IssueLinking.regexp`.
- * @param issueLinking The Issue Linking.
- * @returns The URL for the issue link.
- */
-function generateIssueLinkFromMatch(match: RegExpExecArray, issueLinking: IssueLinking) {
-	return match.length > 1
-		? issueLinking.url.replace(ISSUE_LINKING_ARGUMENT_REGEXP, (placeholder, index) => {
-			const i = parseInt(index);
-			return i < match.length ? match[i] : placeholder;
-		})
-		: issueLinking.url;
 }

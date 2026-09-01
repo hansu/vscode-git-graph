@@ -182,6 +182,11 @@
 	margin-right:6px;
 }
 
+.settingsIssueLinkingError{
+	color:var(--vscode-errorForeground);
+	white-space:normal;
+}
+
 .settingsSection label > input[type=checkbox]:checked ~ .customCheckbox:after{
 	border-color:var(--vscode-editorSuggestWidget-foreground);
 }

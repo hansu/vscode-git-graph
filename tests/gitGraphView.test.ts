@@ -2318,6 +2318,10 @@ describe('GitGraphView', () => {
 					branches: ['master'],
 					head: 'master',
 					remotes: ['origin', 'upstream'],
+					remoteUrls: [
+						{ name: 'origin', url: 'git@github.com:user/repo.git' },
+						{ name: 'upstream', url: 'https://github.com/org/repo.git' }
+					],
 					stashes: [],
 					error: null
 				};
@@ -2336,12 +2340,13 @@ describe('GitGraphView', () => {
 					refreshId: 0,
 					showRemoteBranches: true,
 					showStashes: false,
-					hideRemotes: ['upstream']
+					hideRemotes: ['upstream'],
+					loadRemoteUrls: true
 				});
 
 				// Assert
 				await waitForExpect(() => {
-					expect(spyOnGetRepoInfo).toHaveBeenCalledWith('/path/to/repo', true, false, ['upstream']);
+					expect(spyOnGetRepoInfo).toHaveBeenCalledWith('/path/to/repo', true, false, ['upstream'], true);
 					expect(spyOnRepoRoot).not.toHaveBeenCalled();
 					expect(spyOnSetLastActiveRepo).toHaveBeenCalledWith('/path/to/repo');
 					expect(spyOnRepoFileWatcherStart).toHaveBeenCalledWith('/path/to/repo');
@@ -2352,6 +2357,7 @@ describe('GitGraphView', () => {
 							branches: getRepoInfoResolvedValue.branches,
 							head: getRepoInfoResolvedValue.head,
 							remotes: getRepoInfoResolvedValue.remotes,
+							remoteUrls: getRepoInfoResolvedValue.remoteUrls,
 							stashes: getRepoInfoResolvedValue.stashes,
 							isRepo: true,
 							error: getRepoInfoResolvedValue.error
@@ -2368,6 +2374,7 @@ describe('GitGraphView', () => {
 					branches: ['master'],
 					head: 'master',
 					remotes: ['origin', 'upstream'],
+					remoteUrls: [],
 					stashes: [],
 					error: null
 				};
@@ -2401,6 +2408,7 @@ describe('GitGraphView', () => {
 							branches: getRepoInfoResolvedValue.branches,
 							head: getRepoInfoResolvedValue.head,
 							remotes: getRepoInfoResolvedValue.remotes,
+							remoteUrls: getRepoInfoResolvedValue.remoteUrls,
 							stashes: getRepoInfoResolvedValue.stashes,
 							isRepo: true,
 							error: getRepoInfoResolvedValue.error
@@ -2417,6 +2425,7 @@ describe('GitGraphView', () => {
 					branches: ['master'],
 					head: 'master',
 					remotes: ['origin', 'upstream'],
+					remoteUrls: [],
 					stashes: [],
 					error: 'error message'
 				};
@@ -2451,6 +2460,7 @@ describe('GitGraphView', () => {
 							branches: getRepoInfoResolvedValue.branches,
 							head: getRepoInfoResolvedValue.head,
 							remotes: getRepoInfoResolvedValue.remotes,
+							remoteUrls: getRepoInfoResolvedValue.remoteUrls,
 							stashes: getRepoInfoResolvedValue.stashes,
 							isRepo: true,
 							error: getRepoInfoResolvedValue.error
@@ -2467,6 +2477,7 @@ describe('GitGraphView', () => {
 					branches: ['master'],
 					head: 'master',
 					remotes: ['origin', 'upstream'],
+					remoteUrls: [],
 					stashes: [],
 					error: 'error message'
 				};
@@ -2501,6 +2512,7 @@ describe('GitGraphView', () => {
 							branches: getRepoInfoResolvedValue.branches,
 							head: getRepoInfoResolvedValue.head,
 							remotes: getRepoInfoResolvedValue.remotes,
+							remoteUrls: getRepoInfoResolvedValue.remoteUrls,
 							stashes: getRepoInfoResolvedValue.stashes,
 							isRepo: false,
 							error: null

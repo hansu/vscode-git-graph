@@ -203,9 +203,13 @@ class SettingsWidget {
 			html += '<div class="settingsSection centered"><h3>Issue Linking</h3>';
 			const issueLinkingConfig = this.repo.issueLinkingConfig || globalState.issueLinkingConfig;
 			if (issueLinkingConfig !== null) {
-				const escapedIssue = escapeHtml(issueLinkingConfig.issue), escapedUrl = escapeHtml(issueLinkingConfig.url);
-				html += '<table><tr><td class="left">Issue Regex:</td><td class="leftWithEllipsis" title="' + escapedIssue + '">' + escapedIssue + '</td></tr><tr><td class="left">Issue URL:</td><td class="leftWithEllipsis" title="' + escapedUrl + '">' + escapedUrl + '</td></tr></table>' +
+				const escapedIssue = escapeHtml(issueLinkingConfig.issue), escapedRemote = escapeHtml(issueLinkingConfig.remote || 'Not Set'), escapedUrl = escapeHtml(issueLinkingConfig.url);
+				html += '<table><tr><td class="left">Issue Regex:</td><td class="leftWithEllipsis" title="' + escapedIssue + '">' + escapedIssue + '</td></tr><tr><td class="left">Remote Regex:</td><td class="leftWithEllipsis" title="' + escapedRemote + '">' + escapedRemote + '</td></tr><tr><td class="left">Issue URL:</td><td class="leftWithEllipsis" title="' + escapedUrl + '">' + escapedUrl + '</td></tr></table>' +
 					'<div class="settingsSectionButtons"><div id="editIssueLinking" class="editBtn">' + SVG_ICONS.pencil + 'Edit</div><div id="removeIssueLinking" class="removeBtn">' + SVG_ICONS.close + 'Remove</div></div>';
+				const configError = getIssueLinkingConfigError(issueLinkingConfig);
+				if (configError !== null) {
+					html += '<div class="settingsIssueLinkingError" title="' + escapeHtml(configError) + '">' + escapeHtml(configError) + '</div>';
+				}
 			} else {
 				html += '<span>Issue Linking converts issue numbers in commit &amp; tag messages into hyperlinks, that open the issue in your issue tracking system. If a branch\'s name contains an issue number, the issue can be viewed via the branch\'s context menu.</span>' +
 					'<div class="settingsSectionButtons"><div id="editIssueLinking" class="addBtn">' + SVG_ICONS.plus + 'Add Issue Linking</div></div>';
@@ -456,9 +460,9 @@ class SettingsWidget {
 				if (this.repo === null) return;
 				const issueLinkingConfig = this.repo.issueLinkingConfig || globalState.issueLinkingConfig;
 				if (issueLinkingConfig !== null) {
-					this.showIssueLinkingDialog(issueLinkingConfig.issue, issueLinkingConfig.url, this.repo.issueLinkingConfig === null && globalState.issueLinkingConfig !== null, true);
+					this.showIssueLinkingDialog(issueLinkingConfig.issue, issueLinkingConfig.remote || null, issueLinkingConfig.url, this.repo.issueLinkingConfig === null && globalState.issueLinkingConfig !== null, true);
 				} else {
-					this.showIssueLinkingDialog(null, null, false, false);
+					this.showIssueLinkingDialog(null, null, null, false, false);
 				}
 			});
 
@@ -573,16 +577,17 @@ class SettingsWidget {
 	/**
 	 * Show the dialog allowing the user to configure the issue linking for this repository.
 	 * @param defaultIssueRegex The default regular expression used to match issue numbers.
+	 * @param defaultRemoteRegex The default regular expression used to match a repository remote URL.
 	 * @param defaultIssueUrl The default URL for the issue number to be substituted into.
 	 * @param defaultUseGlobally The default value for the checkbox determining whether the issue linking configuration should be used globally (for all repositories).
 	 * @param isEdit Is the dialog editing an existing issue linking configuration.
 	 */
-	private showIssueLinkingDialog(defaultIssueRegex: string | null, defaultIssueUrl: string | null, defaultUseGlobally: boolean, isEdit: boolean) {
+	private showIssueLinkingDialog(defaultIssueRegex: string | null, defaultRemoteRegex: string | null, defaultIssueUrl: string | null, defaultUseGlobally: boolean, isEdit: boolean) {
 		let html = '<b>' + (isEdit ? 'Edit Issue Linking for' : 'Add Issue Linking to') + ' this Repository</b>';
-		html += '<p style="font-size:12px; margin:6px 0;">The following example links <b>#123</b> in commit messages to <b>https://github.com/mhutchie/repo/issues/123</b>:</p>';
-		html += '<table style="display:inline-table; width:360px; text-align:left; font-size:12px; margin-bottom:2px;"><tr><td>Issue Regex:</td><td>#(\\d+)</td></tr><tr><td>Issue URL:</td><td>https://github.com/mhutchie/repo/issues/$1</td></tr></tbody></table>';
+		html += '<p style="font-size:12px; margin:6px 0;">The following example links <b>#123</b> using the first matching repository remote:</p>';
+		html += '<table style="display:inline-table; width:460px; text-align:left; font-size:12px; margin-bottom:2px;"><tr><td>Issue Regex:</td><td>#(?&lt;num&gt;\\d+)</td></tr><tr><td>Remote Regex:</td><td>github\\.com[/:](?&lt;owner&gt;[^/]+)/(?&lt;repo&gt;[^/.]+)</td></tr><tr><td>Issue URL:</td><td>https://github.com/${remote.owner}/${remote.repo}/issues/${issue.num}</td></tr></tbody></table>';
 
-		if (!isEdit && defaultIssueRegex === null && defaultIssueUrl === null) {
+		if (!isEdit && defaultIssueRegex === null && defaultRemoteRegex === null && defaultIssueUrl === null) {
 			defaultIssueRegex = SettingsWidget.autoDetectIssueRegex(this.view.getCommits());
 			if (defaultIssueRegex !== null) {
 				html += '<p style="font-size:12px"><i>The prefilled Issue Regex was detected in commit messages in this repository. Review and/or correct it if necessary.</i></p>';
@@ -590,33 +595,49 @@ class SettingsWidget {
 		}
 
 		dialog.showForm(html, [
-			{ type: DialogInputType.Text, name: 'Issue Regex', default: defaultIssueRegex !== null ? defaultIssueRegex : '', placeholder: null, info: 'A regular expression that matches your issue numbers, with one or more capturing groups ( ) that will be substituted into the "Issue URL".' },
-			{ type: DialogInputType.Text, name: 'Issue URL', default: defaultIssueUrl !== null ? defaultIssueUrl : '', placeholder: null, info: 'The issue\'s URL in your issue tracking system, with placeholders ($1, $2, etc.) for the groups captured ( ) in the "Issue Regex".' },
-			{ type: DialogInputType.Checkbox, name: 'Use Globally', value: defaultUseGlobally, info: 'Use the "Issue Regex" and "Issue URL" for all repositories by default (it can be overridden per repository). Note: "Use Globally" is only suitable if identical Issue Linking applies to the majority of your repositories (e.g. when using JIRA or Pivotal Tracker).' }
+			{ type: DialogInputType.Text, name: 'Issue Regex', default: defaultIssueRegex !== null ? defaultIssueRegex : '', placeholder: null, info: 'A regular expression that matches issue numbers. Captures can be used in the Issue URL as $1, ${issue.1}, ${issue.0}, or ${issue.name}.' },
+			{ type: DialogInputType.Text, name: 'Remote Regex', default: defaultRemoteRegex !== null ? defaultRemoteRegex : '', placeholder: 'Optional', info: 'An optional regular expression matched against raw fetch URLs, in order: upstream, origin, then other remotes. Captures can be used in the Issue URL as ${remote.1}, ${remote.0}, or ${remote.name}.' },
+			{ type: DialogInputType.Text, name: 'Issue URL', default: defaultIssueUrl !== null ? defaultIssueUrl : '', placeholder: null, info: 'The issue URL template. It must contain an issue placeholder. Use $$ for a literal $.' },
+			{ type: DialogInputType.Checkbox, name: 'Use Globally', value: defaultUseGlobally, info: 'Use the Issue Linking configuration for all repositories by default (it can be overridden per repository).' }
 		], 'Save', (values) => {
-			let issueRegex = (<string>values[0]).trim(), issueUrl = (<string>values[1]).trim(), useGlobally = <boolean>values[2];
+			let issueRegex = (<string>values[0]).trim(), remoteRegex = (<string>values[1]).trim(), issueUrl = (<string>values[2]).trim(), useGlobally = <boolean>values[3];
 			let regExpParseError = null;
 			try {
-				if (issueRegex.indexOf('(') === -1 || issueRegex.indexOf(')') === -1) {
-					regExpParseError = 'The regular expression does not contain a capturing group ( ).';
-				} else if (new RegExp(issueRegex, 'gu')) {
-					regExpParseError = null;
-				}
+				new RegExp(issueRegex, 'gu');
 			} catch (e) {
 				regExpParseError = (e as Error).message;
 			}
 			if (regExpParseError !== null) {
 				dialog.showError('Invalid Issue Regex', regExpParseError, 'Go Back', () => {
-					this.showIssueLinkingDialog(issueRegex, issueUrl, useGlobally, isEdit);
+					this.showIssueLinkingDialog(issueRegex, remoteRegex, issueUrl, useGlobally, isEdit);
 				});
-			} else if (!(/\$([1-9][0-9]*)/.test(issueUrl))) {
-				dialog.showError('Invalid Issue URL', 'The Issue URL does not contain any placeholders ($1, $2, etc.) for the issue number components captured in the Issue Regex.', 'Go Back', () => {
-					this.showIssueLinkingDialog(issueRegex, issueUrl, useGlobally, isEdit);
-				});
+			} else if (remoteRegex !== '') {
+				try {
+					new RegExp(remoteRegex, 'u');
+				} catch (e) {
+					regExpParseError = (e as Error).message;
+				}
+				if (regExpParseError !== null) {
+					dialog.showError('Invalid Remote Regex', regExpParseError, 'Go Back', () => {
+						this.showIssueLinkingDialog(issueRegex, remoteRegex, issueUrl, useGlobally, isEdit);
+					});
+				} else if (!issueLinkingUrlHasIssuePlaceholder(issueUrl)) {
+					this.showInvalidIssueUrlError(issueRegex, remoteRegex, issueUrl, useGlobally, isEdit);
+				} else {
+					this.setIssueLinkingConfig({ issue: issueRegex, remote: remoteRegex, url: issueUrl }, useGlobally);
+				}
+			} else if (!issueLinkingUrlHasIssuePlaceholder(issueUrl)) {
+				this.showInvalidIssueUrlError(issueRegex, remoteRegex, issueUrl, useGlobally, isEdit);
 			} else {
 				this.setIssueLinkingConfig({ issue: issueRegex, url: issueUrl }, useGlobally);
 			}
 		}, null, 'Cancel', null, false);
+	}
+
+	private showInvalidIssueUrlError(issueRegex: string, remoteRegex: string, issueUrl: string, useGlobally: boolean, isEdit: boolean) {
+		dialog.showError('Invalid Issue URL', 'The Issue URL does not contain an issue placeholder ($1, ${issue.1}, ${issue.0}, or ${issue.name}).', 'Go Back', () => {
+			this.showIssueLinkingDialog(issueRegex, remoteRegex, issueUrl, useGlobally, isEdit);
+		});
 	}
 
 	/**

@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { AskpassEnvironment, AskpassManager } from './askpass/askpassManager';
 import { getConfig } from './config';
 import { Logger } from './logger';
-import { ActionedUser, CommitOrdering, DateType, DeepWriteable, ErrorInfo, ErrorInfoExtensionPrefix, GitCommit, GitCommitDetails, GitCommitStash, GitConfigLocation, GitFileChange, GitFileStatus, GitPushBranchMode, GitRepoConfig, GitRepoConfigBranches, GitResetMode, GitSignature, GitSignatureStatus, GitStash, GitTagDetails, MergeActionOn, RebaseActionOn, SquashMessageFormat, TagType, Writeable } from './types';
+import { ActionedUser, CommitOrdering, DateType, DeepWriteable, ErrorInfo, ErrorInfoExtensionPrefix, GitCommit, GitCommitDetails, GitCommitStash, GitConfigLocation, GitFileChange, GitFileStatus, GitPushBranchMode, GitRemoteUrl, GitRepoConfig, GitRepoConfigBranches, GitResetMode, GitSignature, GitSignatureStatus, GitStash, GitTagDetails, MergeActionOn, RebaseActionOn, SquashMessageFormat, TagType, Writeable } from './types';
 import { GitExecutable, GitVersionRequirement, UNABLE_TO_FIND_GIT_MSG, UNCOMMITTED, abbrevCommit, constructIncompatibleGitVersionMessage, doesVersionMeetRequirement, getPathFromStr, getPathFromUri, openGitTerminal, pathWithTrailingSlash, realpath, resolveSpawnOutput, showErrorMessage } from './utils';
 import { Disposable } from './utils/disposable';
 import { Event } from './utils/event';
@@ -132,18 +132,32 @@ export class DataSource extends Disposable {
 	 * @param showRemoteBranches Are remote branches shown.
 	 * @param showStashes Are stashes shown.
 	 * @param hideRemotes An array of hidden remotes.
+	 * @param loadRemoteUrls Should the raw fetch URL of each remote be loaded.
 	 * @returns The repositories information.
 	 */
-	public getRepoInfo(repo: string, showRemoteBranches: boolean, showStashes: boolean, hideRemotes: ReadonlyArray<string>): Promise<GitRepoInfo> {
+	public getRepoInfo(repo: string, showRemoteBranches: boolean, showStashes: boolean, hideRemotes: ReadonlyArray<string>, loadRemoteUrls: boolean = false): Promise<GitRepoInfo> {
 		return Promise.all([
 			this.getBranches(repo, showRemoteBranches, hideRemotes),
 			this.getRemotes(repo),
-			showStashes ? this.getStashes(repo) : Promise.resolve([])
-		]).then((results) => {
+			showStashes ? this.getStashes(repo) : Promise.resolve([]),
+			loadRemoteUrls ? this.getConfigList(repo, GitConfigLocation.Local) : Promise.resolve<GitConfigSet>({})
+		]).then(([branchData, remotes, stashes, configs]) => {
 			/* eslint no-console: "error" */
-			return { branches: results[0].branches, head: results[0].head, remotes: results[1], stashes: results[2], error: null };
+			return {
+				branches: branchData.branches,
+				head: branchData.head,
+				remotes: remotes,
+				remoteUrls: loadRemoteUrls
+					? remotes.map((remote) => ({
+						name: remote,
+						url: getConfigValue(configs, 'remote.' + remote + '.url')
+					}))
+					: [],
+				stashes: stashes,
+				error: null
+			};
 		}).catch((errorMessage) => {
-			return { branches: [], head: null, remotes: [], stashes: [], error: errorMessage };
+			return { branches: [], head: null, remotes: [], remoteUrls: [], stashes: [], error: errorMessage };
 		});
 	}
 	/**
@@ -2226,6 +2240,7 @@ interface GitRefData {
 
 interface GitRepoInfo extends GitBranchData {
 	remotes: string[];
+	remoteUrls: GitRemoteUrl[];
 	stashes: GitStash[];
 }
 
