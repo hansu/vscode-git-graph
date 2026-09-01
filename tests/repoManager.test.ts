@@ -1239,9 +1239,11 @@ describe('RepoManager', () => {
 				pullRequestConfig: null,
 				showRemoteBranches: true,
 				showRemoteBranchesV2: BooleanOverride.Default,
+				simplifyByDecoration: BooleanOverride.Default,
 				showStashes: BooleanOverride.Default,
 				showTags: BooleanOverride.Default,
-				workspaceFolderIndex: 0
+				workspaceFolderIndex: 0,
+				isCdvSummaryHidden: false
 			};
 
 			// Run
@@ -1908,9 +1910,11 @@ describe('RepoManager', () => {
 						pullRequestConfig: null,
 						showRemoteBranches: true,
 						showRemoteBranchesV2: BooleanOverride.Default,
+						simplifyByDecoration: BooleanOverride.Default,
 						showStashes: BooleanOverride.Default,
 						showTags: BooleanOverride.Default,
-						workspaceFolderIndex: 0
+						workspaceFolderIndex: 0,
+						isCdvSummaryHidden: false
 					}
 				};
 				expected['/path/to/workspace-folder1/repo'][stateKey] = stateValue;
@@ -1944,6 +1948,8 @@ describe('RepoManager', () => {
 
 			describe('issueLinkingConfig', () => {
 				it('Should import issueLinkingConfig correctly', testApplyField('issueLinkingConfig', { issue: 'x', url: 'y' }, 'issueLinkingConfig', { issue: 'x', url: 'y' }));
+				it('Should import issueLinkingConfig with a Remote Regex correctly', testApplyField('issueLinkingConfig', { issue: 'x', remote: 'z', url: 'y' }, 'issueLinkingConfig', { issue: 'x', remote: 'z', url: 'y' }));
+				it('Should omit an empty Remote Regex when importing issueLinkingConfig', testApplyField('issueLinkingConfig', { issue: 'x', url: 'y' }, 'issueLinkingConfig', { issue: 'x', remote: '', url: 'y' }));
 			});
 
 			describe('name', () => {
@@ -2039,6 +2045,7 @@ describe('RepoManager', () => {
 			it('Should display a validation error when "issueLinkingConfig" is invalid (null)', testValidationOfField('issueLinkingConfig', null));
 			it('Should display a validation error when "issueLinkingConfig" is invalid (no issue)', testValidationOfField('issueLinkingConfig', { url: 'x' }));
 			it('Should display a validation error when "issueLinkingConfig" is invalid (no url)', testValidationOfField('issueLinkingConfig', { issue: 'x' }));
+			it('Should display a validation error when "issueLinkingConfig" is invalid (remote is not a string)', testValidationOfField('issueLinkingConfig', { issue: 'x', remote: 5, url: 'y' }));
 			it('Should display a validation error when "name" is invalid', testValidationOfField('name', 5));
 			it('Should display a validation error when "onlyFollowFirstParent" is invalid', testValidationOfField('onlyFollowFirstParent', 'invalid'));
 			it('Should display a validation error when "onRepoLoadShowCheckedOutBranch" is invalid', testValidationOfField('onRepoLoadShowCheckedOutBranch', 'invalid'));
@@ -2261,9 +2268,11 @@ describe('RepoManager', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: true,
 					showRemoteBranchesV2: BooleanOverride.Default,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: 0
+					workspaceFolderIndex: 0,
+					isCdvSummaryHidden: false
 				}
 			});
 
@@ -2339,9 +2348,11 @@ describe('RepoManager', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: true,
 					showRemoteBranchesV2: BooleanOverride.Default,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: 0
+					workspaceFolderIndex: 0,
+					isCdvSummaryHidden: false
 				}
 			});
 
@@ -2435,6 +2446,7 @@ describe('RepoManager', () => {
 
 		describe('issueLinkingConfig', () => {
 			it('Should export issueLinkingConfig correctly', testExportField('issueLinkingConfig', { issue: 'x', url: 'y' }, 'issueLinkingConfig', { issue: 'x', url: 'y' }));
+			it('Should export issueLinkingConfig with a Remote Regex correctly', testExportField('issueLinkingConfig', { issue: 'x', remote: 'z', url: 'y' }, 'issueLinkingConfig', { issue: 'x', remote: 'z', url: 'y' }));
 		});
 
 		describe('name', () => {

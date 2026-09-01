@@ -73,9 +73,11 @@ describe('ExtensionState', () => {
 				pullRequestConfig: null,
 				showRemoteBranches: true,
 				showRemoteBranchesV2: BooleanOverride.Enabled,
+				simplifyByDecoration: BooleanOverride.Default,
 				showStashes: BooleanOverride.Enabled,
 				showTags: BooleanOverride.Enabled,
-				workspaceFolderIndex: 0
+				workspaceFolderIndex: 0,
+				isCdvSummaryHidden: false
 			};
 			extensionContext.workspaceState.get.mockReturnValueOnce({
 				'/path/to/repo': repoState
@@ -121,9 +123,11 @@ describe('ExtensionState', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: true,
 					showRemoteBranchesV2: BooleanOverride.Default,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: null
+					workspaceFolderIndex: null,
+					isCdvSummaryHidden: false
 				}
 			});
 		});
@@ -159,9 +163,11 @@ describe('ExtensionState', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: true,
 					showRemoteBranchesV2: BooleanOverride.Default,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: null
+					workspaceFolderIndex: null,
+					isCdvSummaryHidden: false
 				}
 			});
 		});
@@ -197,9 +203,11 @@ describe('ExtensionState', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: false,
 					showRemoteBranchesV2: BooleanOverride.Disabled,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: null
+					workspaceFolderIndex: null,
+					isCdvSummaryHidden: false
 				}
 			});
 		});
@@ -235,9 +243,11 @@ describe('ExtensionState', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: false,
 					showRemoteBranchesV2: BooleanOverride.Default,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: null
+					workspaceFolderIndex: null,
+					isCdvSummaryHidden: false
 				}
 			});
 		});
@@ -273,9 +283,11 @@ describe('ExtensionState', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: true,
 					showRemoteBranchesV2: BooleanOverride.Enabled,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: null
+					workspaceFolderIndex: null,
+					isCdvSummaryHidden: false
 				}
 			});
 		});
@@ -314,9 +326,11 @@ describe('ExtensionState', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: true,
 					showRemoteBranchesV2: BooleanOverride.Default,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: null
+					workspaceFolderIndex: null,
+					isCdvSummaryHidden: false
 				},
 				'/path/to/repo-2': {
 					cdvDivider: 0.5,
@@ -335,9 +349,11 @@ describe('ExtensionState', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: false,
 					showRemoteBranchesV2: BooleanOverride.Disabled,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: null
+					workspaceFolderIndex: null,
+					isCdvSummaryHidden: false
 				}
 			});
 			expect(workspaceConfiguration.get).toHaveBeenCalledTimes(1);
@@ -724,7 +740,7 @@ describe('ExtensionState', () => {
 	describe('isAvatarStorageAvailable', () => {
 		it('Should return TRUE if the avatar storage folder existed on startup', () => {
 			// Setup
-			const spyOnStat = jest.spyOn(fs, 'stat');
+			const spyOnStat = jest.spyOn(fs, 'stat') as jest.Mock;
 			spyOnStat.mockImplementationOnce((_, callback) => callback(null, {} as fs.Stats));
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
 
@@ -741,8 +757,8 @@ describe('ExtensionState', () => {
 
 		it('Should return TRUE if the avatar storage folder was successfully created', () => {
 			// Setup
-			jest.spyOn(fs, 'stat').mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
-			const spyOnMkdir = jest.spyOn(fs, 'mkdir');
+			(jest.spyOn(fs, 'stat') as jest.Mock).mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
+			const spyOnMkdir = jest.spyOn(fs, 'mkdir') as jest.Mock;
 			spyOnMkdir.mockImplementation((_, callback) => callback(null));
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
 
@@ -760,8 +776,8 @@ describe('ExtensionState', () => {
 
 		it('Should return TRUE if the avatar storage folder was created after the initial stat check', () => {
 			// Setup
-			jest.spyOn(fs, 'stat').mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
-			const spyOnMkdir = jest.spyOn(fs, 'mkdir');
+			(jest.spyOn(fs, 'stat') as jest.Mock).mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
+			const spyOnMkdir = jest.spyOn(fs, 'mkdir') as jest.Mock;
 			spyOnMkdir.mockImplementation((_, callback) => callback({ code: 'EEXIST' } as NodeJS.ErrnoException));
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
 
@@ -779,8 +795,8 @@ describe('ExtensionState', () => {
 
 		it('Should return FALSE if the avatar storage folder could not be created', () => {
 			// Setup
-			jest.spyOn(fs, 'stat').mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
-			const spyOnMkdir = jest.spyOn(fs, 'mkdir');
+			(jest.spyOn(fs, 'stat') as jest.Mock).mockImplementationOnce((_, callback) => callback(new Error(), {} as fs.Stats));
+			const spyOnMkdir = jest.spyOn(fs, 'mkdir') as jest.Mock;
 			spyOnMkdir.mockImplementation((_, callback) => callback({} as NodeJS.ErrnoException));
 			const extensionState = new ExtensionState(extensionContext, onDidChangeGitExecutable.subscribe);
 

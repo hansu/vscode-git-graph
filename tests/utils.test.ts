@@ -945,7 +945,7 @@ describe('openExtensionSettings', () => {
 		const result = await openExtensionSettings();
 
 		// Assert
-		expect(vscode.commands.executeCommand).toHaveBeenCalledWith('workbench.action.openSettings', '@ext:mhutchie.git-graph');
+		expect(vscode.commands.executeCommand).toHaveBeenCalledWith('workbench.action.openSettings', '@ext:hansu.git-graph-2');
 		expect(result).toBe(null);
 	});
 

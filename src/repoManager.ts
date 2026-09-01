@@ -752,6 +752,7 @@ export namespace ExternalRepoConfig {
 
 	export interface IssueLinkingConfig {
 		readonly issue: string;
+		readonly remote?: string;
 		readonly url: string;
 	}
 
@@ -935,7 +936,7 @@ function validateExternalConfigFile(file: Readonly<ExternalRepoConfig.File>) {
 	if (typeof file.includeCommitsMentionedByReflogs !== 'undefined' && typeof file.includeCommitsMentionedByReflogs !== 'boolean') {
 		return 'includeCommitsMentionedByReflogs';
 	}
-	if (typeof file.issueLinkingConfig !== 'undefined' && (typeof file.issueLinkingConfig !== 'object' || file.issueLinkingConfig === null || typeof file.issueLinkingConfig.issue !== 'string' || typeof file.issueLinkingConfig.url !== 'string')) {
+	if (typeof file.issueLinkingConfig !== 'undefined' && (typeof file.issueLinkingConfig !== 'object' || file.issueLinkingConfig === null || typeof file.issueLinkingConfig.issue !== 'string' || (typeof file.issueLinkingConfig.remote !== 'undefined' && typeof file.issueLinkingConfig.remote !== 'string') || typeof file.issueLinkingConfig.url !== 'string')) {
 		return 'issueLinkingConfig';
 	}
 	if (typeof file.name !== 'undefined' && typeof file.name !== 'string') {
@@ -1011,6 +1012,7 @@ function applyExternalConfigFile(file: Readonly<ExternalRepoConfig.File>, state:
 	if (typeof file.issueLinkingConfig !== 'undefined') {
 		state.issueLinkingConfig = {
 			issue: file.issueLinkingConfig.issue,
+			...(typeof file.issueLinkingConfig.remote === 'string' && file.issueLinkingConfig.remote !== '' ? { remote: file.issueLinkingConfig.remote } : {}),
 			url: file.issueLinkingConfig.url
 		};
 	}
