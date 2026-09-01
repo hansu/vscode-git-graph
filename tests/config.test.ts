@@ -284,10 +284,12 @@ describe('Config', () => {
 			expect(value).toStrictEqual({
 				branch: {
 					checkout: true,
+					createBranch: true,
 					rename: true,
 					delete: true,
 					merge: true,
 					rebase: true,
+					pull: true,
 					push: true,
 					viewIssue: true,
 					createPullRequest: true,
@@ -324,6 +326,7 @@ describe('Config', () => {
 				},
 				remoteBranch: {
 					checkout: true,
+					createBranch: true,
 					delete: true,
 					fetch: true,
 					merge: true,
@@ -368,10 +371,12 @@ describe('Config', () => {
 			expect(value).toStrictEqual({
 				branch: {
 					checkout: true,
+					createBranch: true,
 					rename: true,
 					delete: true,
 					merge: true,
 					rebase: true,
+					pull: true,
 					push: true,
 					viewIssue: true,
 					createPullRequest: true,
@@ -408,6 +413,7 @@ describe('Config', () => {
 				},
 				remoteBranch: {
 					checkout: true,
+					createBranch: true,
 					delete: true,
 					fetch: true,
 					merge: true,
@@ -470,10 +476,12 @@ describe('Config', () => {
 			expect(value).toStrictEqual({
 				branch: {
 					checkout: true,
+					createBranch: true,
 					rename: false,
 					delete: true,
 					merge: true,
 					rebase: true,
+					pull: true,
 					push: true,
 					viewIssue: true,
 					createPullRequest: true,
@@ -510,6 +518,7 @@ describe('Config', () => {
 				},
 				remoteBranch: {
 					checkout: true,
+					createBranch: true,
 					delete: true,
 					fetch: false,
 					merge: true,

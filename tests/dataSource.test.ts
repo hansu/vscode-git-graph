@@ -572,7 +572,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -668,7 +668,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', ['master', 'develop'], 300, true, true, false, false, CommitOrdering.AuthorDate, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', ['master', 'develop'], null, 300, true, true, false, false, CommitOrdering.AuthorDate, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -754,7 +754,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 2, true, true, false, false, CommitOrdering.Topological, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 2, true, true, false, false, CommitOrdering.Topological, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -828,7 +828,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -902,7 +902,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -980,7 +980,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1071,7 +1071,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, false, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, false, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1162,7 +1162,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1252,7 +1252,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, false, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, false, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1344,7 +1344,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, true, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, true, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1436,7 +1436,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, true, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, true, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1531,7 +1531,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1627,7 +1627,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin', 'other-remote'], ['other-remote'], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin', 'other-remote'], ['other-remote'], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1718,7 +1718,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [
 				{
 					hash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
 					baseHash: '2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c',
@@ -1729,7 +1729,7 @@ describe('DataSource', () => {
 					date: 1587559258,
 					message: 'WIP'
 				}
-			]);
+			], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1822,7 +1822,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [
 				{
 					hash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
 					baseHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
@@ -1843,7 +1843,7 @@ describe('DataSource', () => {
 					date: 1587559258,
 					message: 'WIP 2'
 				}
-			]);
+			], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -1964,7 +1964,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [
 				{
 					hash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
 					baseHash: '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b',
@@ -1985,7 +1985,7 @@ describe('DataSource', () => {
 					date: 1587559260,
 					message: 'WIP 2'
 				}
-			]);
+			], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -2106,7 +2106,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [
 				{
 					hash: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
 					baseHash: '6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a',
@@ -2117,7 +2117,7 @@ describe('DataSource', () => {
 					date: 1587559258,
 					message: 'WIP 1'
 				}
-			]);
+			], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -2205,7 +2205,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -2265,7 +2265,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.showRemoteHeads', true);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -2309,7 +2309,7 @@ describe('DataSource', () => {
 			date.setCurrentTime(1587559259);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -2389,7 +2389,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.showRemoteHeads', true);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -2413,7 +2413,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.showRemoteHeads', true);
 
 			// Run
-			const result = await dataSource.getCommits('/path/to/repo', null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], []);
+			const result = await dataSource.getCommits('/path/to/repo', null, null, 300, true, true, false, false, CommitOrdering.Date, ['origin'], [], [], false);
 
 			// Assert
 			expect(result).toStrictEqual({
@@ -2454,6 +2454,7 @@ describe('DataSource', () => {
 				'user.name\nGlobal Name\0' +
 				'user.email\nglobal@mhutchie.com\0'
 			);
+			mockGitSuccessOnce('');
 
 			// Run
 			const result = await dataSource.getConfig('/path/to/repo', ['origin']);
@@ -2461,6 +2462,7 @@ describe('DataSource', () => {
 			// Assert
 			expect(result).toStrictEqual({
 				config: {
+					authors: [],
 					branches: {
 						master: {
 							pushRemote: 'origin2',
@@ -2520,6 +2522,7 @@ describe('DataSource', () => {
 			mockGitSuccessOnce(
 				'user.name\nGlobal Name\0'
 			);
+			mockGitSuccessOnce('');
 
 			// Run
 			const result = await dataSource.getConfig('/path/to/repo', ['origin']);
@@ -2527,6 +2530,7 @@ describe('DataSource', () => {
 			// Assert
 			expect(result).toStrictEqual({
 				config: {
+					authors: [],
 					branches: {},
 					diffTool: 'abc',
 					guiDiffTool: 'def',
@@ -2567,6 +2571,7 @@ describe('DataSource', () => {
 			mockGitSuccessOnce(
 				'other.setting\nvalue\0'
 			);
+			mockGitSuccessOnce('');
 
 			// Run
 			const result = await dataSource.getConfig('/path/to/repo', []);
@@ -2574,6 +2579,7 @@ describe('DataSource', () => {
 			// Assert
 			expect(result).toStrictEqual({
 				config: {
+					authors: [],
 					branches: {},
 					diffTool: null,
 					guiDiffTool: null,
@@ -2613,6 +2619,7 @@ describe('DataSource', () => {
 				'remote.origin.fetch\n+refs/heads/*:refs/remotes/origin/*\0'
 			);
 			mockGitThrowingErrorOnce('fatal: unable to read config file \'c:/users/michael/.gitconfig\': no such file or directory');
+			mockGitSuccessOnce('');
 
 			// Run
 			const result = await dataSource.getConfig('/path/to/repo', ['origin']);
@@ -2620,6 +2627,7 @@ describe('DataSource', () => {
 			// Assert
 			expect(result).toStrictEqual({
 				config: {
+					authors: [],
 					branches: {},
 					diffTool: 'abc',
 					guiDiffTool: 'def',
@@ -2651,6 +2659,7 @@ describe('DataSource', () => {
 
 		it('Should return an error message thrown by git', async () => {
 			// Setup
+			mockGitThrowingErrorOnce();
 			mockGitThrowingErrorOnce();
 			mockGitThrowingErrorOnce();
 			mockGitThrowingErrorOnce();
@@ -4921,7 +4930,7 @@ describe('DataSource', () => {
 			mockGitSuccessOnce();
 
 			// Run
-			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', false, GitPushBranchMode.Normal);
+			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', false, GitPushBranchMode.Normal, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -4933,7 +4942,7 @@ describe('DataSource', () => {
 			mockGitSuccessOnce();
 
 			// Run
-			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', true, GitPushBranchMode.Normal);
+			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', true, GitPushBranchMode.Normal, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -4945,7 +4954,7 @@ describe('DataSource', () => {
 			mockGitSuccessOnce();
 
 			// Run
-			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', false, GitPushBranchMode.Force);
+			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', false, GitPushBranchMode.Force, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -4957,7 +4966,7 @@ describe('DataSource', () => {
 			mockGitSuccessOnce();
 
 			// Run
-			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', false, GitPushBranchMode.ForceWithLease);
+			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', false, GitPushBranchMode.ForceWithLease, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -4969,7 +4978,7 @@ describe('DataSource', () => {
 			mockGitThrowingErrorOnce();
 
 			// Run
-			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', false, GitPushBranchMode.Normal);
+			const result = await dataSource.pushBranch('/path/to/repo', 'master', 'origin', false, GitPushBranchMode.Normal, false);
 
 			// Assert
 			expect(result).toBe('error message');
@@ -4982,7 +4991,7 @@ describe('DataSource', () => {
 			mockGitSuccessOnce();
 
 			// Run
-			const result = await dataSource.pushBranchToMultipleRemotes('/path/to/repo', 'master', ['origin'], false, GitPushBranchMode.Normal);
+			const result = await dataSource.pushBranchToMultipleRemotes('/path/to/repo', 'master', ['origin'], false, GitPushBranchMode.Normal, false);
 
 			// Assert
 			expect(result).toStrictEqual([null]);
@@ -4995,7 +5004,7 @@ describe('DataSource', () => {
 			mockGitSuccessOnce();
 
 			// Run
-			const result = await dataSource.pushBranchToMultipleRemotes('/path/to/repo', 'master', ['origin', 'other-origin'], false, GitPushBranchMode.Force);
+			const result = await dataSource.pushBranchToMultipleRemotes('/path/to/repo', 'master', ['origin', 'other-origin'], false, GitPushBranchMode.Force, false);
 
 			// Assert
 			expect(result).toStrictEqual([null, null]);
@@ -5009,7 +5018,7 @@ describe('DataSource', () => {
 			mockGitThrowingErrorOnce();
 
 			// Run
-			const result = await dataSource.pushBranchToMultipleRemotes('/path/to/repo', 'master', ['origin', 'other-origin', 'another-origin'], true, GitPushBranchMode.Normal);
+			const result = await dataSource.pushBranchToMultipleRemotes('/path/to/repo', 'master', ['origin', 'other-origin', 'another-origin'], true, GitPushBranchMode.Normal, false);
 
 			// Assert
 			expect(result).toStrictEqual([null, 'error message']);
@@ -5019,7 +5028,7 @@ describe('DataSource', () => {
 
 		it('Should return an error when no remotes are specified', async () => {
 			// Run
-			const result = await dataSource.pushBranchToMultipleRemotes('/path/to/repo', 'master', [], false, GitPushBranchMode.Normal);
+			const result = await dataSource.pushBranchToMultipleRemotes('/path/to/repo', 'master', [], false, GitPushBranchMode.Normal, false);
 
 			// Assert
 			expect(result).toStrictEqual(['No remote(s) were specified to push the branch master to.']);
@@ -5418,6 +5427,7 @@ describe('DataSource', () => {
 	describe('fetchIntoLocalBranch', () => {
 		it('Should fetch a remote branch into a local branch', async () => {
 			// Setup
+			mockGitSuccessOnce('other\n');
 			mockGitSuccessOnce();
 
 			// Run
@@ -5430,6 +5440,7 @@ describe('DataSource', () => {
 
 		it('Should (force) fetch a remote branch into a local branch', async () => {
 			// Setup
+			mockGitSuccessOnce('other\n');
 			mockGitSuccessOnce();
 
 			// Run
@@ -5442,6 +5453,7 @@ describe('DataSource', () => {
 
 		it('Should return an error message thrown by git', async () => {
 			// Setup
+			mockGitSuccessOnce('other\n');
 			mockGitThrowingErrorOnce();
 
 			// Run
@@ -5459,7 +5471,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, false);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5473,7 +5485,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', true, false);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', true, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5487,7 +5499,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', true);
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', true, false);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', true, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5504,7 +5516,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.pullBranch.squashMessageFormat', 'Default');
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5525,7 +5537,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.pullBranch.squashMessageFormat', 'Default');
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5544,7 +5556,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5560,7 +5572,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5578,7 +5590,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.pullBranch.squashMessageFormat', 'Default');
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', true, true);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', true, true, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5597,7 +5609,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.pullBranch.squashMessageFormat', 'Git SQUASH_MSG');
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5613,7 +5625,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true, false);
 
 			// Assert
 			expect(result).toBe('error message');
@@ -5629,7 +5641,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.pullBranch.squashMessageFormat', 'Default');
 
 			// Run
-			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true);
+			const result = await dataSource.pullBranch('/path/to/repo', 'master', 'origin', false, true, false);
 
 			// Assert
 			expect(result).toBe('error message');
@@ -5669,7 +5681,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, false, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, false, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5683,7 +5695,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, true, false, false, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, true, false, false, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5697,7 +5709,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', true);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, true, false, false, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, true, false, false, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5714,7 +5726,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.merge.squashMessageFormat', 'Default');
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5735,7 +5747,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.merge.squashMessageFormat', 'Default');
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'origin/develop', MergeActionOn.RemoteTrackingBranch, false, false, true, false);
+			const result = await dataSource.merge('/path/to/repo', 'origin/develop', MergeActionOn.RemoteTrackingBranch, false, false, true, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5754,7 +5766,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.merge.squashMessageFormat', 'Default');
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', MergeActionOn.Commit, false, false, true, false);
+			const result = await dataSource.merge('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', MergeActionOn.Commit, false, false, true, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5773,7 +5785,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.merge.squashMessageFormat', 'Default');
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5794,7 +5806,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('dialog.merge.squashMessageFormat', 'Git SQUASH_MSG');
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5811,7 +5823,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false, false);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5826,7 +5838,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, false, true);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, false, false, true);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5840,7 +5852,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, true);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false, true);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5854,7 +5866,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, true, false, true, true);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, true, false, true, false, true);
 
 			// Assert
 			expect(result).toBe(null);
@@ -5868,7 +5880,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false, false);
 
 			// Assert
 			expect(result).toBe('error message');
@@ -5883,7 +5895,7 @@ describe('DataSource', () => {
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
 
 			// Run
-			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false);
+			const result = await dataSource.merge('/path/to/repo', 'develop', MergeActionOn.Branch, false, false, true, false, false);
 
 			// Assert
 			expect(result).toBe('error message');
@@ -5948,7 +5960,7 @@ describe('DataSource', () => {
 
 		it('Should launch the interactive rebase of the current branch on a branch in a terminal', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			const spyOnOpenGitTerminal = jest.spyOn(utils, 'openGitTerminal');
 			spyOnOpenGitTerminal.mockReturnValueOnce();
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
@@ -5957,7 +5969,7 @@ describe('DataSource', () => {
 			const resultPromise = dataSource.rebase('/path/to/repo', 'develop', RebaseActionOn.Branch, false, true);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1000);
+			expect(jest.getTimerCount()).toBe(1);
 
 			// Run
 			jest.runOnlyPendingTimers();
@@ -5971,7 +5983,7 @@ describe('DataSource', () => {
 
 		it('Should launch the interactive rebase of the current branch on a commit in a terminal', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			const spyOnOpenGitTerminal = jest.spyOn(utils, 'openGitTerminal');
 			spyOnOpenGitTerminal.mockReturnValueOnce();
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', false);
@@ -5980,7 +5992,7 @@ describe('DataSource', () => {
 			const resultPromise = dataSource.rebase('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', RebaseActionOn.Commit, false, true);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1000);
+			expect(jest.getTimerCount()).toBe(1);
 
 			// Run
 			jest.runOnlyPendingTimers();
@@ -5994,7 +6006,7 @@ describe('DataSource', () => {
 
 		it('Should launch the interactive rebase of the current branch on a branch in a terminal (signing the new commits)', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			const spyOnOpenGitTerminal = jest.spyOn(utils, 'openGitTerminal');
 			spyOnOpenGitTerminal.mockReturnValueOnce();
 			vscode.mockExtensionSettingReturnValue('repository.sign.commits', true);
@@ -6003,7 +6015,7 @@ describe('DataSource', () => {
 			const resultPromise = dataSource.rebase('/path/to/repo', 'develop', RebaseActionOn.Branch, false, true);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1000);
+			expect(jest.getTimerCount()).toBe(1);
 
 			// Run
 			jest.runOnlyPendingTimers();
@@ -6672,14 +6684,14 @@ describe('DataSource', () => {
 	describe('openExternalDirDiff', () => {
 		it('Should launch a gui directory diff (for one commit)', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			mockGitSuccessOnce();
 
 			// Run
 			const resultPromise = dataSource.openExternalDirDiff('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', true);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1500);
+			expect(jest.getTimerCount()).toBe(2);
 
 			// Run
 			jest.runOnlyPendingTimers();
@@ -6695,14 +6707,14 @@ describe('DataSource', () => {
 
 		it('Should launch a gui directory diff (between two commits)', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			mockGitSuccessOnce();
 
 			// Run
 			const resultPromise = dataSource.openExternalDirDiff('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', '2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c', true);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1500);
+			expect(jest.getTimerCount()).toBe(2);
 
 			// Run
 			jest.runOnlyPendingTimers();
@@ -6718,14 +6730,14 @@ describe('DataSource', () => {
 
 		it('Should launch a gui directory diff (for uncommitted changes)', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			mockGitSuccessOnce();
 
 			// Run
 			const resultPromise = dataSource.openExternalDirDiff('/path/to/repo', utils.UNCOMMITTED, utils.UNCOMMITTED, true);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1500);
+			expect(jest.getTimerCount()).toBe(2);
 
 			// Run
 			jest.runOnlyPendingTimers();
@@ -6741,14 +6753,14 @@ describe('DataSource', () => {
 
 		it('Should launch a gui directory diff (between a commit and the uncommitted changes)', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			mockGitSuccessOnce();
 
 			// Run
 			const resultPromise = dataSource.openExternalDirDiff('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', utils.UNCOMMITTED, true);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1500);
+			expect(jest.getTimerCount()).toBe(2);
 
 			// Run
 			jest.runOnlyPendingTimers();
@@ -6764,7 +6776,7 @@ describe('DataSource', () => {
 
 		it('Should launch a directory diff in a terminal (between two commits)', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			const spyOnOpenGitTerminal = jest.spyOn(utils, 'openGitTerminal');
 			spyOnOpenGitTerminal.mockReturnValueOnce();
 
@@ -6772,7 +6784,7 @@ describe('DataSource', () => {
 			const resultPromise = dataSource.openExternalDirDiff('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', '2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c', false);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1500);
+			expect(jest.getTimerCount()).toBe(1);
 
 			// Run
 			jest.runOnlyPendingTimers();
@@ -6798,7 +6810,7 @@ describe('DataSource', () => {
 
 		it('Should display the error message when the diff tool doesn\'t exit successfully', async () => {
 			// Setup
-			jest.useFakeTimers();
+			jest.useFakeTimers({ doNotFake: ['Date'] });
 			mockGitThrowingErrorOnce('line1\nline2\nline3');
 			vscode.window.showErrorMessage.mockResolvedValueOnce(null);
 
@@ -6806,7 +6818,7 @@ describe('DataSource', () => {
 			const resultPromise = dataSource.openExternalDirDiff('/path/to/repo', '1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b', utils.UNCOMMITTED, true);
 
 			// Assert
-			expect(setTimeout).toHaveBeenCalledWith(expect.anything(), 1500);
+			expect(jest.getTimerCount()).toBe(2);
 
 			// Run
 			jest.runOnlyPendingTimers();

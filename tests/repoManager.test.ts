@@ -1239,9 +1239,11 @@ describe('RepoManager', () => {
 				pullRequestConfig: null,
 				showRemoteBranches: true,
 				showRemoteBranchesV2: BooleanOverride.Default,
+				simplifyByDecoration: BooleanOverride.Default,
 				showStashes: BooleanOverride.Default,
 				showTags: BooleanOverride.Default,
-				workspaceFolderIndex: 0
+				workspaceFolderIndex: 0,
+				isCdvSummaryHidden: false
 			};
 
 			// Run
@@ -1908,9 +1910,11 @@ describe('RepoManager', () => {
 						pullRequestConfig: null,
 						showRemoteBranches: true,
 						showRemoteBranchesV2: BooleanOverride.Default,
+						simplifyByDecoration: BooleanOverride.Default,
 						showStashes: BooleanOverride.Default,
 						showTags: BooleanOverride.Default,
-						workspaceFolderIndex: 0
+						workspaceFolderIndex: 0,
+						isCdvSummaryHidden: false
 					}
 				};
 				expected['/path/to/workspace-folder1/repo'][stateKey] = stateValue;
@@ -2264,9 +2268,11 @@ describe('RepoManager', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: true,
 					showRemoteBranchesV2: BooleanOverride.Default,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: 0
+					workspaceFolderIndex: 0,
+					isCdvSummaryHidden: false
 				}
 			});
 
@@ -2342,9 +2348,11 @@ describe('RepoManager', () => {
 					pullRequestConfig: null,
 					showRemoteBranches: true,
 					showRemoteBranchesV2: BooleanOverride.Default,
+					simplifyByDecoration: BooleanOverride.Default,
 					showStashes: BooleanOverride.Default,
 					showTags: BooleanOverride.Default,
-					workspaceFolderIndex: 0
+					workspaceFolderIndex: 0,
+					isCdvSummaryHidden: false
 				}
 			});
 
