@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.31.8 - 2026-09-09
+
+* Add rebase todo editor UI with drag reorder. Thanks [@zekaizer](https://github.com/zekaizer).
+* Optimize layout for drop down elements for better space usage.
+* Add path-based commit filtering. Thanks [@zekaizer](https://github.com/zekaizer).
+  * Add dropdown menu "Paths". Can be hidden with the setting
+    `"git-graph.toolbarButtonVisibility": { "Paths": false }`.
+  * Add explorer context menu "Filter in Git Graph".
+* #78 Fix scroll issue in file list. The scroll position was reset when switching between tabs. Thanks [@ssvine](https://github.com/ssvine).
+
 ## 1.31.7 - 2026-03-14
  * #77 Add 'No Verify' option for push, merge and squash action (#68). Thanks [@th0was14](https://github.com/@th0was14).
  * #70 Fix preserve commit selection state across tab switches. Thanks [@LeuciRemi](https://github.com/LeuciRemi).

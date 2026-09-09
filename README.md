@@ -2,6 +2,8 @@
 
 Fork of mhutchie's Git Graph with further improvements.
 Main improvements:
+* Added rebase todo editor UI with drag reorder (available via right click --> "Rebase...")
+* Added path-based commit filtering. As dropdown and explorer context menu "Filter in Git Graph"
 * Add support for viewing Git Graph in a panel. Change with setting `git-graph.viewLocation` (hansu#62)
 * Add multi-selection and several context menu actions (hansu#62)
 * Selection of single branch and/or author. Can be activated with `git-graph.repository.singleBranchSelect` and `git-graph.repository.singleAuthorSelect`
