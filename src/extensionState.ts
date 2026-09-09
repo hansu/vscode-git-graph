@@ -37,6 +37,7 @@ export const DEFAULT_REPO_STATE: GitRepoState = {
 	simplifyByDecoration: BooleanOverride.Default,
 	showStashes: BooleanOverride.Default,
 	showTags: BooleanOverride.Default,
+	pathFilter: null,
 	workspaceFolderIndex: null,
 	isCdvSummaryHidden: false
 };

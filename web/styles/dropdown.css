@@ -6,6 +6,7 @@
 	margin-top:3px;
 	font-weight:normal;
 	text-align:left;
+	min-width:8vw;
 }
 .dropdown.loaded{
 	display:inline-block;
@@ -58,6 +59,8 @@
 	overflow-x:hidden;
 	margin-top:-1px;
 	white-space:nowrap;
+	max-width:80vw;
+	min-width:100%;
 }
 
 .dropdownOption{

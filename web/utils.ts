@@ -71,6 +71,7 @@ const ELLIPSIS = '&#8230;';
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 const UNCOMMITTED = '*';
 const SHOW_ALL_BRANCHES = '';
+const PATH_FILTER_WS_ALL = '__ws_all__';
 
 const COLUMN_HIDDEN = -100;
 const COLUMN_AUTO = -101;

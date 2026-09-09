@@ -12,6 +12,7 @@ class Dropdown {
 	private readonly multipleAllowed: boolean;
 	private readonly selectMultipleWithCtrl: boolean;
 	private readonly changeCallback: (values: string[]) => void;
+	private readonly filterSubmitCallback: ((value: string) => void) | null;
 
 	private options: ReadonlyArray<DropdownOption> = [];
 	private optionsSelected: boolean[] = [];
@@ -36,12 +37,14 @@ class Dropdown {
 	 * @param changeCallback A callback to be invoked when the selected item(s) of the dropdown changes.
 	 * @returns The Dropdown instance.
 	 * @param selectMultipleWithCtrl Select multiple items using Ctrl
+	 * @param filterSubmitCallback Optional callback invoked when Enter is pressed in the filter input with non-empty text.
 	 */
-	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void, selectMultipleWithCtrl: boolean = false) {
+	constructor(id: string, showInfo: boolean, multipleAllowed: boolean, dropdownType: string, changeCallback: (values: string[]) => void, selectMultipleWithCtrl: boolean = false, filterSubmitCallback: ((value: string) => void) | null = null) {
 		this.showInfo = showInfo;
 		this.multipleAllowed = multipleAllowed;
 		this.selectMultipleWithCtrl = selectMultipleWithCtrl;
 		this.changeCallback = changeCallback;
+		this.filterSubmitCallback = filterSubmitCallback;
 		this.elem = document.getElementById(id)!;
 
 		this.menuElem = document.createElement('div');
@@ -90,6 +93,15 @@ class Dropdown {
 		}, true);
 		document.addEventListener('contextmenu', () => this.close(), true);
 		this.filterInput.addEventListener('keyup', () => this.filter());
+		this.filterInput.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' && this.filterSubmitCallback !== null) {
+				const value = this.filterInput.value.trim();
+				if (value !== '') {
+					this.close();
+					this.filterSubmitCallback(value);
+				}
+			}
+		});
 	}
 
 	/**
@@ -254,12 +266,7 @@ class Dropdown {
 		this.optionsElem.innerHTML = html;
 		this.filterInput.style.display = 'none';
 		this.noResultsElem.style.display = 'none';
-		this.menuElem.style.cssText = 'opacity:0; display:block;';
-		// Width must be at least 138px for the filter element.
-		// Don't need to add 12px if showing (info icons or multi checkboxes) and the scrollbar isn't needed. The scrollbar isn't needed if: menuElem height + filter input (25px) < 297px
-		const menuElemRect = this.menuElem.getBoundingClientRect();
-		this.currentValueElem.style.width = Math.max(Math.ceil(menuElemRect.width) + ((this.showInfo || (this.multipleAllowed && !this.selectMultipleWithCtrl)) && menuElemRect.height < 272 ? 0 : 12), 138) + 'px';
-		this.menuElem.style.cssText = 'right:0; overflow-y:auto; max-height:297px;'; // Max height for the dropdown is [filter (31px) + 9.5 * dropdown item (28px) = 297px]
+		this.menuElem.style.cssText = 'left:0; overflow-y:auto; max-height:297px;'; // Max height for the dropdown is [filter (31px) + 9.5 * dropdown item (28px) = 297px]
 		if (this.dropdownVisible) this.filter();
 	}
 
